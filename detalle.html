@@ -465,254 +465,316 @@
   </div>
 </footer>
 
-<script>const params=new URLSearchParams(window.location.search);
-const idx=parseInt(params.get('id'));
-function _kpmgoy97(q=''){
-const u=q.toLowerCase();
-if (u.includes('4k')) return 'q-4k';
-if (u.includes('720')) return 'q-720p';
-if (u.includes('cam')) return 'q-cam';
-return '';
+<script>
+const params = new URLSearchParams(window.location.search);
+const idx = parseInt(params.get('id'));
+
+function qualityClass(q = '') {
+  const u = q.toLowerCase();
+  if (u.includes('4k')) return 'q-4k';
+  if (u.includes('720')) return 'q-720p';
+  if (u.includes('cam')) return 'q-cam';
+  return '';
 }
-function _cbcquk18(url){
-if (!url) return null;
-const m=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/);
-return m?m[1]:null;
+
+function getYTEmbedId(url) {
+  if (!url) return null;
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
 }
+
 let toastTimer;
-function showToast(msg){
-const t=document.getElementById('toast');
-t.textContent=msg;t.classList.add('show');
-clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
 }
-function copyText(text){
-navigator.clipboard.writeText(text).then(()=>showToast('✓ Link copiado'));
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => showToast('✓ Link copiado'));
 }
-function parseEnlaces(raw){
-if (!raw||!raw.trim()) return [];
-const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
-const servers=[];
-let opcion='';
-let servidor='';
-for (const line of lines){
-const opcionMatch=line.match(/^Opci[oó]n\s*(\d+)\s*:?$/i);
-if (opcionMatch){
-opcion='Opción '+opcionMatch[1];
-servidor='';
-continue;
+
+// =============================================
+// LÓGICA ENLACES: parsear texto multilínea
+// Formato:
+//   Servidor
+//   etiqueta (opcional)
+//   https://...
+// =============================================
+function parseEnlaces(raw) {
+  if (!raw || !raw.trim()) return [];
+  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+  const servers = [];
+  let opcion = '';
+  let servidor = '';
+
+  for (const line of lines) {
+    // Detectar "Opción 1:" o "Opcion 1"
+    const opcionMatch = line.match(/^Opci[oó]n\s*(\d+)\s*:?$/i);
+    if (opcionMatch) {
+      opcion = 'Opción ' + opcionMatch[1];
+      servidor = '';
+      continue;
+    }
+    // Detectar "Etiqueta: https://..."
+    const labelUrl = line.match(/^(.+?):\s*(https?:\/\/.+)$/);
+    if (labelUrl) {
+      const label = labelUrl[1].trim();
+      const url = labelUrl[2].trim();
+      const groupName = opcion && servidor ? opcion + ' › ' + servidor : servidor || opcion || 'Servidor';
+      let group = servers.find(s => s.name === groupName);
+      if (!group) { group = { name: groupName, links: [] }; servers.push(group); }
+      group.links.push({ label, url });
+      continue;
+    }
+    // URL sola
+    if (/^https?:\/\//i.test(line)) {
+      const groupName = opcion && servidor ? opcion + ' › ' + servidor : servidor || opcion || 'Servidor';
+      let group = servers.find(s => s.name === groupName);
+      if (!group) { group = { name: groupName, links: [] }; servers.push(group); }
+      group.links.push({ label: '', url: line });
+      continue;
+    }
+    // Nombre de servidor (texto sin URL)
+    servidor = line;
+  }
+  return servers;
 }
-const labelUrl=line.match(/^(.+?):\s*(https?:\/\/.+)$/);
-if (labelUrl){
-const label=labelUrl[1].trim();
-const url=labelUrl[2].trim();
-const groupName=opcion&&servidor?opcion+' › '+servidor:servidor||opcion||'Servidor';
-let group=servers.find(s=>s.name===groupName);
-if (!group){group={name:groupName,links:[]};servers.push(group);}
-group.links.push({label,url});
-continue;
+
+function renderEnlaces(raw) {
+  const content = document.getElementById('enlaces-content');
+  const servers = parseEnlaces(raw);
+  if (!servers.length) {
+    content.innerHTML = '<div class="no-enlaces">Sin enlaces disponibles.</div>';
+    return;
+  }
+  content.innerHTML = servers.map(s => `
+    <div class="enlaces-section">
+      <div class="enlaces-server-name">🌐 ${s.name}</div>
+      ${s.links.map((lk, i) => `
+        <div class="enlace-item">
+          ${lk.label ? `<span class="enlace-label">${lk.label}</span>` : (s.links.length > 1 ? `<span class="enlace-label">${i+1}</span>` : '')}
+          <a href="${lk.url}" target="_blank" rel="noopener">${lk.url}</a>
+          <button class="btn-copiar-link" onclick="copyText('${lk.url.replace(/'/g,"\\'")}')">Copiar</button>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
 }
-if (/^https?:\/\
-const groupName=opcion&&servidor?opcion+' › '+servidor:servidor||opcion||'Servidor';
-let group=servers.find(s=>s.name===groupName);
-if (!group){group={name:groupName,links:[]};servers.push(group);}
-group.links.push({label:'',url:line});
-continue;
+
+let enlacesVisible = false;
+function toggleEnlaces() {
+  enlacesVisible = !enlacesVisible;
+  const panel = document.getElementById('enlaces-panel');
+  const btn = document.getElementById('btn-enlaces');
+  if (enlacesVisible) {
+    panel.classList.add('visible');
+    btn.textContent = '✕ CERRAR ENLACES';
+    btn.classList.add('open');
+  } else {
+    panel.classList.remove('visible');
+    btn.textContent = '🔗 ENLACES PÚBLICOS';
+    btn.classList.remove('open');
+  }
 }
-servidor=line;
+
+function renderRelated(movies, currentIdx) {
+  const section = document.getElementById('related-section');
+  const grid = document.getElementById('related-grid');
+  // Mostrar hasta 8 películas diferentes, priorizando mismo tipo
+  const current = movies[currentIdx];
+  let pool = movies.filter((_, i) => i !== currentIdx);
+  // Primero mismo tipo, luego resto
+  const sameType = pool.filter(m => m.type === (current && current.type));
+  const others = pool.filter(m => m.type !== (current && current.type));
+  const related = [...sameType, ...others].slice(0, 4);
+
+  if (related.length === 0) { section.style.display = 'none'; return; }
+  grid.innerHTML = related.map(m => {
+    const ri = movies.indexOf(m);
+    const fallback = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='130' height='195'%3E%3Crect fill='%230e1117' width='130' height='195'/%3E%3C/svg%3E`;
+    return `
+    <a class="related-card" href="detalle.html?id=${ri}">
+      <div class="related-poster">
+        <img src="${m.image || ''}" alt="${m.title}" onerror="this.src='${fallback}'"/>
+      </div>
+      <div class="related-info">
+        <div class="related-info-title">${m.title}</div>
+        <div class="related-info-meta">
+          <span class="related-info-year">${m.year || ''}</span>
+          ${m.type ? `<span>${m.type}</span>` : ''}
+        </div>
+      </div>
+      <div class="related-year">${m.year || ''}</div>
+    </a>`;
+  }).join('');
 }
-return servers;
+
+async function init() {
+  let movies = [];
+  try {
+    const local = localStorage.getItem('noctis_movies');
+    if (local) {
+      movies = JSON.parse(local);
+    } else {
+      const res = await fetch('movies.json?v=' + Date.now());
+      movies = await res.json();
+    }
+  } catch { movies = []; }
+
+  if (!movies.length || isNaN(idx) || idx < 0 || idx >= movies.length) {
+    document.getElementById('detail-card').style.display = 'none';
+    document.getElementById('not-found').style.display = 'block';
+    return;
+  }
+
+  const m = movies[idx];
+
+  // Breadcrumb & title
+  document.title = m.title + ' — NoctisMovies';
+  document.getElementById('bc-title').textContent = m.title;
+  document.getElementById('d-title').textContent = m.title;
+
+  // Tags del título — solo campos del filtrado admin
+  const tagsEl = document.getElementById('title-tags');
+  const tags = [];
+  // Audio: primera palabra (Latino, Subtitulado, Inglés…)
+  if (m.audio) tags.push(m.audio.split(/[\s\-–]/)[0].toUpperCase());
+  // Tipo: Película / Serie / Anime…
+  if (m.type) tags.push(m.type.toUpperCase());
+  // Resolución (quality): Full 1080p, 4K, 720p…
+  if (m.quality) tags.push(m.quality.toUpperCase());
+  // Fuente/Encode: WEB-DL, REMUX, HDTS, X265…
+  if (m.source) tags.push(m.source.toUpperCase());
+  // Géneros (máx 3)
+  if (m.genre) m.genre.split(',').slice(0,3).forEach(g => { const t = g.trim(); if(t) tags.push(t.toUpperCase()); });
+  // Año destacado al inicio
+  const yearHtml = m.year ? `<span class="title-year">${m.year}</span>` : '';
+  tagsEl.innerHTML = yearHtml + tags.map(t => `<span class="title-tag">${t}</span>`).join('');
+
+  // Poster
+  const posterEl = document.getElementById('d-poster');
+  posterEl.src = m.image || '';
+  posterEl.alt = m.title;
+  posterEl.onerror = function() {
+    this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='300'%3E%3Crect fill='%230e1117' width='200' height='300'/%3E%3Ctext fill='%236b7280' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='40'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E";
+  };
+
+  // Quality badge — eliminado (el usuario agrega su propio SVG)
+
+  // Datos
+  document.getElementById('d-original-title').textContent = m.originalTitle || m.title;
+  document.getElementById('d-year').textContent = m.year || '—';
+  document.getElementById('d-country').textContent = m.country || '—';
+  document.getElementById('d-duration').textContent = m.duration || '—';
+  document.getElementById('d-genre').textContent = m.genre || '—';
+
+  // Sinopsis
+  document.getElementById('d-sinopsis').textContent = m.description || 'Sin descripción disponible.';
+
+  // Capturas: soporta múltiples URLs separadas por salto de línea
+  const capContainer = document.getElementById('capturas-container');
+  const rawScreenshots = (m.screenshot || '').trim();
+  // Solo URLs válidas de imagen
+  const imageExts = /\.(jpg|jpeg|png|gif|webp|bmp|avif)(\?.*)?$/i;
+  const screenshots = rawScreenshots
+    .split(/[\n,]/)
+    .map(s => s.trim())
+    .filter(s => s && /^https?:\/\//i.test(s) && imageExts.test(s));
+  if (screenshots.length === 0) {
+    capContainer.innerHTML = `<div class="capturas-placeholder">Sin capturas disponibles</div>`;
+  } else if (screenshots.length >= 1) {
+    const imgs = screenshots.map((url, i) =>
+      `<img src="${url}" alt="Captura ${i+1}" class="${i===0?'active':''}" onerror="this.style.display='none'"/>`
+    ).join('');
+    const navBtns = screenshots.length > 1 ? `
+      <button class="slider-btn prev" onclick="sliderPrev()">&#8249;</button>
+      <button class="slider-btn next" onclick="sliderNext()">&#8250;</button>` : '';
+    const dotsHtml = screenshots.length > 1 ? `<div class="slider-dots">${
+      screenshots.map((_, i) => `<span class="slider-dot ${i===0?'active':''}" onclick="sliderGo(${i})"></span>`).join('')
+    }</div>` : '';
+    capContainer.innerHTML = `<div class="capturas-slider" id="capturas-slider">${imgs}${navBtns}${dotsHtml}</div>`;
+    let sliderIdx = 0;
+    const sliderImgs = capContainer.querySelectorAll('.capturas-slider img');
+    const sliderDots = capContainer.querySelectorAll('.slider-dot');
+    function sliderShow(n) {
+      sliderImgs.forEach(i => i.classList.remove('active'));
+      sliderDots.forEach(d => d.classList.remove('active'));
+      sliderIdx = ((n % sliderImgs.length) + sliderImgs.length) % sliderImgs.length;
+      sliderImgs[sliderIdx].classList.add('active');
+      if (sliderDots[sliderIdx]) sliderDots[sliderIdx].classList.add('active');
+    }
+    window.sliderNext = () => sliderShow(sliderIdx + 1);
+    window.sliderPrev = () => sliderShow(sliderIdx - 1);
+    window.sliderGo = (n) => sliderShow(n);
+    if (screenshots.length > 1) setInterval(() => sliderShow(sliderIdx + 1), 15000);
+  }
+
+  // Trailer
+  const trailerContainer = document.getElementById('trailer-container');
+  const ytId = getYTEmbedId(m.trailer);
+  if (ytId) {
+    trailerContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytId}" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>`;
+  }
+
+  // Descarga: usar raw block si disponible, si no el grid clásico
+  if (m.descargaRaw) {
+    document.getElementById('d-descarga-grid-block').style.display = 'none';
+    const rawBlock = document.getElementById('d-descarga-raw-block');
+    rawBlock.style.display = 'block';
+    const lines = m.descargaRaw.split('\n').map(l => l.trim()).filter(Boolean);
+    rawBlock.innerHTML = lines.map(line => {
+      const colonIdx = line.indexOf(':');
+      if (colonIdx < 0) return `<div style="color:var(--muted);font-size:0.85rem;">${line}</div>`;
+      const label = line.slice(0, colonIdx).trim();
+      const val = line.slice(colonIdx + 1).trim();
+      if (!val) return `<div><span style="color:var(--muted);">${label}:</span></div>`;
+      return `<div><span style="color:var(--muted);">${label}:</span> <strong style="color:var(--white);">${val}</strong></div>`;
+    }).join('');
+  } else {
+    document.getElementById('d-audio').textContent = m.audio || '—';
+    document.getElementById('d-calidad').textContent = m.quality || '—';
+    document.getElementById('d-resolucion').textContent = m.resolution || '—';
+    document.getElementById('d-formato').textContent = m.format || 'MKV';
+    document.getElementById('d-size').textContent = m.size || '—';
+    document.getElementById('d-codec').textContent = m.codec || '—';
+    document.getElementById('d-subs').textContent = m.subtitles || '—';
+    if (m.uploader) {
+      document.getElementById('d-uploader').textContent = m.uploader;
+      document.getElementById('d-uploader-row').style.display = 'block';
+    }
+  }
+
+  // Renderizar enlaces desplegables
+  renderEnlaces(m.links || m.link || '');
+
+  // Relacionadas
+  renderRelated(movies, idx);
+
+  // Generar años en sidebar
+  const yearContainer = document.getElementById('year-tags-sidebar');
+  if (yearContainer) {
+    const currentYear = new Date().getFullYear();
+    let yearsHtml = '';
+    for (let y = currentYear; y >= 1980; y--) {
+      yearsHtml += `<a class="side-tag" href="index.html?year=${y}" style="text-align:center;">${y}</a>`;
+    }
+    yearContainer.innerHTML = yearsHtml;
+  }
 }
-function renderEnlaces(raw){
-const content=document.getElementById('enlaces-content');
-const servers=parseEnlaces(raw);
-if (!servers.length){
-content.innerHTML='<div class="no-enlaces">Sin enlaces disponibles.</div>';
-return;
-}
-content.innerHTML=servers.map(s=>`
-<div class="enlaces-section">
-<div class="enlaces-server-name">🌐 ${s.name}</div>
-${s.links.map((lk,i)=>`
-<div class="enlace-item">
-${lk.label?`<span class="enlace-label">${lk.label}</span>`:(s.links.length>1?`<span class="enlace-label">${i+1}</span>`:'')}
-<a href="${lk.url}" target="_blank" rel="noopener">${lk.url}</a>
-<button class="btn-copiar-link" onclick="copyText('${lk.url.replace(/'/g,"\\'")}')">Copiar</button>
-</div>
-`).join('')}
-</div>
-`).join('');
-}
-let enlacesVisible=false;
-function toggleEnlaces(){
-enlacesVisible=!enlacesVisible;
-const panel=document.getElementById('enlaces-panel');
-const btn=document.getElementById('btn-enlaces');
-if (enlacesVisible){
-panel.classList.add('visible');
-btn.textContent='✕ CERRAR ENLACES';
-btn.classList.add('open');
-}else{
-panel.classList.remove('visible');
-btn.textContent='🔗 ENLACES PÚBLICOS';
-btn.classList.remove('open');
-}
-}
-function _kxlggo43(movies,currentIdx){
-const section=document.getElementById('related-section');
-const grid=document.getElementById('related-grid');
-const current=movies[currentIdx];
-let pool=movies.filter((_,i)=>i!==currentIdx);
-const sameType=pool.filter(m=>m.type===(current&&current.type));
-const others=pool.filter(m=>m.type!==(current&&current.type));
-const related=[...sameType,...others].slice(0,4);
-if (related.length===0){section.style.display='none';return;}
-grid.innerHTML=related.map(m=>{
-const ri=movies.indexOf(m);
-const fallback=`data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='300'%3E%3Crect fill='%230e1117' width='200' height='300'/%3E%3Ctext fill='%236b7280' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='40'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E`; //fixed
-const _dummyFixD=`http:
-return `
-<a class="related-card" href="detalle.html?id=${ri}">
-<div class="related-poster">
-<img src="${m.image||''}" alt="${m.title}" onerror="this.src='${fallback}'"/>
-</div>
-<div class="related-info">
-<div class="related-info-title">${m.title}</div>
-<div class="related-info-meta">
-<span class="related-info-year">${m.year||''}</span>
-${m.type?`<span>${m.type}</span>`:''}
-</div>
-</div>
-<div class="related-year">${m.year||''}</div>
-</a>`;
-}).join('');
-}
-async function init(){
-let movies=[];
-try{
-const local=localStorage.getItem('noctis_movies');
-if (local){
-movies=JSON.parse(local);
-}else{
-const res=await fetch('movies.json?v='+Date.now());
-movies=await res.json();
-}
-}catch{movies=[];}
-if (!movies.length||isNaN(idx)||idx<0||idx>=movies.length){
-document.getElementById('detail-card').style.display='none';
-document.getElementById('not-found').style.display='block';
-return;
-}
-const m=movies[idx];
-document.title=m.title+' — NoctisMovies';
-document.getElementById('bc-title').textContent=m.title;
-document.getElementById('d-title').textContent=m.title;
-const tagsEl=document.getElementById('title-tags');
-const tags=[];
-if (m.audio) tags.push(m.audio.split(/[\s\-–]/)[0].toUpperCase());
-if (m.type) tags.push(m.type.toUpperCase());
-if (m.quality) tags.push(m.quality.toUpperCase());
-if (m.source) tags.push(m.source.toUpperCase());
-if (m.genre) m.genre.split(',').slice(0,3).forEach(g=>{const t=g.trim();if(t) tags.push(t.toUpperCase());});
-const yearHtml=m.year?`<span class="title-year">${m.year}</span>`:'';
-tagsEl.innerHTML=yearHtml+tags.map(t=>`<span class="title-tag">${t}</span>`).join('');
-const posterEl=document.getElementById('d-poster');
-posterEl.src=m.image||'';
-posterEl.alt=m.title;
-posterEl.onerror=function(){
-this.src=\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='300'%3E%3Crect fill='%230e1117' width='200' height='300'/%3E%3Ctext fill='%236b7280' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='40'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E\"
-};
-document.getElementById('d-original-title').textContent=m.originalTitle||m.title;
-document.getElementById('d-year').textContent=m.year||'—';
-document.getElementById('d-country').textContent=m.country||'—';
-document.getElementById('d-duration').textContent=m.duration||'—';
-document.getElementById('d-genre').textContent=m.genre||'—';
-document.getElementById('d-sinopsis').textContent=m.description||'Sin descripción disponible.';
-const capContainer=document.getElementById('capturas-container');
-const rawScreenshots=(m.screenshot||'').trim();
-const imageExts=/\.(jpg|jpeg|png|gif|webp|bmp|avif)(\?.*)?$/i;
-const screenshots=rawScreenshots
-.split(/[\n,]/)
-.map(s=>s.trim())
-.filter(s=>s&&/^https?:\/\
-if (screenshots.length===0){
-capContainer.innerHTML=`<div class="capturas-placeholder">Sin capturas disponibles</div>`;
-}else if (screenshots.length>=1){
-const imgs=screenshots.map((url,i)=>
-`<img src="${url}" alt="Captura ${i+1}" class="${i===0?'active':''}" onerror="this.style.display='none'"/>`
-).join('');
-const navBtns=screenshots.length>1?`
-<button class="slider-btn prev" onclick="sliderPrev()">&#8249;</button>
-<button class="slider-btn next" onclick="sliderNext()">&#8250;</button>`:'';
-const dotsHtml=screenshots.length>1?`<div class="slider-dots">${
-screenshots.map((_,i)=>`<span class="slider-dot ${i===0?'active':''}" onclick="sliderGo(${i})"></span>`).join('')
-}</div>`:'';
-capContainer.innerHTML=`<div class="capturas-slider" id="capturas-slider">${imgs}${navBtns}${dotsHtml}</div>`;
-let sliderIdx=0;
-const sliderImgs=capContainer.querySelectorAll('.capturas-slider img');
-const sliderDots=capContainer.querySelectorAll('.slider-dot');
-function _tlpjzd73(n){
-sliderImgs.forEach(i=>i.classList.remove('active'));
-sliderDots.forEach(d=>d.classList.remove('active'));
-sliderIdx=((n % sliderImgs.length)+sliderImgs.length) % sliderImgs.length;
-sliderImgs[sliderIdx].classList.add('active');
-if (sliderDots[sliderIdx]) sliderDots[sliderIdx].classList.add('active');
-}
-window.sliderNext=()=>_tlpjzd73(sliderIdx+1);
-window.sliderPrev=()=>_tlpjzd73(sliderIdx-1);
-window.sliderGo=(n)=>_tlpjzd73(n);
-if (screenshots.length>1) setInterval(()=>_tlpjzd73(sliderIdx+1),15000);
-}
-const trailerContainer=document.getElementById('trailer-container');
-const ytId=_cbcquk18(m.trailer);
-if (ytId){
-trailerContainer.innerHTML=`<iframe src="https:
-}
-if (m.descargaRaw){
-document.getElementById('d-descarga-grid-block').style.display='none';
-const rawBlock=document.getElementById('d-descarga-raw-block');
-rawBlock.style.display='block';
-const lines=m.descargaRaw.split('\n').map(l=>l.trim()).filter(Boolean);
-rawBlock.innerHTML=lines.map(line=>{
-const colonIdx=line.indexOf(':');
-if (colonIdx<0) return `<div style="color:var(--muted);font-size:0.85rem;">${line}</div>`;
-const label=line.slice(0,colonIdx).trim();
-const val=line.slice(colonIdx+1).trim();
-if (!val) return `<div><span style="color:var(--muted);">${label}:</span></div>`;
-return `<div><span style="color:var(--muted);">${label}:</span><strong style="color:var(--white);">${val}</strong></div>`;
-}).join('');
-}else{
-document.getElementById('d-audio').textContent=m.audio||'—';
-document.getElementById('d-calidad').textContent=m.quality||'—';
-document.getElementById('d-resolucion').textContent=m.resolution||'—';
-document.getElementById('d-formato').textContent=m.format||'MKV';
-document.getElementById('d-size').textContent=m.size||'—';
-document.getElementById('d-codec').textContent=m.codec||'—';
-document.getElementById('d-subs').textContent=m.subtitles||'—';
-if (m.uploader){
-document.getElementById('d-uploader').textContent=m.uploader;
-document.getElementById('d-uploader-row').style.display='block';
-}
-}
-renderEnlaces(m.links||m.link||'');
-_kxlggo43(movies,idx);
-const yearContainer=document.getElementById('year-tags-sidebar');
-if (yearContainer){
-const currentYear=new Date().getFullYear();
-let yearsHtml='';
-for (let y=currentYear;y>=1980;y--){
-yearsHtml+=`<a class="side-tag" href="index.html?year=${y}" style="text-align:center;">${y}</a>`;
-}
-yearContainer.innerHTML=yearsHtml;
-}
-}
+
 init();
-const navSearchInput=document.getElementById('nav-search-input');
-if (navSearchInput){
-navSearchInput.addEventListener('keydown',e=>{
-if (e.key==='Enter'&&navSearchInput.value.trim()){
-window.location.href='index.html?search='+encodeURIComponent(navSearchInput.value.trim());
+
+// Buscador del nav → redirige a index con búsqueda
+const navSearchInput = document.getElementById('nav-search-input');
+if (navSearchInput) {
+  navSearchInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && navSearchInput.value.trim()) {
+      window.location.href = 'index.html?search=' + encodeURIComponent(navSearchInput.value.trim());
+    }
+  });
 }
-});
-}</script>
+
+</script>
 </body>
 </html>
