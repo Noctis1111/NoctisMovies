@@ -505,25 +505,50 @@ function parseEnlaces(raw) {
   if (!raw || !raw.trim()) return [];
   const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
   const servers = [];
-  let current = null;
+  let opcion = '';
+  let servidor = '';
 
   for (const line of lines) {
-    const isUrl = /^https?:\/\//i.test(line);
-    if (isUrl) {
-      if (!current) { current = { name: 'Servidor', links: [] }; }
-      // La línea anterior puede ser una etiqueta
-      current.links.push({ label: '', url: line });
-    } else {
-      // Es un nombre de servidor o etiqueta
-      // Si la siguiente no es url, puede ser etiqueta para el próximo link
-      // Heurística: si no hay current activo o es nombre nuevo de servidor
-      if (current && current.links.length > 0) {
-        servers.push(current);
-      }
-      current = { name: line, links: [] };
+    // Detectar "Opción X:" o "Opcion X:"
+    const opcionMatch = line.match(/^Opci[oó]n\s*(\d+)\s*:?$/i);
+    if (opcionMatch) {
+      opcion = 'Opción ' + opcionMatch[1];
+      servidor = '';
+      continue;
     }
+
+    // Detectar línea con URL (con o sin "Etiqueta: https://...")
+    const urlInLine = line.match(/^(.+?):\s*(https?:\/\/.+)$/) || line.match(/^()(https?:\/\/.+)$/);
+    if (urlInLine) {
+      const label = urlInLine[1].trim();
+      const url = urlInLine[2].trim();
+      // Nombre del grupo = "Opción X > Servidor" o solo "Servidor"
+      const groupName = opcion && servidor ? opcion + ' › ' + servidor
+                      : servidor ? servidor
+                      : opcion ? opcion
+                      : 'Servidor';
+      // Buscar grupo existente
+      let group = servers.find(s => s.name === groupName);
+      if (!group) { group = { name: groupName, links: [] }; servers.push(group); }
+      group.links.push({ label, url });
+      continue;
+    }
+
+    // Línea pura https://
+    if (/^https?:\/\//i.test(line)) {
+      const groupName = opcion && servidor ? opcion + ' › ' + servidor
+                      : servidor ? servidor
+                      : opcion ? opcion
+                      : 'Servidor';
+      let group = servers.find(s => s.name === groupName);
+      if (!group) { group = { name: groupName, links: [] }; servers.push(group); }
+      group.links.push({ label: '', url: line });
+      continue;
+    }
+
+    // Si no es URL ni Opción, es nombre de servidor (puede tener emojis)
+    servidor = line;
   }
-  if (current && current.links.length > 0) servers.push(current);
   return servers;
 }
 
@@ -539,7 +564,7 @@ function renderEnlaces(raw) {
       <div class="enlaces-server-name">🌐 ${s.name}</div>
       ${s.links.map((lk, i) => `
         <div class="enlace-item">
-          ${s.links.length > 1 ? `<span class="enlace-label">Cap ${i+1}</span>` : ''}
+          ${lk.label ? `<span class="enlace-label">${lk.label}</span>` : (s.links.length > 1 ? `<span class="enlace-label">${i+1}</span>` : '')}
           <a href="${lk.url}" target="_blank" rel="noopener">${lk.url}</a>
           <button class="btn-copiar-link" onclick="copyText('${lk.url.replace(/'/g,"\\'")}')">Copiar</button>
         </div>
