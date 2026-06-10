@@ -127,7 +127,7 @@
     /* EXPORT / IMPORT */
     .io-section { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-top: 1rem; }
     .io-title { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 2px; margin-bottom: 0.75rem; color: var(--gold); }
-    .export-code { background: #0a0c10; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; font-family: monospace; font-size: 0.75rem; color: #7dd3fc; max-height: 160px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; margin-bottom: 0.75rem; }
+    .export-code { background: #0a0c10; border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; font-family: monospace; font-size: 0.72rem; color: #7dd3fc; max-height: 70px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; word-break: normal; margin-bottom: 0.75rem; user-select: none; pointer-events: none; }
     .export-btn { width: 100%; padding: 0.75rem; background: var(--surface3); color: var(--white); border: 1px solid var(--border); border-radius: 8px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.85rem; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; margin-bottom: 0.5rem; }
     .export-btn:hover { border-color: var(--gold); color: var(--gold); }
     .export-btn.primary-export { background: var(--gold); color: #000; border-color: var(--gold); }
@@ -363,27 +363,10 @@
         </div>
       </div>
 
-      <!-- EXPORT + IMPORT lado a lado -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.75rem;">
-        <div class="io-section" style="margin-top:0;">
-          <div class="io-title">📋 Exportar movies.json</div>
-          <p style="font-size:0.75rem;color:var(--muted);margin-bottom:0.5rem;">Descarga y sube a GitHub para actualizar el sitio.</p>
-          <div class="export-code" id="export-preview" style="max-height:100px;margin-bottom:0.5rem;">[]</div>
-          <button class="export-btn" onclick="downloadJSON()" style="margin-bottom:0.4rem;">⬇ Descargar movies.json</button>
-          <button class="export-btn" onclick="copyJSON()" style="margin-bottom:0;">📋 Copiar JSON</button>
-        </div>
-        <div class="io-section" style="margin-top:0;">
-          <div class="io-title">📥 Importar movies.json</div>
-          <p style="font-size:0.75rem;color:var(--muted);margin-bottom:0.5rem;">Pega el contenido del movies.json para cargar tu catálogo guardado.</p>
-          <textarea class="import-area" id="import-area" placeholder='[{"title":"..."}]' style="min-height:100px;"></textarea>
-          <button class="export-btn" onclick="importJSON()" style="margin-bottom:0.3rem;">✓ Importar y cargar</button>
-          <p style="font-size:0.7rem;color:var(--muted);">⚠ Esto reemplazará el catálogo actual en memoria.</p>
-        </div>
-      </div>
     </div>
 
-    <!-- COLUMNA DERECHA: LISTA -->
-    <div>
+    <!-- COLUMNA DERECHA: LISTA + EXPORT/IMPORT -->
+    <div style="display:flex;flex-direction:column;gap:1rem;">
       <div class="panel">
         <div class="panel-header">
           <div class="panel-title">Catálogo <span id="count-badge">0</span></div>
@@ -406,6 +389,28 @@
             <div>No hay contenido todavía.</div>
             <div style="font-size:0.8rem;margin-top:0.5rem;">Agrega títulos con el formulario o importa un movies.json.</div>
           </div>
+        </div>
+      </div>
+
+      <!-- EXPORT + IMPORT en la columna derecha -->
+      <div class="panel" style="overflow:hidden;">
+        <div class="panel-header" style="padding:0.9rem 1.25rem;">
+          <div class="panel-title" style="font-size:0.95rem;">📋 Exportar movies.json</div>
+        </div>
+        <div style="padding:1rem 1.25rem;">
+          <p style="font-size:0.73rem;color:var(--muted);margin-bottom:0.6rem;">Descarga y sube a GitHub para actualizar el sitio.</p>
+          <div class="export-code" id="export-preview">[]</div>
+          <button class="export-btn" onclick="downloadJSON()" style="margin-bottom:0.4rem;">⬇ Descargar movies.json</button>
+          <button class="export-btn" onclick="copyJSON()" style="margin-bottom:0;">📋 Copiar JSON</button>
+        </div>
+        <div class="panel-header" style="padding:0.9rem 1.25rem;margin-top:0.25rem;">
+          <div class="panel-title" style="font-size:0.95rem;">📥 Importar movies.json</div>
+        </div>
+        <div style="padding:1rem 1.25rem;">
+          <p style="font-size:0.73rem;color:var(--muted);margin-bottom:0.6rem;">Pega el contenido del movies.json para cargar tu catálogo.</p>
+          <textarea class="import-area" id="import-area" placeholder='[{"title":"..."}]' style="min-height:80px;max-height:120px;"></textarea>
+          <button class="export-btn" onclick="importJSON()" style="margin-bottom:0.3rem;">✓ Importar y cargar</button>
+          <p style="font-size:0.7rem;color:var(--muted);">⚠ Esto reemplazará el catálogo actual en memoria.</p>
         </div>
       </div>
     </div>
