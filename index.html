@@ -286,238 +286,311 @@
   </div>
 </footer>
 
-<script>let allMovies=[];
-let activeFilter='all';
-let activeSource='';
-let activeYear='';
-let searchQuery='';
-function _qahftr79(str){
-return (str||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+<script>
+let allMovies = [];
+let activeFilter = 'all';
+let activeSource = '';
+let activeYear = '';
+let searchQuery = '';
+
+// Normaliza texto para comparación sin acento, minúsculas
+function norm(str) {
+  return (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 }
-async function loadMovies(){
-try{
-const local=localStorage.getItem('noctis_movies');
-if (local){allMovies=JSON.parse(local);}
-else{
-const res=await fetch('movies.json?v='+Date.now());
-allMovies=await res.json();
+
+async function loadMovies() {
+  try {
+    const local = localStorage.getItem('noctis_movies');
+    if (local) { allMovies = JSON.parse(local); }
+    else {
+      const res = await fetch('movies.json?v=' + Date.now());
+      allMovies = await res.json();
+    }
+  } catch { allMovies = []; }
+
+  // Leer parámetros URL
+  const params = new URLSearchParams(window.location.search);
+  const filterParam = params.get('filter');
+  const sourceParam = params.get('source');
+  const yearParam   = params.get('year');
+
+  if (sourceParam) {
+    activeSource = sourceParam;
+    activeFilter = 'all';
+    document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+    document.querySelector('.filter-tab[data-filter="all"]').classList.add('active');
+    // Marcar en sidebar
+    document.querySelectorAll('.side-tag').forEach(a => {
+      if (a.getAttribute('href') === `index.html?source=${sourceParam}`) a.classList.add('active');
+    });
+  } else if (yearParam) {
+    activeYear = yearParam;
+    activeFilter = 'all';
+    document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+    document.querySelector('.filter-tab[data-filter="all"]').classList.add('active');
+  } else if (filterParam) {
+    activeFilter = filterParam;
+    const matchTab = document.querySelector(`.filter-tab[data-filter="${filterParam}"]`);
+    if (matchTab) {
+      document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+      matchTab.classList.add('active');
+    }
+    // Marcar en sidebar
+    document.querySelectorAll('.side-tag').forEach(a => {
+      if (a.getAttribute('href') === `index.html?filter=${filterParam}`) a.classList.add('active');
+    });
+  }
+
+  // Generar años en sidebar
+  buildYearSidebar();
+  renderGrid();
+  build2026(allMovies);
 }
-}catch{allMovies=[];}
-const params=new URLSearchParams(window.location.search);
-const filterParam=params.get('filter');
-const sourceParam=params.get('source');
-const yearParam=params.get('year');
-if (sourceParam){
-activeSource=sourceParam;
-activeFilter='all';
-document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
-document.querySelector('.filter-tab[data-filter="all"]').classList.add('active');
-document.querySelectorAll('.side-tag').forEach(a=>{
-if (a.getAttribute('href')===`index.html?source=${sourceParam}`) a.classList.add('active');
+
+function buildYearSidebar() {
+  const container = document.getElementById('year-tags-sidebar');
+  if (!container) return;
+  const currentYear = new Date().getFullYear();
+  let html = '';
+  for (let y = currentYear; y >= 1980; y--) {
+    const isActive = activeYear === String(y);
+    html += `<a class="side-tag${isActive?' active':''}" href="index.html?year=${y}">${y}</a>`;
+  }
+  container.innerHTML = html;
+}
+
+const ITEMS_PER_PAGE = 28;
+let currentPage = 1;
+
+function renderGrid() {
+  const grid  = document.getElementById('movie-grid');
+  const empty = document.getElementById('empty-state');
+  const label = document.getElementById('section-label');
+
+  let filtered = allMovies.filter(m => {
+    // FILTRO TIPO/RESOLUCIÓN/AUDIO/FUENTE
+    let matchFilter = true;
+    if (activeFilter !== 'all') {
+      const f = norm(activeFilter);
+      // Tipo (Película, Serie, Anime, Dorama, Colección)
+      const typeMatch   = norm(m.type).includes(f);
+      // Resolución (quality): 4k, 1080p, 720p, 2k…
+      const qualMatch   = norm(m.quality).includes(f);
+      // Audio: latino, subtitulado, inglés…
+      const audioMatch  = norm(m.audio).includes(f);
+      // Fuente/encode: web-dl, remux, x265…
+      const sourceMatch = norm(m.source).includes(f);
+      matchFilter = typeMatch || qualMatch || audioMatch || sourceMatch;
+    }
+
+    // FILTRO FUENTE exacta (desde sidebar o URL ?source=)
+    let matchSource = true;
+    if (activeSource) {
+      matchSource = norm(m.source) === norm(activeSource);
+    }
+
+    // FILTRO AÑO
+    let matchYear = true;
+    if (activeYear) {
+      matchYear = String(m.yearFilter || m.year || '') === String(activeYear);
+    }
+
+    // BÚSQUEDA
+    const matchSearch = !searchQuery ||
+      norm(m.title).includes(searchQuery) ||
+      String(m.year || '').includes(searchQuery);
+
+    return matchFilter && matchSource && matchYear && matchSearch;
+  });
+
+  // Label dinámico
+  if (activeYear) label.textContent = `Año ${activeYear}`;
+  else if (activeSource) label.textContent = activeSource;
+  else if (activeFilter !== 'all') label.textContent = activeFilter.toUpperCase();
+  else label.textContent = 'Últimos Aportes';
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  // Paginación
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  if (currentPage > totalPages) currentPage = 1;
+  const start = (currentPage - 1) * ITEMS_PER_PAGE;
+  const pageItems = filtered.slice(start, start + ITEMS_PER_PAGE);
+
+  const fallbackSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='300'%3E%3Crect fill='%230e1117' width='200' height='300'/%3E%3Ctext fill='%236b7280' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='40'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E";
+
+  grid.innerHTML = pageItems.map((m, i) => {
+    const realIdx = allMovies.indexOf(m);
+    return `
+    <a class="movie-card" href="detalle.html?id=${realIdx}" style="animation-delay:${(i % 20) * 40}ms">
+      <div class="card-poster">
+        <img src="${m.image || ''}" alt="${m.title}" loading="lazy" onerror="this.src='${fallbackSvg}'"/>
+      </div>
+      <div class="card-title">${m.title}</div>
+    </a>`;
+  }).join('');
+
+  // Renderizar paginación
+  renderPagination(totalPages, filtered.length);
+}
+
+function renderPagination(totalPages, totalItems) {
+  const pag = document.getElementById('pagination');
+  if (totalPages <= 1) { pag.innerHTML = ''; return; }
+
+  let html = '';
+  // Botón anterior
+  html += `<button class="page-btn" ${currentPage===1?'disabled':''} onclick="goPage(${currentPage-1})">&#8249;</button>`;
+
+  // Páginas — mostrar máx 7 botones centrados en la actual
+  const range = 3;
+  let start = Math.max(1, currentPage - range);
+  let end   = Math.min(totalPages, currentPage + range);
+  if (start > 1) html += `<button class="page-btn" onclick="goPage(1)">1</button>${start > 2 ? '<span class="page-info">…</span>' : ''}`;
+  for (let p = start; p <= end; p++) {
+    html += `<button class="page-btn${p===currentPage?' active':''}" onclick="goPage(${p})">${p}</button>`;
+  }
+  if (end < totalPages) html += `${end < totalPages-1 ? '<span class="page-info">…</span>' : ''}<button class="page-btn" onclick="goPage(${totalPages})">${totalPages}</button>`;
+
+  // Botón siguiente
+  html += `<button class="page-btn" ${currentPage===totalPages?'disabled':''} onclick="goPage(${currentPage+1})">&#8250;</button>`;
+  html += `<span class="page-info">${totalItems} títulos · Página ${currentPage}/${totalPages}</span>`;
+
+  pag.innerHTML = html;
+}
+
+function goPage(p) {
+  currentPage = p;
+  renderGrid();
+  // Scroll suave al grid
+  document.getElementById('movie-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+document.querySelectorAll('.filter-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+    activeSource = '';
+    activeYear   = '';
+    currentPage  = 1;
+    // Quitar activo de sidebar
+    document.querySelectorAll('.side-tag').forEach(a => a.classList.remove('active'));
+    renderGrid();
+  });
 });
-}else if (yearParam){
-activeYear=yearParam;
-activeFilter='all';
-document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
-document.querySelector('.filter-tab[data-filter="all"]').classList.add('active');
-}else if (filterParam){
-activeFilter=filterParam;
-const matchTab=document.querySelector(`.filter-tab[data-filter="${filterParam}"]`);
-if (matchTab){
-document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
-matchTab.classList.add('active');
-}
-document.querySelectorAll('.side-tag').forEach(a=>{
-if (a.getAttribute('href')===`index.html?filter=${filterParam}`) a.classList.add('active');
+
+document.getElementById('search-input').addEventListener('input', e => {
+  searchQuery = norm(e.target.value.trim());
+  currentPage = 1;
+  renderGrid();
 });
+
+function build2026(movies) {
+  const track = document.getElementById('s2026-track');
+  if (!track) return;
+
+  const currentYear = String(new Date().getFullYear());
+  const yearLabel = document.getElementById('s2026-year-label');
+  if (yearLabel) yearLabel.textContent = currentYear;
+
+  const all = movies.filter(m => {
+    const yf = String(m.yearFilter || '').trim();
+    const y  = String(m.year || '').trim();
+    return yf === currentYear || y === currentYear;
+  });
+  // Máximo 16 = 4 páginas de 4
+  const items = all.slice(0, 16);
+
+  if (items.length === 0) {
+    document.querySelector('.s2026-wrap').style.display = 'none';
+    return;
+  }
+
+  const fallback = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='190' height='285'%3E%3Crect fill='%230e1117' width='190' height='285'/%3E%3Ctext fill='%236b7280' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='38'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E";
+
+  track.innerHTML = items.map((m, i) => {
+    const realIdx = movies.indexOf(m);
+    return `<a class="s2026-card" href="detalle.html?id=${realIdx}">
+      <div class="s2026-poster">
+        <img src="${m.image||''}" alt="${m.title}" loading="lazy" onerror="this.src='${fallback}'"/>
+        <div class="s2026-overlay"></div>
+      </div>
+    </a>`;
+  }).join('');
+
+  // Calcular ancho de tarjeta para mostrar EXACTAMENTE 4 por página (horizontal)
+  const CARDS_PER_PAGE = 4;
+  const GAP = 16; // 1rem = 16px
+
+  function getCardWidth() {
+    const wrapW = document.getElementById('s2026-track-wrap').offsetWidth;
+    // Ancho de 1 tarjeta = (ancho total - gaps entre 6 tarjetas) / 6
+    return (wrapW - GAP * (CARDS_PER_PAGE - 1)) / CARDS_PER_PAGE;
+  }
+
+  function setCardWidths(cardW) {
+    track.querySelectorAll('.s2026-card').forEach(c => c.style.width = cardW + 'px');
+  }
+
+  const totalPages = Math.ceil(items.length / CARDS_PER_PAGE);
+  let currentCarousel = 0;
+  let autoTimer = null;
+  const dotsEl = document.getElementById('s2026-dots');
+
+  function renderDots() {
+    if (!dotsEl || totalPages <= 1) return;
+    dotsEl.innerHTML = Array.from({length: totalPages}, (_, i) =>
+      `<span class="s2026-dot${i === currentCarousel ? ' active' : ''}" data-page="${i}"></span>`
+    ).join('');
+    dotsEl.querySelectorAll('.s2026-dot').forEach(d => {
+      d.onclick = () => goCarousel(+d.dataset.page);
+    });
+  }
+
+  function goCarousel(page) {
+    currentCarousel = ((page % totalPages) + totalPages) % totalPages;
+    const cardW = getCardWidth();
+    const pageOffset = currentCarousel * CARDS_PER_PAGE * (cardW + GAP);
+    track.style.transform = `translateX(-${pageOffset}px)`;
+    renderDots();
+    restartAuto();
+  }
+
+  function restartAuto() {
+    clearInterval(autoTimer);
+    autoTimer = setInterval(() => goCarousel(currentCarousel + 1), 5000);
+  }
+
+  // Inicializar anchos y posición
+  function init() {
+    const cardW = getCardWidth();
+    setCardWidths(cardW);
+    track.style.transform = 'translateX(0)';
+    renderDots();
+    restartAuto();
+  }
+
+  document.getElementById('s2026-next').onclick = () => goCarousel(currentCarousel + 1);
+  document.getElementById('s2026-prev').onclick = () => goCarousel(currentCarousel - 1);
+
+  // Recalcular en resize
+  window.addEventListener('resize', () => {
+    const cardW = getCardWidth();
+    setCardWidths(cardW);
+    goCarousel(currentCarousel);
+  });
+
+  init();
 }
-_bfhcgc45();
-_ckafna35();
-_rfitbv50(allMovies);
-}
-function _bfhcgc45(){
-const container=document.getElementById('year-tags-sidebar');
-if (!container) return;
-const currentYear=new Date().getFullYear();
-let html='';
-for (let y=currentYear;y>=1980;y--){
-const isActive=activeYear===String(y);
-html+=`<a class="side-tag${isActive?' active':''}" href="index.html?year=${y}">${y}</a>`;
-}
-container.innerHTML=html;
-}
-const ITEMS_PER_PAGE=28;
-let currentPage=1;
-function _ckafna35(){
-const grid=document.getElementById('movie-grid');
-const empty=document.getElementById('empty-state');
-const label=document.getElementById('section-label');
-let filtered=allMovies.filter(m=>{
-let matchFilter=true;
-if (activeFilter!=='all'){
-const f=_qahftr79(activeFilter);
-const typeMatch=_qahftr79(m.type).includes(f);
-const qualMatch=_qahftr79(m.quality).includes(f);
-const audioMatch=_qahftr79(m.audio).includes(f);
-const sourceMatch=_qahftr79(m.source).includes(f);
-matchFilter=typeMatch||qualMatch||audioMatch||sourceMatch;
-}
-let matchSource=true;
-if (activeSource){
-matchSource=_qahftr79(m.source)===_qahftr79(activeSource);
-}
-let matchYear=true;
-if (activeYear){
-matchYear=String(m.yearFilter||m.year||'')===String(activeYear);
-}
-const matchSearch=!searchQuery||
-_qahftr79(m.title).includes(searchQuery)||
-String(m.year||'').includes(searchQuery);
-return matchFilter&&matchSource&&matchYear&&matchSearch;
-});
-if (activeYear) label.textContent=`Año ${activeYear}`;
-else if (activeSource) label.textContent=activeSource;
-else if (activeFilter!=='all') label.textContent=activeFilter.toUpperCase();
-else label.textContent='Últimos Aportes';
-if (filtered.length===0){
-grid.innerHTML='';
-empty.style.display='block';
-document.getElementById('pagination').innerHTML='';
-return;
-}
-empty.style.display='none';
-const totalPages=Math.ceil(filtered.length / ITEMS_PER_PAGE);
-if (currentPage>totalPages) currentPage=1;
-const start=(currentPage-1) * ITEMS_PER_PAGE;
-const pageItems=filtered.slice(start,start+ITEMS_PER_PAGE);
-const fallbackSvg="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='300'%3E%3Crect fill='%230e1117' width='200' height='300'/%3E%3Ctext fill='%236b7280' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='40'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E"; //fixed
-grid.innerHTML=pageItems.map((m,i)=>{
-const realIdx=allMovies.indexOf(m);
-return `
-<a class="movie-card" href="detalle.html?id=${realIdx}" style="animation-delay:${(i % 20) * 40}ms">
-<div class="card-poster">
-<img src="${m.image||''}" alt="${m.title}" loading="lazy" onerror="this.src='${fallbackSvg}'"/>
-</div>
-<div class="card-title">${m.title}</div>
-</a>`;
-}).join('');
-_qpesej91(totalPages,filtered.length);
-}
-function _qpesej91(totalPages,totalItems){
-const pag=document.getElementById('pagination');
-if (totalPages<=1){pag.innerHTML='';return;}
-let html='';
-html+=`<button class="page-btn" ${currentPage===1?'disabled':''}onclick="_ssklhw30(${currentPage-1})">&#8249;</button>`;
-const range=3;
-let start=Math.max(1,currentPage-range);
-let end=Math.min(totalPages,currentPage+range);
-if (start>1) html+=`<button class="page-btn" onclick="_ssklhw30(1)">1</button>${start>2?'<span class="page-info">…</span>':''}`;
-for (let p=start;p<=end;p++){
-html+=`<button class="page-btn${p===currentPage?' active':''}" onclick="_ssklhw30(${p})">${p}</button>`;
-}
-if (end<totalPages) html+=`${end<totalPages-1?'<span class="page-info">…</span>':''}<button class="page-btn" onclick="_ssklhw30(${totalPages})">${totalPages}</button>`;
-html+=`<button class="page-btn" ${currentPage===totalPages?'disabled':''}onclick="_ssklhw30(${currentPage+1})">&#8250;</button>`;
-html+=`<span class="page-info">${totalItems}títulos · Página ${currentPage}/${totalPages}</span>`;
-pag.innerHTML=html;
-}
-function _ssklhw30(p){
-currentPage=p;
-_ckafna35();
-document.getElementById('movie-grid').scrollIntoView({behavior:'smooth',block:'start'});
-}
-document.querySelectorAll('.filter-tab').forEach(btn=>{
-btn.addEventListener('click',()=>{
-document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
-btn.classList.add('active');
-activeFilter=btn.dataset.filter;
-activeSource='';
-activeYear='';
-currentPage=1;
-document.querySelectorAll('.side-tag').forEach(a=>a.classList.remove('active'));
-_ckafna35();
-});
-});
-document.getElementById('search-input').addEventListener('input',e=>{
-searchQuery=_qahftr79(e.target.value.trim());
-currentPage=1;
-_ckafna35();
-});
-function _rfitbv50(movies){
-const track=document.getElementById('s2026-track');
-if (!track) return;
-const currentYear=String(new Date().getFullYear());
-const yearLabel=document.getElementById('s2026-year-label');
-if (yearLabel) yearLabel.textContent=currentYear;
-const all=movies.filter(m=>{
-const yf=String(m.yearFilter||'').trim();
-const y=String(m.year||'').trim();
-return yf===currentYear||y===currentYear;
-});
-const items=all.slice(0,16);
-if (items.length===0){
-document.querySelector('.s2026-wrap').style.display='none';
-return;
-}
-const fallback="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='190' height='285'%3E%3Crect fill='%230e1117' width='190' height='285'/%3E%3Ctext fill='%236b7280' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='38'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E"; //fixed
-track.innerHTML=items.map((m,i)=>{
-const realIdx=movies.indexOf(m);
-return `<a class="s2026-card" href="detalle.html?id=${realIdx}">
-<div class="s2026-poster">
-<img src="${m.image||''}" alt="${m.title}" loading="lazy" onerror="this.src='${fallback}'"/>
-<div class="s2026-overlay"></div>
-</div>
-</a>`;
-}).join('');
-const CARDS_PER_PAGE=4;
-const GAP=16;
-function _kbxosf73(){
-const wrapW=document.getElementById('s2026-track-wrap').offsetWidth;
-return (wrapW-GAP * (CARDS_PER_PAGE-1)) / CARDS_PER_PAGE;
-}
-function _lvejrs97(cardW){
-track.querySelectorAll('.s2026-card').forEach(c=>c.style.width=cardW+'px');
-}
-const totalPages=Math.ceil(items.length / CARDS_PER_PAGE);
-let currentCarousel=0;
-let autoTimer=null;
-const dotsEl=document.getElementById('s2026-dots');
-function _jigbld58(){
-if (!dotsEl||totalPages<=1) return;
-dotsEl.innerHTML=Array.from({length:totalPages},(_,i)=>
-`<span class="s2026-dot${i===currentCarousel?' active':''}" data-page="${i}"></span>`
-).join('');
-dotsEl.querySelectorAll('.s2026-dot').forEach(d=>{
-d.onclick=()=>_chqxje18(+d.dataset.page);
-});
-}
-function _chqxje18(page){
-currentCarousel=((page % totalPages)+totalPages) % totalPages;
-const cardW=_kbxosf73();
-const pageOffset=currentCarousel * CARDS_PER_PAGE * (cardW+GAP);
-track.style.transform=`translateX(-${pageOffset}px)`;
-_jigbld58();
-_sieyic22();
-}
-function _sieyic22(){
-clearInterval(autoTimer);
-autoTimer=setInterval(()=>_chqxje18(currentCarousel+1),5000);
-}
-function init(){
-const cardW=_kbxosf73();
-_lvejrs97(cardW);
-track.style.transform='translateX(0)';
-_jigbld58();
-_sieyic22();
-}
-document.getElementById('s2026-next').onclick=()=>_chqxje18(currentCarousel+1);
-document.getElementById('s2026-prev').onclick=()=>_chqxje18(currentCarousel-1);
-window.addEventListener('resize',()=>{
-const cardW=_kbxosf73();
-_lvejrs97(cardW);
-_chqxje18(currentCarousel);
-});
-init();
-}
-loadMovies();</script>
+
+loadMovies();
+</script>
 </body>
 </html>
