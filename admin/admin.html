@@ -31,7 +31,7 @@
     /* ADMIN */
     #admin-screen { display: none; }
     .admin-header { position: sticky; top: 0; z-index: 50; background: rgba(8,10,15,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0 2rem; }
-    .admin-header-inner { max-width: 1700px; margin: 0 auto; display: flex; align-items: center; gap: 1rem; height: 60px; }
+    .admin-header-inner { max-width: 1600px; margin: 0 auto; display: flex; align-items: center; gap: 1rem; height: 60px; }
     .admin-logo-link { text-decoration: none; }
     .admin-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 3px; color: var(--white); transition: opacity 0.2s; }
     .admin-logo-link:hover .admin-logo { opacity: 0.8; }
@@ -42,7 +42,7 @@
     .admin-nav a:hover, .admin-nav button:hover { color: var(--white); border-color: var(--gold); }
     .logout-btn { color: var(--red) !important; border-color: var(--red) !important; }
 
-    .admin-main { max-width: 1700px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 1fr 540px; gap: 2rem; align-items: start; }
+    .admin-main { max-width: 1600px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 1fr 500px; gap: 2rem; align-items: start; }
     @media (max-width: 1100px) { .admin-main { grid-template-columns: 1fr; } }
 
     /* PANEL */
@@ -106,7 +106,7 @@
     .movie-item:hover { border-color: rgba(201,168,76,0.2); }
     .movie-item-poster { width: 48px; height: 72px; object-fit: cover; border-radius: 6px; flex-shrink: 0; background: var(--surface3); }
     .movie-item-info { flex: 1; min-width: 0; }
-    .movie-item-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.05rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .movie-item-title { font-family: 'Barlow Condensed', sans-serif; font-size: 0.95rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .movie-item-meta { font-size: 0.75rem; color: var(--muted); display: flex; gap: 0.5rem; margin-top: 0.2rem; flex-wrap: wrap; }
     .badge { padding: 1px 7px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
     .badge-4k { background: #7c3aed; color: #fff; }
@@ -127,14 +127,13 @@
     /* EXPORT / IMPORT */
     .io-section { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-top: 1rem; }
     .io-title { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 2px; margin-bottom: 0.75rem; color: var(--gold); }
-    .export-code { background: #0a0c10; border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 0.75rem; font-family: monospace; font-size: 0.7rem; color: #7dd3fc; height: 72px; overflow: hidden; white-space: pre; text-overflow: ellipsis; word-break: normal; margin-bottom: 0.6rem; user-select: none; }
+    .export-code { background: #0a0c10; border: 1px solid var(--border); border-radius: 8px; padding: 0.65rem 1rem; font-family: monospace; font-size: 0.72rem; color: #7dd3fc; height: 80px; max-height: 80px; overflow-y: scroll; overflow-x: hidden; white-space: pre-wrap; word-break: break-all; margin-bottom: 0.6rem; }
     .export-btn { width: 100%; padding: 0.75rem; background: var(--surface3); color: var(--white); border: 1px solid var(--border); border-radius: 8px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.85rem; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; margin-bottom: 0.5rem; }
     .export-btn:hover { border-color: var(--gold); color: var(--gold); }
     .export-btn.primary-export { background: var(--gold); color: #000; border-color: var(--gold); }
     .export-btn.primary-export:hover { background: var(--gold2); }
-    .import-area { background: #0a0c10; border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 0.75rem; color: var(--white); font-family: monospace; font-size: 0.72rem; width: 100%; height: 72px; resize: none; outline: none; margin-bottom: 0.5rem; }
+    .import-area { background: #0a0c10; border: 1px solid var(--border); border-radius: 8px; padding: 0.65rem 1rem; color: var(--white); font-family: monospace; font-size: 0.72rem; width: 100%; height: 80px; resize: vertical; outline: none; margin-bottom: 0.5rem; }
     .import-area:focus { border-color: var(--gold); }
-    .import-area { resize: vertical; }
 
     .admin-search { padding: 1rem 1.5rem 0; }
     .admin-search input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 1rem; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 0.85rem; outline: none; }
@@ -363,12 +362,13 @@
           <button class="cancel-btn" id="cancel-btn" onclick="cancelEdit()">Cancelar edición</button>
         </div>
       </div>
+
     </div>
 
     <!-- COLUMNA DERECHA: LISTA + EXPORT/IMPORT -->
     <div style="display:flex;flex-direction:column;gap:1rem;">
 
-      <!-- CATÁLOGO -->
+      <!-- Panel Catálogo -->
       <div class="panel">
         <div class="panel-header">
           <div class="panel-title">Catálogo <span id="count-badge">0</span></div>
@@ -394,21 +394,21 @@
         </div>
       </div>
 
-      <!-- EXPORT + IMPORT en columna derecha — 2 cajas lado a lado -->
+      <!-- Export + Import debajo del catálogo, lado a lado -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
         <div class="io-section" style="margin-top:0;">
-          <div class="io-title">📋 Exportar</div>
-          <p style="font-size:0.72rem;color:var(--muted);margin-bottom:0.5rem;">Descarga y sube a GitHub.</p>
+          <div class="io-title">📋 Exportar movies.json</div>
+          <p style="font-size:0.73rem;color:var(--muted);margin-bottom:0.5rem;">Descarga y sube a GitHub para actualizar el sitio.</p>
           <div class="export-code" id="export-preview">[]</div>
-          <button class="export-btn" onclick="downloadJSON()" style="margin-bottom:0.4rem;">⬇ Descargar JSON</button>
+          <button class="export-btn" onclick="downloadJSON()" style="margin-bottom:0.4rem;">⬇ Descargar movies.json</button>
           <button class="export-btn" onclick="copyJSON()" style="margin-bottom:0;">📋 Copiar JSON</button>
         </div>
         <div class="io-section" style="margin-top:0;">
-          <div class="io-title">📥 Importar</div>
-          <p style="font-size:0.72rem;color:var(--muted);margin-bottom:0.5rem;">Pega tu movies.json guardado.</p>
+          <div class="io-title">📥 Importar movies.json</div>
+          <p style="font-size:0.73rem;color:var(--muted);margin-bottom:0.5rem;">Pega el contenido del movies.json para cargar tu catálogo guardado.</p>
           <textarea class="import-area" id="import-area" placeholder='[{"title":"..."}]'></textarea>
           <button class="export-btn" onclick="importJSON()" style="margin-bottom:0.3rem;">✓ Importar y cargar</button>
-          <p style="font-size:0.68rem;color:var(--muted);">⚠ Reemplaza el catálogo en memoria.</p>
+          <p style="font-size:0.7rem;color:var(--muted);">⚠ Esto reemplazará el catálogo actual en memoria.</p>
         </div>
       </div>
 
