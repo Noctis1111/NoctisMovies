@@ -414,337 +414,387 @@
 
 <div class="toast" id="toast"></div>
 
-<script>const ADMIN_PASSWORD='72941361';
-const EXPIRATION_TIME=2 * 60 * 60 * 1000;
-function _eakyuh99(){
-const pass=document.getElementById('login-pass').value;
-const remember=document.getElementById('remember-pass').checked;
-if (pass===ADMIN_PASSWORD){
-document.getElementById('login-screen').style.display='none';
-document.getElementById('admin-screen').style.display='block';
-const authData={loggedIn:true,timestamp:Date.now()};
-localStorage.setItem('noctis_auth_data',JSON.stringify(authData));
-if (remember){
-localStorage.setItem('noctis_saved_pass',pass);
-}else{
-localStorage.removeItem('noctis_saved_pass');
+<script>
+const ADMIN_PASSWORD = '72941361'; // ← CAMBIA TU CONTRASEÑA
+const EXPIRATION_TIME = 2 * 60 * 60 * 1000;
+
+/* ======================== AUTH ======================== */
+function doLogin() {
+  const pass = document.getElementById('login-pass').value;
+  const remember = document.getElementById('remember-pass').checked;
+  if (pass === ADMIN_PASSWORD) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-screen').style.display = 'block';
+    const authData = { loggedIn: true, timestamp: Date.now() };
+    localStorage.setItem('noctis_auth_data', JSON.stringify(authData));
+    if (remember) {
+      localStorage.setItem('noctis_saved_pass', pass);
+    } else {
+      localStorage.removeItem('noctis_saved_pass');
+    }
+    renderList(); updateExport();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+    document.getElementById('login-pass').value = '';
+  }
 }
-renderList();_ounaia56();
-}else{
-document.getElementById('login-error').style.display='block';
-document.getElementById('login-pass').value='';
-}
-}
-function _ywemfk17(){localStorage.removeItem('noctis_auth_data');location.reload();}
-document.getElementById('login-pass').addEventListener('keydown',e=>{if (e.key==='Enter') _eakyuh99();});
-(function(){
-const saved=localStorage.getItem('noctis_saved_pass');
-if (saved){
-document.getElementById('login-pass').value=saved;
-document.getElementById('remember-pass').checked=true;
-}
+function doLogout() { localStorage.removeItem('noctis_auth_data'); location.reload(); }
+document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// Pre-fill saved password if exists
+(function() {
+  const saved = localStorage.getItem('noctis_saved_pass');
+  if (saved) {
+    document.getElementById('login-pass').value = saved;
+    document.getElementById('remember-pass').checked = true;
+  }
 })();
-function _yzoseh17(){
-const raw=localStorage.getItem('noctis_auth_data');
-if (raw){
-try{
-const d=JSON.parse(raw);
-if (Date.now()-d.timestamp<EXPIRATION_TIME){
-document.getElementById('login-screen').style.display='none';
-document.getElementById('admin-screen').style.display='block';
-renderList();_ounaia56();return;
-}else{localStorage.removeItem('noctis_auth_data');}
-}catch{localStorage.removeItem('noctis_auth_data');}
+
+function checkAuth() {
+  const raw = localStorage.getItem('noctis_auth_data');
+  if (raw) {
+    try {
+      const d = JSON.parse(raw);
+      if (Date.now() - d.timestamp < EXPIRATION_TIME) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-screen').style.display = 'block';
+        renderList(); updateExport(); return;
+      } else { localStorage.removeItem('noctis_auth_data'); }
+    } catch { localStorage.removeItem('noctis_auth_data'); }
+  }
 }
+checkAuth();
+
+/* ======================== DATA ======================== */
+function getMovies() { try { return JSON.parse(localStorage.getItem('noctis_movies') || '[]'); } catch { return []; } }
+function saveMovies(arr) { localStorage.setItem('noctis_movies', JSON.stringify(arr)); updateExport(); updateStats(); }
+
+let editingIndex = -1;
+
+/* ======================== PARSE DATOS RAW ======================== */
+function parseDatosRaw(raw) {
+  const result = { originalTitle: '', year: '', country: '', duration: '', genre: '' };
+  if (!raw) return result;
+  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+  for (const line of lines) {
+    const colonIdx = line.indexOf(':');
+    if (colonIdx < 0) continue;
+    const key = line.slice(0, colonIdx).toLowerCase().trim();
+    const val = line.slice(colonIdx + 1).trim();
+    if (key.includes('título original') || key.includes('titulo original')) result.originalTitle = val;
+    else if (key === 'año' || key === 'ano') result.year = val;
+    else if (key.includes('país') || key.includes('pais') || key === 'country') result.country = val;
+    else if (key.includes('duración') || key.includes('duracion')) result.duration = val;
+    else if (key.includes('género') || key.includes('genero') || key === 'genre') result.genre = val;
+  }
+  return result;
 }
-_yzoseh17();
-function _tvzndr80(){try{return JSON.parse(localStorage.getItem('noctis_movies')||'[]');}catch{return [];}}
-function _gbaopa90(arr){localStorage.setItem('noctis_movies',JSON.stringify(arr));_ounaia56();_potbpn77();}
-let editingIndex=-1;
-function _qqbsuc34(raw){
-const result={originalTitle:'',year:'',country:'',duration:'',genre:''};
-if (!raw) return result;
-const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
-for (const line of lines){
-const colonIdx=line.indexOf(':');
-if (colonIdx<0) continue;
-const key=line.slice(0,colonIdx).toLowerCase().trim();
-const val=line.slice(colonIdx+1).trim();
-if (key.includes('título original')||key.includes('titulo original')) result.originalTitle=val;
-else if (key==='año'||key==='ano') result.year=val;
-else if (key.includes('país')||key.includes('pais')||key==='country') result.country=val;
-else if (key.includes('duración')||key.includes('duracion')) result.duration=val;
-else if (key.includes('género')||key.includes('genero')||key==='genre') result.genre=val;
+
+function parseDescargaRaw(raw) {
+  const result = { audio2: '', calidad2: '', resolucion2: '', formato2: 'MKV', size2: '', codec2: 'H264', subtitles2: '', uploader2: '' };
+  if (!raw) return result;
+  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+  for (const line of lines) {
+    const colonIdx = line.indexOf(':');
+    if (colonIdx < 0) continue;
+    const key = line.slice(0, colonIdx).toLowerCase().trim();
+    const val = line.slice(colonIdx + 1).trim();
+    if (key === 'audio') result.audio2 = val;
+    else if (key === 'calidad') result.calidad2 = val;
+    else if (key === 'resolución' || key === 'resolucion' || key === 'resolución') result.resolucion2 = val;
+    else if (key === 'formato') result.formato2 = val;
+    else if (key === 'tamaño' || key === 'tamano') result.size2 = val;
+    else if (key === 'codec' || key === 'códec') result.codec2 = val;
+    else if (key.includes('subtítulo') || key.includes('subtitulo')) result.subtitles2 = val;
+    else if (key === 'por') result.uploader2 = val;
+  }
+  return result;
 }
-return result;
+
+/* ======================== FORM ======================== */
+function getFormData() {
+  const datosRaw = (document.getElementById('f-datos-raw')?.value || '').trim();
+  const parsed = parseDatosRaw(datosRaw);
+  const descRaw = (document.getElementById('f-descarga-raw')?.value || '').trim();
+  const dp = parseDescargaRaw(descRaw);
+  return {
+    title:         document.getElementById('f-title').value.trim(),
+    originalTitle: parsed.originalTitle,
+    year:          parsed.year,
+    type:          document.getElementById('f-type').value,
+    country:       parsed.country,
+    duration:      parsed.duration,
+    genre:         parsed.genre,
+    quality:       document.getElementById('f-quality').value,
+    source:        document.getElementById('f-source').value,
+    yearFilter:    document.getElementById('f-year-filter').value.trim(),
+    audio:         document.getElementById('f-audio').value,
+    resolution:    dp.resolucion2 || '',
+    format:        dp.formato2 || 'MKV',
+    size:          dp.size2,
+    codec:         dp.codec2 || 'H264',
+    subtitles:     dp.subtitles2,
+    uploader:      dp.uploader2,
+    image:         posterDataUrl || document.getElementById('f-image').value.trim(),
+    screenshot:    document.getElementById('f-screenshot').value.trim(),
+    trailer:       document.getElementById('f-trailer').value.trim(),
+    links:         document.getElementById('f-links').value.trim(),
+    description:   document.getElementById('f-desc').value.trim(),
+    descargaRaw:   descRaw,
+  };
 }
-function _bbainh72(raw){
-const result={audio2:'',calidad2:'',resolucion2:'',formato2:'MKV',size2:'',codec2:'H264',subtitles2:'',uploader2:''};
-if (!raw) return result;
-const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
-for (const line of lines){
-const colonIdx=line.indexOf(':');
-if (colonIdx<0) continue;
-const key=line.slice(0,colonIdx).toLowerCase().trim();
-const val=line.slice(colonIdx+1).trim();
-if (key==='audio') result.audio2=val;
-else if (key==='calidad') result.calidad2=val;
-else if (key==='resolución'||key==='resolucion'||key==='resolución') result.resolucion2=val;
-else if (key==='formato') result.formato2=val;
-else if (key==='tamaño'||key==='tamano') result.size2=val;
-else if (key==='codec'||key==='códec') result.codec2=val;
-else if (key.includes('subtítulo')||key.includes('subtitulo')) result.subtitles2=val;
-else if (key==='por') result.uploader2=val;
+
+function clearForm() {
+  ['f-title','f-datos-raw','f-desc','f-image','f-screenshot','f-trailer','f-links','f-descarga-raw'
+  ].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  document.getElementById('f-type').value = 'Película';
+  document.getElementById('f-quality').value = 'Full HD';
+  document.getElementById('f-source').value = '';
+  document.getElementById('f-year-filter').value = '';
+  document.getElementById('f-audio').value = 'Latino';
+  
+  document.getElementById('img-preview').classList.remove('show');
+  document.getElementById('poster-preview-wrap').style.display = 'none';
+  posterDataUrl = null;
+  resetDropZone();
+  editingIndex = -1;
+  document.getElementById('form-panel-title').innerHTML = 'Agregar <span>Película</span>';
+  document.getElementById('form-submit-btn').textContent = '+ AGREGAR AL CATÁLOGO';
+  document.getElementById('form-submit-btn').classList.remove('editing');
+  document.getElementById('cancel-btn').classList.remove('visible');
 }
-return result;
+
+function cancelEdit() { clearForm(); }
+
+function submitForm() {
+  const data = getFormData();
+  if (!data.title) { showToast('El título es obligatorio.', 'error'); return; }
+  const movies = getMovies();
+  if (editingIndex >= 0) {
+    movies[editingIndex] = data;
+    showToast('Actualizado ✓', 'success');
+  } else {
+    movies.unshift(data);
+    showToast('Agregado ✓', 'success');
+  }
+  saveMovies(movies);
+  clearForm();
+  renderList();
 }
-function _enpzyt98(){
-const datosRaw=(document.getElementById('f-datos-raw')?.value||'').trim();
-const parsed=_qqbsuc34(datosRaw);
-const descRaw=(document.getElementById('f-descarga-raw')?.value||'').trim();
-const dp=_bbainh72(descRaw);
-return{
-title:document.getElementById('f-title').value.trim(),
-originalTitle:parsed.originalTitle,
-year:parsed.year,
-type:document.getElementById('f-type').value,
-country:parsed.country,
-duration:parsed.duration,
-genre:parsed.genre,
-quality:document.getElementById('f-quality').value,
-source:document.getElementById('f-source').value,
-yearFilter:document.getElementById('f-year-filter').value.trim(),
-audio:document.getElementById('f-audio').value,
-resolution:dp.resolucion2||'',
-format:dp.formato2||'MKV',
-size:dp.size2,
-codec:dp.codec2||'H264',
-subtitles:dp.subtitles2,
-uploader:dp.uploader2,
-image:posterDataUrl||document.getElementById('f-image').value.trim(),
-screenshot:document.getElementById('f-screenshot').value.trim(),
-trailer:document.getElementById('f-trailer').value.trim(),
-links:document.getElementById('f-links').value.trim(),
-description:document.getElementById('f-desc').value.trim(),
-descargaRaw:descRaw,
-};
+
+function previewImg(url) {
+  const p = document.getElementById('img-preview');
+  if (url && url.startsWith('http')) { p.src = url; p.classList.add('show'); }
+  else { p.classList.remove('show'); }
 }
-function _fizqln25(){
-['f-title','f-datos-raw','f-desc','f-image','f-screenshot','f-trailer','f-links','f-descarga-raw'
-].forEach(id=>{const el=document.getElementById(id);if(el) el.value='';});
-document.getElementById('f-type').value='Película';
-document.getElementById('f-quality').value='Full HD';
-document.getElementById('f-source').value='';
-document.getElementById('f-year-filter').value='';
-document.getElementById('f-audio').value='Latino';
-document.getElementById('img-preview').classList.remove('show');
-document.getElementById('poster-preview-wrap').style.display='none';
-posterDataUrl=null;
-_ecllms96();
-editingIndex=-1;
-document.getElementById('form-panel-title').innerHTML='Agregar<span>Película</span>';
-document.getElementById('form-submit-btn').textContent='+AGREGAR AL CATÁLOGO';
-document.getElementById('form-submit-btn').classList.remove('editing');
-document.getElementById('cancel-btn').classList.remove('visible');
+
+// Sistema de portada combinado (archivo + URL)
+let posterDataUrl = null; // guarda base64 si es archivo local
+
+function handleImageFile(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    posterDataUrl = e.target.result;
+    // Generar nombre de archivo sugerido
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-').toLowerCase();
+    // Mostrar preview en drop zone
+    const dz = document.getElementById('drop-zone');
+    dz.classList.add('has-image');
+    dz.innerHTML = `<img src="${posterDataUrl}" style="height:120px;border-radius:6px;object-fit:cover;display:block;margin:0 auto;"/>`;
+    // Limpiar URL field y mostrar preview
+    document.getElementById('f-image').value = '';
+    showPosterPreview(posterDataUrl);
+    showToast('Imagen cargada ✓', 'success');
+  };
+  reader.readAsDataURL(file);
 }
-function cancelEdit(){_fizqln25();}
-function _elkhgy66(){
-const data=_enpzyt98();
-if (!data.title){showToast('El título es obligatorio.','error');return;}
-const movies=_tvzndr80();
-if (editingIndex>=0){
-movies[editingIndex]=data;
-showToast('Actualizado ✓','success');
-}else{
-movies.unshift(data);
-showToast('Agregado ✓','success');
+
+function previewImgUrl(url) {
+  // Si escribe URL, limpiar imagen subida
+  if (url && url.startsWith('http')) {
+    posterDataUrl = null;
+    resetDropZone();
+    showPosterPreview(url);
+  } else {
+    document.getElementById('poster-preview-wrap').style.display = 'none';
+  }
 }
-_gbaopa90(movies);
-_fizqln25();
-renderList();
+
+function showPosterPreview(src) {
+  const wrap = document.getElementById('poster-preview-wrap');
+  const img = document.getElementById('img-preview');
+  img.src = src;
+  wrap.style.display = 'block';
 }
-function _fdyomu62(url){
-const p=document.getElementById('img-preview');
-if (url&&url.startsWith('http')){p.src=url;p.classList.add('show');}
-else{p.classList.remove('show');}
+
+function clearPoster() {
+  posterDataUrl = null;
+  document.getElementById('f-image').value = '';
+  document.getElementById('poster-preview-wrap').style.display = 'none';
+  resetDropZone();
 }
-let posterDataUrl=null;
-function _vwcqoa21(file){
-if (!file) return;
-const reader=new FileReader();
-reader.onload=function(e){
-posterDataUrl=e.target.result;
-const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'-').toLowerCase();
-const dz=document.getElementById('drop-zone');
-dz.classList.add('has-image');
-dz.innerHTML=`<img src="${posterDataUrl}" style="height:120px;border-radius:6px;object-fit:cover;display:block;margin:0 auto;"/>`;
-document.getElementById('f-image').value='';
-_xwhqpd30(posterDataUrl);
-showToast('Imagen cargada ✓','success');
-};
-reader.readAsDataURL(file);
+
+function resetDropZone() {
+  const dz = document.getElementById('drop-zone');
+  dz.classList.remove('has-image');
+  dz.innerHTML = `<div class="drop-zone-inner"><div style="font-size:2rem;margin-bottom:0.5rem;">🖼</div><div style="font-size:0.85rem;color:var(--white);font-weight:600;">Arrastra la imagen aquí</div><div style="font-size:0.75rem;color:var(--muted);margin-top:0.25rem;">o haz clic para seleccionar</div><div style="font-size:0.7rem;color:var(--muted);margin-top:0.15rem;">WEBP · JPG · PNG</div></div>`;
 }
-function _easszt74(url){
-if (url&&url.startsWith('http')){
-posterDataUrl=null;
-_ecllms96();
-_xwhqpd30(url);
-}else{
-document.getElementById('poster-preview-wrap').style.display='none';
-}
-}
-function _xwhqpd30(src){
-const wrap=document.getElementById('poster-preview-wrap');
-const img=document.getElementById('img-preview');
-img.src=src;
-wrap.style.display='block';
-}
-function _srngqc65(){
-posterDataUrl=null;
-document.getElementById('f-image').value='';
-document.getElementById('poster-preview-wrap').style.display='none';
-_ecllms96();
-}
-function _ecllms96(){
-const dz=document.getElementById('drop-zone');
-dz.classList.remove('has-image');
-dz.innerHTML=`<div class="drop-zone-inner"><div style="font-size:2rem;margin-bottom:0.5rem;">🖼</div><div style="font-size:0.85rem;color:var(--white);font-weight:600;">Arrastra la imagen aquí</div><div style="font-size:0.75rem;color:var(--muted);margin-top:0.25rem;">o haz clic para seleccionar</div><div style="font-size:0.7rem;color:var(--muted);margin-top:0.15rem;">WEBP · JPG · PNG</div></div>`;
-}
-document.addEventListener('DOMContentLoaded',function(){
-const dz=document.getElementById('drop-zone');
-if (!dz) return;
-dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});
-dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));
-dz.addEventListener('drop',e=>{
-e.preventDefault();dz.classList.remove('dragover');
-const file=e.dataTransfer.files[0];
-if (file&&file.type.startsWith('image/')) _vwcqoa21(file);
+
+// Inicializar drag & drop
+document.addEventListener('DOMContentLoaded', function() {
+  const dz = document.getElementById('drop-zone');
+  if (!dz) return;
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) handleImageFile(file);
+  });
 });
-});
-function _wvhbwy20(q=''){
-const u=q.toLowerCase();
-if (u.includes('4k')) return 'badge-4k';
-if (u.includes('1080')) return 'badge-1080p';
-if (u.includes('720')) return 'badge-720p';
-return 'badge-other';
+
+/* ======================== LIST ======================== */
+function qualityBadge(q = '') {
+  const u = q.toLowerCase();
+  if (u.includes('4k')) return 'badge-4k';
+  if (u.includes('1080')) return 'badge-1080p';
+  if (u.includes('720')) return 'badge-720p';
+  return 'badge-other';
 }
-function renderList(){
-const movies=_tvzndr80();
-const q=(document.getElementById('admin-search')?.value||'').toLowerCase();
-const list=document.getElementById('movie-list');
-const empty=document.getElementById('list-empty');
-document.getElementById('count-badge').textContent=movies.length;
-const filtered=movies.filter(m=>!q||(m.title||'').toLowerCase().includes(q)||(m.year||'').includes(q));
-if (filtered.length===0){list.innerHTML='';empty.style.display='block';_potbpn77();return;}
-empty.style.display='none';
-const fallback=`data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='300'%3E%3Crect fill='%230e1117' width='200' height='300'/%3E%3Ctext fill='%236b7280' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='40'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E`; //fixed
-const _dummyFixA=`http:
-list.innerHTML=filtered.map(m=>{
-const ri=movies.indexOf(m);
-return `
-<div class="movie-item">
-<img class="movie-item-poster" src="${m.image||''}" alt="${m.title}" onerror="this.src='${fallback}'"/>
-<div class="movie-item-info">
-<div class="movie-item-title">${m.title}</div>
-<div class="movie-item-meta">
-<span class="badge ${_wvhbwy20(m.quality)}">${m.quality||'HD'}</span>
-<span>${m.year||''}</span><span>${m.type||''}</span>
-</div>
-</div>
-<div class="movie-item-actions">
-<button class="item-btn edit" title="Editar" onclick="editMovie(${ri})">✏️</button>
-<button class="item-btn delete" title="Eliminar" onclick="deleteMovie(${ri})">🗑</button>
-</div>
-</div>`;
-}).join('');
-_potbpn77();
+
+function renderList() {
+  const movies = getMovies();
+  const q = (document.getElementById('admin-search')?.value || '').toLowerCase();
+  const list = document.getElementById('movie-list');
+  const empty = document.getElementById('list-empty');
+  document.getElementById('count-badge').textContent = movies.length;
+  const filtered = movies.filter(m => !q || (m.title||'').toLowerCase().includes(q) || (m.year||'').includes(q));
+  if (filtered.length === 0) { list.innerHTML = ''; empty.style.display = 'block'; updateStats(); return; }
+  empty.style.display = 'none';
+  const fallback = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='72'%3E%3Crect fill='%23161b24' width='48' height='72'/%3E%3C/svg%3E`;
+  list.innerHTML = filtered.map(m => {
+    const ri = movies.indexOf(m);
+    return `
+    <div class="movie-item">
+      <img class="movie-item-poster" src="${m.image||''}" alt="${m.title}" onerror="this.src='${fallback}'"/>
+      <div class="movie-item-info">
+        <div class="movie-item-title">${m.title}</div>
+        <div class="movie-item-meta">
+          <span class="badge ${qualityBadge(m.quality)}">${m.quality||'HD'}</span>
+          <span>${m.year||''}</span><span>${m.type||''}</span>
+        </div>
+      </div>
+      <div class="movie-item-actions">
+        <button class="item-btn edit" title="Editar" onclick="editMovie(${ri})">✏️</button>
+        <button class="item-btn delete" title="Eliminar" onclick="deleteMovie(${ri})">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+  updateStats();
 }
-function editMovie(idx){
-const m=_tvzndr80()[idx];
-if (!m) return;
-document.getElementById('f-title').value=m.title||'';
-const datosLines=[];
-if (m.originalTitle) datosLines.push('Título Original:'+m.originalTitle);
-if (m.year) datosLines.push('Año:'+m.year);
-if (m.country) datosLines.push('País(es):'+m.country);
-if (m.duration) datosLines.push('Duración:'+m.duration);
-if (m.genre) datosLines.push('Género:'+m.genre);
-document.getElementById('f-datos-raw').value=datosLines.join('\n');
-if (m.descargaRaw){
-document.getElementById('f-descarga-raw').value=m.descargaRaw;
-}else{
-const descLines=[];
-if (m.audio) descLines.push('Audio:'+m.audio);
-if (m.quality) descLines.push('Calidad:'+m.quality);
-if (m.resolution) descLines.push('Resolución:'+m.resolution);
-if (m.format) descLines.push('Formato:'+m.format);
-if (m.size) descLines.push('Tamaño:'+m.size);
-if (m.codec) descLines.push('Codec:'+m.codec);
-if (m.subtitles) descLines.push('Subtítulos:'+m.subtitles);
-if (m.uploader) descLines.push('por:'+m.uploader);
-document.getElementById('f-descarga-raw').value=descLines.join('\n');
+
+function editMovie(idx) {
+  const m = getMovies()[idx];
+  if (!m) return;
+  document.getElementById('f-title').value = m.title||'';
+  // Rebuild datos-raw
+  const datosLines = [];
+  if (m.originalTitle) datosLines.push('Título Original: ' + m.originalTitle);
+  if (m.year) datosLines.push('Año: ' + m.year);
+  if (m.country) datosLines.push('País(es): ' + m.country);
+  if (m.duration) datosLines.push('Duración: ' + m.duration);
+  if (m.genre) datosLines.push('Género: ' + m.genre);
+  document.getElementById('f-datos-raw').value = datosLines.join('\n');
+  // Rebuild descarga-raw (use stored raw if available, else rebuild)
+  if (m.descargaRaw) {
+    document.getElementById('f-descarga-raw').value = m.descargaRaw;
+  } else {
+    const descLines = [];
+    if (m.audio) descLines.push('Audio: ' + m.audio);
+    if (m.quality) descLines.push('Calidad: ' + m.quality);
+    if (m.resolution) descLines.push('Resolución: ' + m.resolution);
+    if (m.format) descLines.push('Formato: ' + m.format);
+    if (m.size) descLines.push('Tamaño: ' + m.size);
+    if (m.codec) descLines.push('Codec: ' + m.codec);
+    if (m.subtitles) descLines.push('Subtítulos: ' + m.subtitles);
+    if (m.uploader) descLines.push('por: ' + m.uploader);
+    document.getElementById('f-descarga-raw').value = descLines.join('\n');
+  }
+  document.getElementById('f-type').value = m.type||'Película';
+  document.getElementById('f-quality').value = m.quality||'Full HD';
+  document.getElementById('f-source').value = m.source||'';
+  document.getElementById('f-year-filter').value = m.yearFilter||m.year||'';
+  document.getElementById('f-audio').value = m.audio||'Latino';
+  document.getElementById('f-image').value = m.image||'';
+  document.getElementById('f-screenshot').value = m.screenshot||'';
+  document.getElementById('f-trailer').value = m.trailer||'';
+  document.getElementById('f-links').value = m.links||m.link||'';
+  document.getElementById('f-desc').value = m.description||'';
+  if (m.image) { posterDataUrl = null; showPosterPreview(m.image); }
+  editingIndex = idx;
+  document.getElementById('form-panel-title').innerHTML = 'Editando <span>Película</span>';
+  document.getElementById('form-submit-btn').textContent = '✓ GUARDAR CAMBIOS';
+  document.getElementById('form-submit-btn').classList.add('editing');
+  document.getElementById('cancel-btn').classList.add('visible');
+  window.scrollTo({top:0, behavior:'smooth'});
 }
-document.getElementById('f-type').value=m.type||'Película';
-document.getElementById('f-quality').value=m.quality||'Full HD';
-document.getElementById('f-source').value=m.source||'';
-document.getElementById('f-year-filter').value=m.yearFilter||m.year||'';
-document.getElementById('f-audio').value=m.audio||'Latino';
-document.getElementById('f-image').value=m.image||'';
-document.getElementById('f-screenshot').value=m.screenshot||'';
-document.getElementById('f-trailer').value=m.trailer||'';
-document.getElementById('f-links').value=m.links||m.link||'';
-document.getElementById('f-desc').value=m.description||'';
-if (m.image){posterDataUrl=null;_xwhqpd30(m.image);}
-editingIndex=idx;
-document.getElementById('form-panel-title').innerHTML='Editando<span>Película</span>';
-document.getElementById('form-submit-btn').textContent='✓ GUARDAR CAMBIOS';
-document.getElementById('form-submit-btn').classList.add('editing');
-document.getElementById('cancel-btn').classList.add('visible');
-window.scrollTo({top:0,behavior:'smooth'});
+
+function deleteMovie(idx) {
+  if (!confirm('¿Eliminar este título?')) return;
+  const movies = getMovies(); movies.splice(idx, 1); saveMovies(movies); renderList(); showToast('Eliminado.','info');
 }
-function deleteMovie(idx){
-if (!confirm('¿Eliminar este título?')) return;
-const movies=_tvzndr80();movies.splice(idx,1);_gbaopa90(movies);renderList();showToast('Eliminado.','info');
+
+function clearAll() {
+  if (!confirm('¿Eliminar TODO el catálogo del almacenamiento local?')) return;
+  localStorage.removeItem('noctis_movies'); renderList(); updateExport(); showToast('Catálogo vaciado.','info');
 }
-function clearAll(){
-if (!confirm('¿Eliminar TODO el catálogo del almacenamiento local?')) return;
-localStorage.removeItem('noctis_movies');renderList();_ounaia56();showToast('Catálogo vaciado.','info');
+
+/* ======================== STATS ======================== */
+function updateStats() {
+  const m = getMovies();
+  document.getElementById('stat-total').textContent = m.length;
+  document.getElementById('stat-movies').textContent = m.filter(x=>x.type==='Película').length;
+  document.getElementById('stat-series').textContent = m.filter(x=>['Serie','Anime','Dorama'].includes(x.type)).length;
 }
-function _potbpn77(){
-const m=_tvzndr80();
-document.getElementById('stat-total').textContent=m.length;
-document.getElementById('stat-movies').textContent=m.filter(x=>x.type==='Película').length;
-document.getElementById('stat-series').textContent=m.filter(x=>['Serie','Anime','Dorama'].includes(x.type)).length;
+
+/* ======================== EXPORT ======================== */
+function updateExport() { document.getElementById('export-preview').textContent = JSON.stringify(getMovies(),null,2); }
+
+function downloadJSON() {
+  const json = JSON.stringify(getMovies(),null,2);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([json],{type:'application/json'}));
+  a.download = 'movies.json'; a.click();
+  showToast('movies.json descargado ✓','success');
 }
-function _ounaia56(){document.getElementById('export-preview').textContent=JSON.stringify(_tvzndr80(),null,2);}
-function downloadJSON(){
-const json=JSON.stringify(_tvzndr80(),null,2);
-const a=document.createElement('a');
-a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));
-a.download='movies.json';a.click();
-showToast('movies.json descargado ✓','success');
+
+function copyJSON() { navigator.clipboard.writeText(JSON.stringify(getMovies(),null,2)).then(()=>showToast('JSON copiado ✓','success')); }
+
+/* ======================== IMPORT ======================== */
+function importJSON() {
+  const raw = document.getElementById('import-area').value.trim();
+  if (!raw) { showToast('Pega el JSON primero.','error'); return; }
+  try {
+    const data = JSON.parse(raw);
+    if (!Array.isArray(data)) throw new Error('No es un array');
+    if (!confirm(`¿Importar ${data.length} títulos? Esto reemplazará el catálogo actual.`)) return;
+    saveMovies(data);
+    renderList();
+    document.getElementById('import-area').value = '';
+    showToast(`✓ ${data.length} títulos importados`,'success');
+  } catch(e) {
+    showToast('JSON inválido. Revisa el formato.','error');
+  }
 }
-function copyJSON(){navigator.clipboard.writeText(JSON.stringify(_tvzndr80(),null,2)).then(()=>showToast('JSON copiado ✓','success'));}
-function importJSON(){
-const raw=document.getElementById('import-area').value.trim();
-if (!raw){showToast('Pega el JSON primero.','error');return;}
-try{
-const data=JSON.parse(raw);
-if (!Array.isArray(data)) throw new Error('No es un array');
-if (!confirm(`¿Importar ${data.length}títulos?Esto reemplazará el catálogo actual.`)) return;
-_gbaopa90(data);
-renderList();
-document.getElementById('import-area').value='';
-showToast(`✓ ${data.length}títulos importados`,'success');
-}catch(e){
-showToast('JSON inválido. Revisa el formato.','error');
-}
-}
+
+/* ======================== TOAST ======================== */
 let toastTimer;
-function showToast(msg,type='info'){
-const t=document.getElementById('toast');
-t.textContent=msg;t.className='toast show '+type;
-clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
-}</script>
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show '+type;
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
 </body>
 </html>
