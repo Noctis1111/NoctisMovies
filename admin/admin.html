@@ -467,7 +467,23 @@ checkAuth();
 
 /* ======================== DATA ======================== */
 function getMovies() { try { return JSON.parse(localStorage.getItem('noctis_movies') || '[]'); } catch { return []; } }
-function saveMovies(arr) { localStorage.setItem('noctis_movies', JSON.stringify(arr)); updateExport(); updateStats(); }
+function saveMovies(arr) {
+  try {
+    const json = JSON.stringify(arr);
+    localStorage.setItem('noctis_movies', json);
+    updateExport();
+    updateStats();
+    return true;
+  } catch(e) {
+    // Si la cuota de localStorage está llena (por imágenes base64 muy grandes)
+    if (e.name === 'QuotaExceededError' || e.code === 22) {
+      showToast('⚠ Error: localStorage lleno. Usa URLs de imagen en vez de archivos locales.', 'error');
+    } else {
+      showToast('⚠ Error al guardar: ' + e.message, 'error');
+    }
+    return false;
+  }
+}
 
 let editingIndex = -1;
 
@@ -569,15 +585,23 @@ function cancelEdit() { clearForm(); }
 function submitForm() {
   const data = getFormData();
   if (!data.title) { showToast('El título es obligatorio.', 'error'); return; }
+
+  // Advertir si la imagen es base64 muy grande (>500KB) → puede llenar localStorage
+  if (data.image && data.image.startsWith('data:image') && data.image.length > 500000) {
+    if (!confirm('⚠ La imagen es muy grande (' + Math.round(data.image.length/1024) + 'KB).\nEsto puede llenar el almacenamiento. ¿Continuar de todas formas?')) return;
+  }
+
   const movies = getMovies();
-  if (editingIndex >= 0) {
+  const isEdit = editingIndex >= 0;
+  if (isEdit) {
     movies[editingIndex] = data;
-    showToast('Actualizado ✓', 'success');
   } else {
     movies.unshift(data);
-    showToast('Agregado ✓', 'success');
   }
-  saveMovies(movies);
+  const ok = saveMovies(movies);
+  if (!ok) return; // saveMovies mostró el error
+
+  showToast(isEdit ? '✓ Actualizado' : '✓ Agregado — Total: ' + movies.length, 'success');
   clearForm();
   renderList();
 }
