@@ -42,7 +42,9 @@
     .admin-nav a:hover, .admin-nav button:hover { color: var(--white); border-color: var(--gold); }
     .logout-btn { color: var(--red) !important; border-color: var(--red) !important; }
 
-    .admin-main { max-width: 1400px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 1fr 600px; gap: 2rem; align-items: start; }
+    /* ===== AQUI ESTA EL CAMBIO DE ANCHO ===== */
+    /* Se aumentó a 1600px y la grilla ahora es 1.2fr para formulario y 1fr para el catálogo */
+    .admin-main { max-width: 1600px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; align-items: start; }
     @media (max-width: 1100px) { .admin-main { grid-template-columns: 1fr; } }
 
     /* PANEL */
@@ -143,7 +145,6 @@
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
     <a href="../index.html" class="login-logo-link">
@@ -160,7 +161,6 @@
   </div>
 </div>
 
-<!-- ADMIN -->
 <div id="admin-screen">
   <header class="admin-header">
     <div class="admin-header-inner">
@@ -179,7 +179,6 @@
 
   <div class="admin-main">
 
-    <!-- COLUMNA IZQUIERDA: FORMULARIO -->
     <div>
       <div class="panel">
         <div class="panel-header">
@@ -187,7 +186,6 @@
         </div>
         <div class="panel-body">
 
-          <!-- ── FILA 1: Título + Tipo en la misma línea ── -->
           <div class="form-section">📽 Información básica</div>
           <div style="display:grid;grid-template-columns:1fr 160px;gap:0.75rem;">
             <div class="form-group" style="margin-bottom:0.75rem;">
@@ -206,7 +204,6 @@
             </div>
           </div>
 
-          <!-- ── FILA 2: Datos + Sinopsis lado a lado ── -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
             <div class="form-group" style="margin-bottom:0;">
               <label>Datos <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(pega el bloque)</span></label>
@@ -218,20 +215,16 @@
             </div>
           </div>
 
-          <!-- Campos ocultos para compatibilidad -->
           <input type="hidden" id="f-original-title"/>
           <input type="hidden" id="f-year"/>
           <input type="hidden" id="f-country"/>
           <input type="hidden" id="f-duration"/>
           <input type="hidden" id="f-genre"/>
 
-          <!-- ── IMÁGENES Y MEDIOS ── -->
           <div class="form-section">🖼 Imágenes y Medios</div>
 
-          <!-- Portada + capturas/trailer en grilla -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
 
-            <!-- Izquierda: drop zone + URL -->
             <div class="form-group" style="margin-bottom:0;">
               <label>Portada (poster) *</label>
               <div class="drop-zone" id="drop-zone" onclick="document.getElementById('f-image-file').click()" style="padding:0.75rem;">
@@ -255,7 +248,6 @@
               </div>
             </div>
 
-            <!-- Derecha: capturas + trailer -->
             <div style="display:flex;flex-direction:column;gap:0.65rem;">
               <div class="form-group" style="margin-bottom:0;">
                 <label>URLs Capturas</label>
@@ -269,7 +261,6 @@
             </div>
           </div>
 
-          <!-- ── FILTRADO: 4 campos en 1 fila ── -->
           <div class="form-section">🎛 Filtrado</div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr 90px;gap:0.75rem;margin-bottom:0.75rem;">
             <div class="form-group" style="margin-bottom:0;">
@@ -338,7 +329,6 @@
             </div>
           </div>
 
-          <!-- ── ENLACES DE DESCARGA: 2 columnas ── -->
           <div class="form-section">🔗 Enlaces de Descarga</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
             <div class="form-group" style="margin-bottom:0;">
@@ -351,7 +341,6 @@
             </div>
           </div>
 
-          <!-- Campos ocultos descarga (compatibilidad) -->
           <input type="hidden" id="f-format" value="MKV"/>
           <input type="hidden" id="f-size"/>
           <input type="hidden" id="f-codec" value="H264"/>
@@ -363,7 +352,6 @@
         </div>
       </div>
 
-      <!-- EXPORT + IMPORT lado a lado -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.75rem;">
         <div class="io-section" style="margin-top:0;">
           <div class="io-title">📋 Exportar movies.json</div>
@@ -382,7 +370,6 @@
       </div>
     </div>
 
-    <!-- COLUMNA DERECHA: LISTA -->
     <div>
       <div class="panel">
         <div class="panel-header">
@@ -536,7 +523,20 @@ function getFormData() {
     subtitles:     dp.subtitles2,
     uploader:      dp.uploader2,
     image:         posterDataUrl || document.getElementById('f-image').value.trim(),
-    screenshot:    document.getElementById('f-screenshot').value.trim(),
+    
+    // ===== AQUÍ ESTÁ INTEGRADO EL ARREGLO DE GOOGLE IMAGES Y BASE64 =====
+    screenshot:    document.getElementById('f-screenshot').value.split(/\r?\n/).map(url => {
+                     url = url.trim();
+                     if (url.includes('google.com/imgres')) {
+                       try {
+                         const urlObj = new URL(url);
+                         const imgReal = urlObj.searchParams.get('imgurl');
+                         return imgReal ? decodeURIComponent(imgReal) : url;
+                       } catch(e) { return url; }
+                     }
+                     return url;
+                   }).filter(Boolean).join('\n'),
+
     trailer:       document.getElementById('f-trailer').value.trim(),
     links:         document.getElementById('f-links').value.trim(),
     description:   document.getElementById('f-desc').value.trim(),
