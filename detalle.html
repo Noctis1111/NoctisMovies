@@ -495,48 +495,39 @@ function copyText(text) {
 }
 
 // =============================================
-// LÓGICA ENLACES: parsear texto multilínea
-// Formato:
-//   Servidor
-//   etiqueta (opcional)
-//   https://...
+// LÓGICA ENLACES: parsear CUALQUIER formato
+// Acepta: 1. url, 1) url, Etiqueta: url, url sola, Nombre servidor + url
 // =============================================
 function parseEnlaces(raw) {
   if (!raw || !raw.trim()) return [];
-  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+  const lines = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
   const servers = [];
-  let opcion = '';
-  let servidor = '';
+  let currentServer = '';
+
+  function extractUrl(line) {
+    const m = line.match(/https?:\/\/\S+/i);
+    return m ? m[0].replace(/[)\].,;]+$/, '') : null;
+  }
+
+  function extractLabel(line, url) {
+    let label = line.replace(url, '').trim();
+    label = label.replace(/^[\d]+[.)\s]+/, '').replace(/^[-•:\s]+/, '').replace(/:$/, '').trim();
+    return label;
+  }
 
   for (const line of lines) {
-    // Detectar "Opción 1:" o "Opcion 1"
-    const opcionMatch = line.match(/^Opci[oó]n\s*(\d+)\s*:?$/i);
-    if (opcionMatch) {
-      opcion = 'Opción ' + opcionMatch[1];
-      servidor = '';
-      continue;
-    }
-    // Detectar "Etiqueta: https://..."
-    const labelUrl = line.match(/^(.+?):\s*(https?:\/\/.+)$/);
-    if (labelUrl) {
-      const label = labelUrl[1].trim();
-      const url = labelUrl[2].trim();
-      const groupName = opcion && servidor ? opcion + ' › ' + servidor : servidor || opcion || 'Servidor';
+    const url = extractUrl(line);
+    if (url) {
+      const label = extractLabel(line, url);
+      const groupName = currentServer || 'Servidores';
       let group = servers.find(s => s.name === groupName);
       if (!group) { group = { name: groupName, links: [] }; servers.push(group); }
       group.links.push({ label, url });
-      continue;
+    } else {
+      if (line.length > 1 && !/^[\d\s.)\-]+$/.test(line)) {
+        currentServer = line;
+      }
     }
-    // URL sola
-    if (/^https?:\/\//i.test(line)) {
-      const groupName = opcion && servidor ? opcion + ' › ' + servidor : servidor || opcion || 'Servidor';
-      let group = servers.find(s => s.name === groupName);
-      if (!group) { group = { name: groupName, links: [] }; servers.push(group); }
-      group.links.push({ label: '', url: line });
-      continue;
-    }
-    // Nombre de servidor (texto sin URL)
-    servidor = line;
   }
   return servers;
 }
@@ -548,18 +539,25 @@ function renderEnlaces(raw) {
     content.innerHTML = '<div class="no-enlaces">Sin enlaces disponibles.</div>';
     return;
   }
-  content.innerHTML = servers.map(s => `
+  content.innerHTML = servers.map(s => {
+    // Si solo hay un grupo llamado 'Servidores' y un solo link, no mostrar header
+    const showHeader = !(s.name === 'Servidores' && servers.length === 1 && s.links.length === 1);
+    return `
     <div class="enlaces-section">
-      <div class="enlaces-server-name">🌐 ${s.name}</div>
-      ${s.links.map((lk, i) => `
+      ${showHeader ? `<div class="enlaces-server-name">🌐 ${s.name}</div>` : ''}
+      ${s.links.map((lk, i) => {
+        const safeUrl = lk.url.replace(/'/g, "\\'");
+        // Nombre visible del link: label > número si hay varios > URL corta
+        const display = lk.label || (s.links.length > 1 ? String(i+1) : '');
+        return `
         <div class="enlace-item">
-          ${lk.label ? `<span class="enlace-label">${lk.label}</span>` : (s.links.length > 1 ? `<span class="enlace-label">${i+1}</span>` : '')}
+          ${display ? `<span class="enlace-label">${display}</span>` : ''}
           <a href="${lk.url}" target="_blank" rel="noopener">${lk.url}</a>
-          <button class="btn-copiar-link" onclick="copyText('${lk.url.replace(/'/g,"\\'")}')">Copiar</button>
-        </div>
-      `).join('')}
-    </div>
-  `).join('');
+          <button class="btn-copiar-link" onclick="copyText('${safeUrl}')">Copiar</button>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
 }
 
 let enlacesVisible = false;
