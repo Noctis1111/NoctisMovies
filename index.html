@@ -300,12 +300,8 @@ function norm(str) {
 
 async function loadMovies() {
   try {
-    const local = localStorage.getItem('noctis_movies');
-    if (local) { allMovies = JSON.parse(local); }
-    else {
-      const res = await fetch('movies.json?v=' + Date.now());
-      allMovies = await res.json();
-    }
+    const res = await fetch('movies.json?v=' + Date.now());
+    allMovies = await res.json();
   } catch { allMovies = []; }
 
   // Leer parámetros URL
