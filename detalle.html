@@ -611,13 +611,8 @@ function renderRelated(movies, currentIdx) {
 async function init() {
   let movies = [];
   try {
-    const local = localStorage.getItem('noctis_movies');
-    if (local) {
-      movies = JSON.parse(local);
-    } else {
-      const res = await fetch('movies.json?v=' + Date.now());
-      movies = await res.json();
-    }
+    const res = await fetch('movies.json?v=' + Date.now());
+    movies = await res.json();
   } catch { movies = []; }
 
   if (!movies.length || isNaN(idx) || idx < 0 || idx >= movies.length) {
