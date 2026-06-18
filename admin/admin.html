@@ -281,8 +281,6 @@
                 <option value="720p">720p</option>
                 <option value="480p">480p</option>
                 <option value="CAM">CAM</option>
-                <option value="MP3">MP3</option>
-                <option value="FLAC">FLAC</option>
               </select>
             </div>
             <div class="form-group" style="margin-bottom:0;">
@@ -299,37 +297,18 @@
               <label>Fuente / Encode</label>
               <select id="f-source">
                 <option value="">— Seleccionar —</option>
-                <optgroup label="── WEB ──">
-                  <option value="WEB-DL">WEB-DL</option>
-                  <option value="WEB-RIP">WEB-RIP</option>
-                  <option value="WEBRIP">WEBRIP</option>
-                </optgroup>
-                <optgroup label="── BLU-RAY ──">
-                  <option value="REMUX">REMUX</option>
-                  <option value="BDXL">BDXL</option>
-                  <option value="BD50">BD50</option>
-                  <option value="BD25">BD25</option>
-                  <option value="BDRIP">BDRIP</option>
-                  <option value="BRRIP">BRRIP</option>
-                  <option value="PLACEBO">PLACEBO</option>
-                </optgroup>
-                <optgroup label="── HD ──">
-                  <option value="HDRIP">HDRip</option>
-                  <option value="HDTS">HDTS</option>
-                  <option value="HDTV">HDTV</option>
-                </optgroup>
-                <optgroup label="── ENCODE ──">
-                  <option value="X265">X265</option>
-                  <option value="60FPS">60FPS</option>
-                  <option value="DVDRIP">DVDRIP</option>
-                </optgroup>
-                <optgroup label="── MÚSICA ──">
-                  <option value="MP3 320KBPS">MP3 320KBPS</option>
-                  <option value="FLAC 16-24 Bits">FLAC 16-24 Bits</option>
-                </optgroup>
-                <optgroup label="── OTROS ──">
-                  <option value="Otros">Otros</option>
-                </optgroup>
+                <option value="60FPS" style="color:#cf0f0f;">60FPS</option>
+                <option value="REMUX" style="color:#d39407;">REMUX</option>
+                <option value="BDRIP" style="color:#5e37b6;">BDRIP</option>
+                <option value="BRRIP" style="color:#046fb6;">BRRIP</option>
+                <option value="X265" style="color:#6e6e6e;">X265</option>
+                <option value="WEB-DL" style="color:#0fb528;">WEB-DL</option>
+                <option value="WEB-RIP" style="color:#ee4394;">WEB-RIP</option>
+                <option value="PLACEBO" style="color:#6ac2eb;">PLACEBO</option>
+                <option value="HDRIP" style="color:#f8b800;">HDRip</option>
+                <option value="HDTS" style="color:#3330ac;">HDTS</option>
+                <option value="FLAC 16-24 Bits" style="color:#d39407;">16-24 bits Flac</option>
+                <option value="320Kbps" style="color:#8b0000;">320Kbps</option>
               </select>
             </div>
             <div class="form-group" style="margin-bottom:0;">
@@ -361,22 +340,6 @@
           <button class="form-submit" id="form-submit-btn" onclick="submitForm()">+ AGREGAR AL CATÁLOGO</button>
           <button class="cancel-btn" id="cancel-btn" onclick="cancelEdit()">Cancelar edición</button>
         </div>
-      </div>
-
-      <!-- SINCRONIZACIÓN GITHUB -->
-      <div class="io-section" style="margin-top:0.75rem;">
-        <div class="io-title">🔄 Sincronización con GitHub</div>
-        <p style="font-size:0.75rem;color:var(--muted);margin-bottom:0.6rem;">Configura una vez. Luego "Publicar" sube el catálogo directo a tu repo, sin tocar GitHub a mano.</p>
-        <div id="gh-config-form" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.6rem;">
-          <input type="text" id="gh-owner" placeholder="Usuario (ej: noctis1111)" style="padding:0.5rem;background:#0a0c12;border:1px solid var(--border);border-radius:6px;color:#fff;font-size:0.8rem;"/>
-          <input type="text" id="gh-repo" placeholder="Repositorio (ej: NoctisMovies)" style="padding:0.5rem;background:#0a0c12;border:1px solid var(--border);border-radius:6px;color:#fff;font-size:0.8rem;"/>
-          <input type="password" id="gh-token" placeholder="Token (ghp_...)" style="padding:0.5rem;background:#0a0c12;border:1px solid var(--border);border-radius:6px;color:#fff;font-size:0.8rem;grid-column:1/3;"/>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
-          <button class="export-btn" onclick="saveGhConfig()" style="margin:0;">💾 Guardar config</button>
-          <button class="export-btn primary-export" onclick="publishToGithub()" style="margin:0;background:var(--green);border-color:var(--green);color:#000;">🚀 Publicar en GitHub</button>
-        </div>
-        <p id="gh-status" style="font-size:0.7rem;color:var(--muted);margin-top:0.5rem;"></p>
       </div>
 
       <!-- EXPORT + IMPORT lado a lado -->
@@ -683,7 +646,6 @@ function resetDropZone() {
 
 // Inicializar drag & drop
 document.addEventListener('DOMContentLoaded', function() {
-  loadGhConfig();
   const dz = document.getElementById('drop-zone');
   if (!dz) return;
   dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
@@ -801,90 +763,6 @@ function updateStats() {
 
 /* ======================== EXPORT ======================== */
 function updateExport() { document.getElementById('export-preview').textContent = JSON.stringify(getMovies(),null,2); }
-
-// ===== SINCRONIZACIÓN GITHUB =====
-function loadGhConfig() {
-  try {
-    const cfg = JSON.parse(localStorage.getItem('noctis_gh_config') || '{}');
-    document.getElementById('gh-owner').value = cfg.owner || '';
-    document.getElementById('gh-repo').value = cfg.repo || '';
-    document.getElementById('gh-token').value = cfg.token || '';
-  } catch {}
-}
-
-function saveGhConfig() {
-  const owner = document.getElementById('gh-owner').value.trim();
-  const repo = document.getElementById('gh-repo').value.trim();
-  const token = document.getElementById('gh-token').value.trim();
-  if (!owner || !repo || !token) {
-    showToast('Completa usuario, repositorio y token.', 'error');
-    return;
-  }
-  localStorage.setItem('noctis_gh_config', JSON.stringify({ owner, repo, token }));
-  showToast('✓ Configuración guardada en este navegador.', 'success');
-}
-
-async function publishToGithub() {
-  const owner = document.getElementById('gh-owner').value.trim();
-  const repo = document.getElementById('gh-repo').value.trim();
-  const token = document.getElementById('gh-token').value.trim();
-  const statusEl = document.getElementById('gh-status');
-
-  if (!owner || !repo || !token) {
-    showToast('Configura usuario, repositorio y token primero.', 'error');
-    return;
-  }
-
-  statusEl.textContent = 'Publicando...';
-  statusEl.style.color = 'var(--muted)';
-
-  try {
-    const path = 'movies.json';
-    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-
-    // 1. Obtener el SHA actual del archivo (necesario para actualizar)
-    let sha = null;
-    const getRes = await fetch(apiUrl, {
-      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' }
-    });
-    if (getRes.ok) {
-      const getData = await getRes.json();
-      sha = getData.sha;
-    } else if (getRes.status !== 404) {
-      const err = await getRes.json().catch(() => ({}));
-      throw new Error(err.message || ('Error al leer archivo: ' + getRes.status));
-    }
-
-    // 2. Preparar el contenido en base64 (UTF-8 seguro)
-    const json = JSON.stringify(getMovies(), null, 2);
-    const utf8Bytes = new TextEncoder().encode(json);
-    const base64Content = btoa(Array.from(utf8Bytes, b => String.fromCharCode(b)).join(''));
-
-    // 3. Crear o actualizar el archivo
-    const putRes = await fetch(apiUrl, {
-      method: 'PUT',
-      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' },
-      body: JSON.stringify({
-        message: 'Actualizar catálogo desde admin — ' + new Date().toLocaleString(),
-        content: base64Content,
-        sha: sha || undefined
-      })
-    });
-
-    if (!putRes.ok) {
-      const err = await putRes.json().catch(() => ({}));
-      throw new Error(err.message || ('Error al publicar: ' + putRes.status));
-    }
-
-    statusEl.textContent = '✓ Publicado correctamente. Tarda ~1 min en reflejarse en el sitio.';
-    statusEl.style.color = 'var(--green)';
-    showToast('🚀 Catálogo publicado en GitHub', 'success');
-  } catch (e) {
-    statusEl.textContent = '✗ ' + e.message;
-    statusEl.style.color = '#e55';
-    showToast('Error al publicar: ' + e.message, 'error');
-  }
-}
 
 function downloadJSON() {
   const json = JSON.stringify(getMovies(),null,2);
