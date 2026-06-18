@@ -42,25 +42,25 @@
     .admin-nav a:hover, .admin-nav button:hover { color: var(--white); border-color: var(--gold); }
     .logout-btn { color: var(--red) !important; border-color: var(--red) !important; }
 
-    .admin-main { max-width: 1800px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 1fr 500px; gap: 2rem; align-items: start; }
+    .admin-main { max-width: 1800px; margin: 0 auto; padding: 1.25rem 2rem; display: grid; grid-template-columns: 1fr 600px; gap: 1.5rem; align-items: start; }
     @media (max-width: 1100px) { .admin-main { grid-template-columns: 1fr; } }
 
     /* PANEL */
     .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
-    .panel-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .panel-header { padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
     .panel-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 2px; }
     .panel-title span { color: var(--gold); }
-    .panel-body { padding: 1.5rem; }
+    .panel-body { padding: 1rem 1.25rem; }
 
     /* FORM */
-    .form-group { margin-bottom: 1rem; }
+    .form-group { margin-bottom: 0.6rem; }
     .form-group label { display: block; font-size: 0.72rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem; }
     .form-group input, .form-group select, .form-group textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.65rem 1rem; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 0.88rem; outline: none; transition: border-color 0.2s; }
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); }
     .form-group select option { background: var(--surface2); }
     .form-group textarea { resize: vertical; min-height: 65px; line-height: 1.5; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-    .form-submit { width: 100%; padding: 0.9rem; background: var(--gold); color: #000; border: none; border-radius: 10px; font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 2px; cursor: pointer; transition: background 0.2s; margin-top: 0.5rem; }
+    .form-submit { width: 100%; padding: 0.7rem; background: var(--gold); color: #000; border: none; border-radius: 10px; font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 2px; cursor: pointer; transition: background 0.2s; margin-top: 0.35rem; }
     .form-submit:hover { background: var(--gold2); }
     .form-submit.editing { background: var(--blue); }
     .form-submit.editing:hover { background: #60a5fa; }
@@ -84,7 +84,17 @@
     }
 
     /* SECTION DIVIDER */
-    .form-section { font-family: 'Bebas Neue', sans-serif; font-size: 0.85rem; letter-spacing: 2px; color: var(--gold); margin: 1.25rem 0 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); }
+    .form-section { font-family: 'Bebas Neue', sans-serif; font-size: 0.85rem; letter-spacing: 2px; color: var(--gold); margin: 0.75rem 0 0.5rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); }
+    .chip-group { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .chip-group-vertical { flex-direction: column; gap: 0.4rem; }
+    .chip { background: #0a0c12; border: 1px solid var(--border); color: var(--muted); padding: 0.4rem 0.85rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.18s; letter-spacing: 0.5px; }
+    .chip:hover { border-color: #fff; color: #fff; background: rgba(255,255,255,0.06); }
+    /* Chips normales activos (Calidad, Audio) → fondo blanco brillante, texto negro */
+    .chip.chip-active { background: #fff; border-color: #fff; color: #111; box-shadow: 0 0 10px rgba(255,255,255,0.35); }
+    /* Chips de Tipo → cada uno con su color definido por --chip-c */
+    .chip-type { text-align: left; border-radius: 8px; padding: 0.5rem 0.75rem; }
+    .chip-type:hover { border-color: var(--chip-c); color: var(--chip-c); background: rgba(255,255,255,0.04); }
+    .chip-type.chip-active { background: var(--chip-c); border-color: var(--chip-c); color: #fff; box-shadow: 0 0 12px color-mix(in srgb, var(--chip-c) 60%, transparent); }
 
     /* HELPER TEXT */
     .form-helper { font-size: 0.72rem; color: var(--muted); margin-top: 0.3rem; line-height: 1.4; }
@@ -139,6 +149,14 @@
     .admin-search input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 1rem; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 0.85rem; outline: none; }
     .admin-search input:focus { border-color: var(--gold); }
     .admin-search input::placeholder { color: var(--muted); }
+
+    /* PAGINACIÓN */
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.75rem 1rem 1rem; flex-wrap: wrap; }
+    .page-btn { min-width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.2s; padding: 0 0.5rem; }
+    .page-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+    .page-btn.active { background: var(--gold); border-color: var(--gold); color: #000; }
+    .page-btn:disabled { opacity: 0.25; cursor: default; }
+    .page-info { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.5px; white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -187,34 +205,48 @@
         </div>
         <div class="panel-body">
 
-          <!-- ── FILA 1: Título + Tipo en la misma línea ── -->
+          <!-- ── INFORMACIÓN BÁSICA ── -->
           <div class="form-section">📽 Información básica</div>
-          <div style="display:grid;grid-template-columns:1fr 160px;gap:0.75rem;">
-            <div class="form-group" style="margin-bottom:0.75rem;">
-              <label>Título completo *</label>
-              <input type="text" id="f-title" placeholder="Título completo de la película o serie"/>
-            </div>
-            <div class="form-group" style="margin-bottom:0.75rem;">
-              <label>Tipo</label>
-              <select id="f-type">
-                <option value="Película">Película</option>
-                <option value="Serie">Serie</option>
-                <option value="Anime">Anime</option>
-                <option value="Dorama">Dorama</option>
-                <option value="Colección">Colección</option>
-              </select>
-            </div>
+
+          <!-- Título completo -->
+          <div class="form-group">
+            <label>Título completo *</label>
+            <input type="text" id="f-title" placeholder="Título completo de la película o serie"/>
           </div>
 
-          <!-- ── FILA 2: Datos + Sinopsis lado a lado ── -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
+          <!-- Datos+Sinopsis | Tipo (3 cols) | Año -->
+          <div style="display:grid;grid-template-columns:1fr auto auto;gap:0.75rem;margin-bottom:0.75rem;align-items:start;">
+            <!-- Datos + Sinopsis -->
             <div class="form-group" style="margin-bottom:0;">
-              <label>Datos <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(pega el bloque)</span></label>
-              <textarea id="f-datos-raw" class="textarea-links" style="min-height:110px;font-size:0.82rem;" placeholder="Título Original: ...&#10;Año: ...&#10;País(es): ...&#10;Duración: ...&#10;Género: ..."></textarea>
+              <label>Datos + Sinopsis <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(pega el bloque completo)</span></label>
+              <textarea id="f-datos-raw" class="textarea-links" style="min-height:110px;font-size:0.82rem;" placeholder="Título Original: ...&#10;Año: ...&#10;País(es): ...&#10;Duración: ...&#10;Género: ...&#10;&#10;Descripción de la película o serie..." onblur="autoRellenarSinopsis()"></textarea>
+              <input type="hidden" id="f-desc"/>
             </div>
+            <!-- Tipo: 3 columnas internas -->
             <div class="form-group" style="margin-bottom:0;">
-              <label>Sinopsis</label>
-              <textarea id="f-desc" style="min-height:110px;font-size:0.82rem;resize:vertical;" placeholder="Descripción de la película o serie..."></textarea>
+              <label>Tipo</label>
+              <div class="chip-group" style="display:grid;grid-template-columns:repeat(3,auto);gap:0.35rem;" id="chips-type">
+                <!-- Col 1 -->
+                <div style="display:flex;flex-direction:column;gap:0.35rem;">
+                  <button type="button" class="chip chip-type chip-active" data-value="Película" style="--chip-c:#e8a020;">🎬 Película</button>
+                  <button type="button" class="chip chip-type" data-value="Serie" style="--chip-c:#2e86de;">📺 Serie</button>
+                </div>
+                <!-- Col 2 -->
+                <div style="display:flex;flex-direction:column;gap:0.35rem;">
+                  <button type="button" class="chip chip-type" data-value="Anime" style="--chip-c:#e040fb;">⛩ Anime</button>
+                  <button type="button" class="chip chip-type" data-value="Dorama" style="--chip-c:#00b894;">🌸 Dorama</button>
+                </div>
+                <!-- Col 3 -->
+                <div style="display:flex;flex-direction:column;gap:0.35rem;">
+                  <button type="button" class="chip chip-type" data-value="Colección" style="--chip-c:#e17055;">📦 Colección</button>
+                </div>
+              </div>
+              <input type="hidden" id="f-type" value="Película"/>
+            </div>
+            <!-- Año -->
+            <div class="form-group" style="margin-bottom:0;min-width:80px;">
+              <label>Año</label>
+              <input type="text" id="f-year-filter" placeholder="2024" maxlength="4" style="text-align:center;letter-spacing:2px;width:80px;"/>
             </div>
           </div>
 
@@ -229,11 +261,13 @@
           <div class="form-section">🖼 Imágenes y Medios</div>
 
           <!-- Portada + capturas/trailer en grilla -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.6rem;">
 
-            <!-- Izquierda: drop zone + URL -->
+            <!-- Izquierda: drop zone / preview + URL -->
             <div class="form-group" style="margin-bottom:0;">
               <label>Portada (poster) *</label>
+
+              <!-- Drop zone: se oculta cuando hay imagen -->
               <div class="drop-zone" id="drop-zone" onclick="document.getElementById('f-image-file').click()" style="padding:0.75rem;">
                 <div class="drop-zone-inner" id="drop-zone-inner">
                   <div style="font-size:1.6rem;margin-bottom:0.3rem;">🖼</div>
@@ -242,24 +276,27 @@
                   <div style="font-size:0.65rem;color:var(--muted);margin-top:0.1rem;">WEBP · JPG · PNG</div>
                 </div>
               </div>
+
+              <!-- Preview: reemplaza el drop-zone cuando hay imagen -->
+              <div id="poster-preview-wrap" style="display:none;position:relative;width:100%;aspect-ratio:2/3;max-height:160px;">
+                <img id="img-preview" src="" alt="Preview" style="width:100%;height:100%;object-fit:cover;border-radius:8px;border:1px solid var(--border);display:block;"/>
+                <button onclick="clearPoster()" title="Quitar imagen" style="position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.7);border:1px solid var(--border);color:#fff;font-size:0.7rem;cursor:pointer;line-height:1;">✕</button>
+              </div>
+
               <input type="file" id="f-image-file" accept="image/webp,image/jpeg,image/png" style="display:none" onchange="handleImageFile(this.files[0])"/>
               <div style="display:flex;align-items:center;gap:0.4rem;margin:0.4rem 0;">
                 <div style="flex:1;height:1px;background:var(--border);"></div>
                 <span style="font-size:0.65rem;color:var(--muted);letter-spacing:1px;">O URL</span>
                 <div style="flex:1;height:1px;background:var(--border);"></div>
               </div>
-              <input type="url" id="f-image" placeholder="https://..." oninput="previewImgUrl(this.value)" style="margin-bottom:0.3rem;"/>
-              <div id="poster-preview-wrap" style="display:none;margin-top:0.4rem;position:relative;width:80px;">
-                <img id="img-preview" src="" alt="Preview" style="width:80px;height:120px;object-fit:cover;border-radius:6px;border:1px solid var(--border);display:block;"/>
-                <button onclick="clearPoster()" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:var(--red);border:none;color:#fff;font-size:0.65rem;cursor:pointer;line-height:1;">✕</button>
-              </div>
+              <input type="url" id="f-image" placeholder="https://..." oninput="previewImgUrl(this.value)" style="margin-bottom:0;"/>
             </div>
 
             <!-- Derecha: capturas + trailer -->
             <div style="display:flex;flex-direction:column;gap:0.65rem;">
               <div class="form-group" style="margin-bottom:0;">
                 <label>URLs Capturas</label>
-                <textarea id="f-screenshot" class="textarea-links" style="min-height:80px;font-size:0.8rem;" placeholder="https://cap1.jpg&#10;https://cap2.jpg"></textarea>
+                <textarea id="f-screenshot" class="textarea-links" style="min-height:60px;font-size:0.8rem;" placeholder="https://cap1.jpg&#10;https://cap2.jpg"></textarea>
                 <div class="form-helper">Una URL por línea.</div>
               </div>
               <div class="form-group" style="margin-bottom:0;">
@@ -269,64 +306,63 @@
             </div>
           </div>
 
-          <!-- ── FILTRADO: 4 campos en 1 fila ── -->
+          <!-- ── FILTRADO: chips clicleables ── -->
           <div class="form-section">🎛 Filtrado</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 90px;gap:0.75rem;margin-bottom:0.75rem;">
-            <div class="form-group" style="margin-bottom:0;">
-              <label>Calidad</label>
-              <select id="f-quality">
-                <option value="4K">4K</option>
-                <option value="Full HD" selected>Full HD</option>
-                <option value="1080p">1080p</option>
-                <option value="720p">720p</option>
-                <option value="480p">480p</option>
-                <option value="CAM">CAM</option>
-              </select>
+
+          <div class="form-group">
+            <label>Calidad</label>
+            <div class="chip-group" id="chips-quality">
+              <button type="button" class="chip" data-value="4K">4K</button>
+              <button type="button" class="chip chip-active" data-value="Full HD">Full HD</button>
+              <button type="button" class="chip" data-value="1080p">1080p</button>
+              <button type="button" class="chip" data-value="720p">720p</button>
+              <button type="button" class="chip" data-value="480p">480p</button>
+              <button type="button" class="chip" data-value="CAM">CAM</button>
+              <button type="button" class="chip" data-value="FLAC 16-24 Bits" style="border-color:#d39407;color:#d39407;">16-24 bits Flac</button>
+              <button type="button" class="chip" data-value="320Kbps" style="border-color:#8b0000;color:#8b0000;">320Kbps</button>
             </div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label>Audio</label>
-              <select id="f-audio">
-                <option value="Latino">Latino</option>
-                <option value="Inglés">Inglés</option>
-                <option value="Japonés">Japonés</option>
-                <option value="Koreano">Koreano</option>
-                <option value="Chino">Chino</option>
-              </select>
+            <input type="hidden" id="f-quality" value="Full HD"/>
+          </div>
+
+          <div class="form-group">
+            <label>Audio</label>
+            <div class="chip-group" id="chips-audio">
+              <button type="button" class="chip chip-active" data-value="Latino">Latino</button>
+              <button type="button" class="chip" data-value="Inglés">Inglés</button>
+              <button type="button" class="chip" data-value="Japonés">Japonés</button>
+              <button type="button" class="chip" data-value="Koreano">Koreano</button>
+              <button type="button" class="chip" data-value="Chino">Chino</button>
             </div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label>Fuente / Encode</label>
-              <select id="f-source">
-                <option value="">— Seleccionar —</option>
-                <option value="60FPS" style="color:#cf0f0f;">60FPS</option>
-                <option value="REMUX" style="color:#d39407;">REMUX</option>
-                <option value="BDRIP" style="color:#5e37b6;">BDRIP</option>
-                <option value="BRRIP" style="color:#046fb6;">BRRIP</option>
-                <option value="X265" style="color:#6e6e6e;">X265</option>
-                <option value="WEB-DL" style="color:#0fb528;">WEB-DL</option>
-                <option value="WEB-RIP" style="color:#ee4394;">WEB-RIP</option>
-                <option value="PLACEBO" style="color:#6ac2eb;">PLACEBO</option>
-                <option value="HDRIP" style="color:#f8b800;">HDRip</option>
-                <option value="HDTS" style="color:#3330ac;">HDTS</option>
-                <option value="FLAC 16-24 Bits" style="color:#d39407;">16-24 bits Flac</option>
-                <option value="320Kbps" style="color:#8b0000;">320Kbps</option>
-              </select>
+            <input type="hidden" id="f-audio" value="Latino"/>
+          </div>
+
+          <div class="form-group">
+            <label>Fuente / Encode</label>
+            <div class="chip-group" id="chips-source">
+              <button type="button" class="chip" data-value="60FPS" style="border-color:#cf0f0f;color:#cf0f0f;">60FPS</button>
+              <button type="button" class="chip" data-value="REMUX" style="border-color:#d39407;color:#d39407;">REMUX</button>
+              <button type="button" class="chip" data-value="BDRIP" style="border-color:#5e37b6;color:#5e37b6;">BDRIP</button>
+              <button type="button" class="chip" data-value="BRRIP" style="border-color:#046fb6;color:#046fb6;">BRRIP</button>
+              <button type="button" class="chip" data-value="X265" style="border-color:#6e6e6e;color:#6e6e6e;">X265</button>
+              <button type="button" class="chip" data-value="WEB-DL" style="border-color:#0fb528;color:#0fb528;">WEB-DL</button>
+              <button type="button" class="chip" data-value="WEB-RIP" style="border-color:#ee4394;color:#ee4394;">WEB-RIP</button>
+              <button type="button" class="chip" data-value="PLACEBO" style="border-color:#6ac2eb;color:#6ac2eb;">PLACEBO</button>
+              <button type="button" class="chip" data-value="HDRIP" style="border-color:#f8b800;color:#f8b800;">HDRip</button>
+              <button type="button" class="chip" data-value="HDTS" style="border-color:#3330ac;color:#3330ac;">HDTS</button>
             </div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label>Año</label>
-              <input type="text" id="f-year-filter" placeholder="2024" maxlength="4" style="text-align:center;letter-spacing:2px;"/>
-            </div>
+            <input type="hidden" id="f-source" value=""/>
           </div>
 
           <!-- ── ENLACES DE DESCARGA: 2 columnas ── -->
           <div class="form-section">🔗 Enlaces de Descarga</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.6rem;">
             <div class="form-group" style="margin-bottom:0;">
               <label>Info descarga <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(pega el bloque)</span></label>
-              <textarea id="f-descarga-raw" class="textarea-links" style="min-height:130px;font-size:0.82rem;" placeholder="Audio: Español Latino&#10;Calidad: WEBDL&#10;Resolución: 1920×1080&#10;Formato: MKV&#10;Tamaño: 4.5 GB&#10;Codec: H264&#10;Subtítulos: ..."></textarea>
+              <textarea id="f-descarga-raw" class="textarea-links" style="min-height:95px;font-size:0.82rem;" placeholder="Audio: Español Latino&#10;Calidad: WEBDL&#10;Resolución: 1920×1080&#10;Formato: MKV&#10;Tamaño: 4.5 GB&#10;Codec: H264&#10;Subtítulos: ..."></textarea>
             </div>
             <div class="form-group" style="margin-bottom:0;">
               <label>Enlaces públicos <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(pega el bloque)</span></label>
-              <textarea class="textarea-links" id="f-links" style="min-height:130px;font-size:0.82rem;" placeholder="Servidor 1&#10;https://enlace1.com&#10;&#10;Servidor 2&#10;https://enlace2.com"></textarea>
+              <textarea class="textarea-links" id="f-links" style="min-height:95px;font-size:0.82rem;" placeholder="Servidor 1&#10;https://enlace1.com&#10;&#10;Servidor 2&#10;https://enlace2.com"></textarea>
             </div>
           </div>
 
@@ -343,13 +379,13 @@
       </div>
 
       <!-- SINCRONIZACIÓN GITHUB -->
-      <div class="io-section" style="margin-top:0.75rem;">
+      <div class="io-section" style="margin-top:0.5rem;">
         <div class="io-title">🔄 Sincronización con GitHub</div>
         <p style="font-size:0.75rem;color:var(--muted);margin-bottom:0.6rem;">Configura una vez. Luego "Publicar" sube el catálogo directo a tu repo, sin tocar GitHub a mano.</p>
-        <div id="gh-config-form" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.6rem;">
+        <div id="gh-config-form" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-bottom:0.6rem;">
           <input type="text" id="gh-owner" placeholder="Usuario (ej: noctis1111)" style="padding:0.5rem;background:#0a0c12;border:1px solid var(--border);border-radius:6px;color:#fff;font-size:0.8rem;"/>
           <input type="text" id="gh-repo" placeholder="Repositorio (ej: NoctisMovies)" style="padding:0.5rem;background:#0a0c12;border:1px solid var(--border);border-radius:6px;color:#fff;font-size:0.8rem;"/>
-          <input type="password" id="gh-token" placeholder="Token (ghp_...)" style="padding:0.5rem;background:#0a0c12;border:1px solid var(--border);border-radius:6px;color:#fff;font-size:0.8rem;grid-column:1/3;"/>
+          <input type="password" id="gh-token" placeholder="Token (ghp_...)" style="padding:0.5rem;background:#0a0c12;border:1px solid var(--border);border-radius:6px;color:#fff;font-size:0.8rem;"/>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
           <button class="export-btn" onclick="saveGhConfig()" style="margin:0;">💾 Guardar config</button>
@@ -392,7 +428,7 @@
           </div>
         </div>
         <div class="admin-search">
-          <input type="text" id="admin-search" placeholder="Buscar en el catálogo..." oninput="renderList()"/>
+          <input type="text" id="admin-search" placeholder="Buscar en el catálogo..." oninput="renderList(true)"/>
         </div>
         <div class="panel-body" style="padding-top:1rem;">
           <div class="movie-list" id="movie-list"></div>
@@ -402,6 +438,7 @@
             <div style="font-size:0.8rem;margin-top:0.5rem;">Agrega títulos con el formulario o importa un movies.json.</div>
           </div>
         </div>
+        <div class="pagination" id="pagination" style="display:none;"></div>
       </div>
     </div>
   </div>
@@ -427,7 +464,7 @@ function doLogin() {
     } else {
       localStorage.removeItem('noctis_saved_pass');
     }
-    renderList(); updateExport();
+    renderList(true); updateExport();
   } else {
     document.getElementById('login-error').style.display = 'block';
     document.getElementById('login-pass').value = '';
@@ -453,7 +490,7 @@ function checkAuth() {
       if (Date.now() - d.timestamp < EXPIRATION_TIME) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('admin-screen').style.display = 'block';
-        renderList(); updateExport(); return;
+        renderList(true); updateExport(); return;
       } else { localStorage.removeItem('noctis_auth_data'); }
     } catch { localStorage.removeItem('noctis_auth_data'); }
   }
@@ -484,22 +521,120 @@ let editingIndex = -1;
 
 /* ======================== PARSE DATOS RAW ======================== */
 function parseDatosRaw(raw) {
-  const result = { originalTitle: '', year: '', country: '', duration: '', genre: '' };
+  const result = { originalTitle: '', year: '', country: '', duration: '', genre: '', sinopsisDetectada: '' };
   if (!raw) return result;
-  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+  const lines = raw.split('\n').map(l => l.trim());
+
+  const camposReconocidos = ['título original','titulo original','año','ano','país','pais','country','duración','duracion','género','genero','genre'];
+  const sinopsisRestante = [];
+  let yaTerminaronLosCampos = false;
+
   for (const line of lines) {
+    if (!line) continue;
+    // Saltar encabezados sueltos tipo "DATOS" o "SINOPSIS"
+    if (/^(datos|sinopsis)\s*$/i.test(line)) { continue; }
+
     const colonIdx = line.indexOf(':');
-    if (colonIdx < 0) continue;
-    const key = line.slice(0, colonIdx).toLowerCase().trim();
-    const val = line.slice(colonIdx + 1).trim();
-    if (key.includes('título original') || key.includes('titulo original')) result.originalTitle = val;
-    else if (key === 'año' || key === 'ano') result.year = val;
-    else if (key.includes('país') || key.includes('pais') || key === 'country') result.country = val;
-    else if (key.includes('duración') || key.includes('duracion')) result.duration = val;
-    else if (key.includes('género') || key.includes('genero') || key === 'genre') result.genre = val;
+    const key = colonIdx >= 0 ? line.slice(0, colonIdx).toLowerCase().trim() : '';
+    const esCampoConocido = colonIdx >= 0 && camposReconocidos.some(c => key.includes(c) || key === c);
+
+    if (esCampoConocido && !yaTerminaronLosCampos) {
+      const val = line.slice(colonIdx + 1).trim();
+      if (key.includes('título original') || key.includes('titulo original')) result.originalTitle = val;
+      else if (key === 'año' || key === 'ano') result.year = val;
+      else if (key.includes('país') || key.includes('pais') || key === 'country') result.country = val;
+      else if (key.includes('duración') || key.includes('duracion')) result.duration = val;
+      else if (key.includes('género') || key.includes('genero') || key === 'genre') result.genre = val;
+    } else {
+      // Ya no es un campo reconocido → todo lo siguiente es sinopsis
+      yaTerminaronLosCampos = true;
+      sinopsisRestante.push(line);
+    }
   }
+
+  result.sinopsisDetectada = sinopsisRestante.join(' ').trim();
   return result;
 }
+
+function autoRellenarSinopsis() {
+  const datosRaw = document.getElementById('f-datos-raw').value;
+  const parsed = parseDatosRaw(datosRaw);
+  // Siempre actualiza el hidden f-desc con la sinopsis detectada
+  if (parsed.sinopsisDetectada) {
+    document.getElementById('f-desc').value = parsed.sinopsisDetectada;
+  }
+}
+
+// ===== CHIPS DE SELECCIÓN (Calidad / Audio / Fuente) =====
+function initChips() {
+  document.querySelectorAll('.chip-group').forEach(group => {
+    const hiddenInputId = 'f-' + group.id.replace('chips-', '');
+    const hiddenInput = document.getElementById(hiddenInputId);
+    if (!hiddenInput) return;
+
+    group.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const wasActive = chip.classList.contains('chip-active');
+        const isSource = hiddenInputId === 'f-source';
+
+        // Desactivar todos en el grupo
+        group.querySelectorAll('.chip').forEach(c => {
+          c.classList.remove('chip-active');
+          // Restaurar chips de fuente (con color propio)
+          if (c.dataset.ownColor) {
+            c.style.background = '#0a0c12';
+            c.style.color = c.dataset.ownColor;
+          }
+        });
+
+        // Fuente: permite des-seleccionar
+        if (wasActive && isSource) {
+          hiddenInput.value = '';
+          return;
+        }
+
+        chip.classList.add('chip-active');
+
+        // Chips de Fuente: fondo con su propio color
+        if (isSource && chip.style.color) {
+          const ownColor = chip.style.color;
+          chip.dataset.ownColor = ownColor;
+          chip.style.background = ownColor;
+          chip.style.color = '#fff';
+        }
+
+        hiddenInput.value = chip.dataset.value;
+      });
+    });
+  });
+}
+
+function setActiveChip(groupId, value) {
+  const group = document.getElementById(groupId);
+  if (!group) return;
+  const hiddenInputId = 'f-' + groupId.replace('chips-', '');
+  const hiddenInput = document.getElementById(hiddenInputId);
+
+  group.querySelectorAll('.chip').forEach(c => {
+    const match = c.dataset.value === value;
+    c.classList.toggle('chip-active', match);
+    // Restaurar color base
+    if (c.dataset.ownColor) {
+      c.style.background = '#0a0c12';
+      c.style.color = c.dataset.ownColor;
+    }
+    // Si coincide y es chip de fuente, aplicar fondo de color
+    if (match && groupId === 'chips-source' && c.style.color) {
+      const ownColor = c.dataset.ownColor || c.style.color;
+      c.dataset.ownColor = ownColor;
+      c.style.background = ownColor;
+      c.style.color = '#fff';
+    }
+  });
+
+  if (hiddenInput) hiddenInput.value = value;
+}
+
 
 function parseDescargaRaw(raw) {
   const result = { audio2: '', calidad2: '', resolucion2: '', formato2: 'MKV', size2: '', codec2: 'H264', subtitles2: '', uploader2: '' };
@@ -559,14 +694,17 @@ function clearForm() {
   ['f-title','f-datos-raw','f-desc','f-image','f-screenshot','f-trailer','f-links','f-descarga-raw'
   ].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
   document.getElementById('f-type').value = 'Película';
+  document.getElementById('f-year-filter').value = '';
+  setActiveChip('chips-type', 'Película');
+  setActiveChip('chips-quality', 'Full HD');
+  setActiveChip('chips-audio', 'Latino');
+  setActiveChip('chips-source', '');
   document.getElementById('f-quality').value = 'Full HD';
   document.getElementById('f-source').value = '';
-  document.getElementById('f-year-filter').value = '';
   document.getElementById('f-audio').value = 'Latino';
   
-  document.getElementById('img-preview').classList.remove('show');
-  document.getElementById('poster-preview-wrap').style.display = 'none';
   posterDataUrl = null;
+  hidePosterPreview();
   resetDropZone();
   editingIndex = -1;
   document.getElementById('form-panel-title').innerHTML = 'Agregar <span>Película</span>';
@@ -598,7 +736,7 @@ function submitForm() {
 
   showToast(isEdit ? '✓ Actualizado' : '✓ Agregado — Total: ' + movies.length, 'success');
   clearForm();
-  renderList();
+  renderList(true);
 }
 
 function previewImg(url) {
@@ -630,27 +768,34 @@ function handleImageFile(file) {
 }
 
 function previewImgUrl(url) {
-  // Si escribe URL, limpiar imagen subida
   if (url && url.startsWith('http')) {
     posterDataUrl = null;
-    resetDropZone();
     showPosterPreview(url);
   } else {
-    document.getElementById('poster-preview-wrap').style.display = 'none';
+    hidePosterPreview();
   }
 }
 
 function showPosterPreview(src) {
   const wrap = document.getElementById('poster-preview-wrap');
   const img = document.getElementById('img-preview');
+  const dz = document.getElementById('drop-zone');
   img.src = src;
   wrap.style.display = 'block';
+  dz.style.display = 'none'; // ocultar drop-zone cuando hay imagen
+}
+
+function hidePosterPreview() {
+  const wrap = document.getElementById('poster-preview-wrap');
+  const dz = document.getElementById('drop-zone');
+  wrap.style.display = 'none';
+  dz.style.display = 'flex'; // mostrar drop-zone cuando no hay imagen
 }
 
 function clearPoster() {
   posterDataUrl = null;
   document.getElementById('f-image').value = '';
-  document.getElementById('poster-preview-wrap').style.display = 'none';
+  hidePosterPreview();
   resetDropZone();
 }
 
@@ -663,6 +808,7 @@ function resetDropZone() {
 // Inicializar drag & drop
 document.addEventListener('DOMContentLoaded', function() {
   loadGhConfig();
+  initChips();
   const dz = document.getElementById('drop-zone');
   if (!dz) return;
   dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
@@ -675,6 +821,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /* ======================== LIST ======================== */
+const PAGE_SIZE = 15;
+let currentPage = 1;
+
 function qualityBadge(q = '') {
   const u = q.toLowerCase();
   if (u.includes('4k')) return 'badge-4k';
@@ -683,17 +832,26 @@ function qualityBadge(q = '') {
   return 'badge-other';
 }
 
-function renderList() {
+function renderList(resetPage) {
+  if (resetPage) currentPage = 1;
   const movies = getMovies();
   const q = (document.getElementById('admin-search')?.value || '').toLowerCase();
   const list = document.getElementById('movie-list');
   const empty = document.getElementById('list-empty');
+  const paginationEl = document.getElementById('pagination');
   document.getElementById('count-badge').textContent = movies.length;
   const filtered = movies.filter(m => !q || (m.title||'').toLowerCase().includes(q) || (m.year||'').includes(q));
-  if (filtered.length === 0) { list.innerHTML = ''; empty.style.display = 'block'; updateStats(); return; }
+  if (filtered.length === 0) { list.innerHTML = ''; empty.style.display = 'block'; paginationEl.style.display = 'none'; updateStats(); return; }
   empty.style.display = 'none';
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageItems = filtered.slice(start, start + PAGE_SIZE);
+
   const fallback = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='72'%3E%3Crect fill='%23161b24' width='48' height='72'/%3E%3C/svg%3E`;
-  list.innerHTML = filtered.map(m => {
+  list.innerHTML = pageItems.map(m => {
     const ri = movies.indexOf(m);
     return `
     <div class="movie-item">
@@ -711,21 +869,48 @@ function renderList() {
       </div>
     </div>`;
   }).join('');
+
+  if (totalPages <= 1) {
+    paginationEl.style.display = 'none';
+  } else {
+    paginationEl.style.display = 'flex';
+    // Calcular ventana de hasta 10 páginas centrada en la actual
+    const MAX_BTNS = 10;
+    let pgStart = Math.max(1, currentPage - Math.floor(MAX_BTNS / 2));
+    let pgEnd = pgStart + MAX_BTNS - 1;
+    if (pgEnd > totalPages) { pgEnd = totalPages; pgStart = Math.max(1, pgEnd - MAX_BTNS + 1); }
+    let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+    if (pgStart > 1) html += `<button class="page-btn" onclick="goPage(1)">1</button><span class="page-info">…</span>`;
+    for (let i = pgStart; i <= pgEnd; i++) {
+      html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    }
+    if (pgEnd < totalPages) html += `<span class="page-info">…</span><button class="page-btn" onclick="goPage(${totalPages})">${totalPages}</button>`;
+    html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>›</button>`;
+    html += `<span class="page-info">&nbsp;Página ${currentPage} de ${totalPages}</span>`;
+    paginationEl.innerHTML = html;
+  }
   updateStats();
+}
+
+function goPage(p) {
+  currentPage = p;
+  renderList(false);
 }
 
 function editMovie(idx) {
   const m = getMovies()[idx];
   if (!m) return;
   document.getElementById('f-title').value = m.title||'';
-  // Rebuild datos-raw
+  // Rebuild datos-raw (datos + sinopsis juntos)
   const datosLines = [];
   if (m.originalTitle) datosLines.push('Título Original: ' + m.originalTitle);
   if (m.year) datosLines.push('Año: ' + m.year);
   if (m.country) datosLines.push('País(es): ' + m.country);
   if (m.duration) datosLines.push('Duración: ' + m.duration);
   if (m.genre) datosLines.push('Género: ' + m.genre);
+  if (m.description) datosLines.push('', m.description); // línea vacía + sinopsis
   document.getElementById('f-datos-raw').value = datosLines.join('\n');
+  document.getElementById('f-desc').value = m.description || '';
   // Rebuild descarga-raw (use stored raw if available, else rebuild)
   if (m.descargaRaw) {
     document.getElementById('f-descarga-raw').value = m.descargaRaw;
@@ -742,9 +927,13 @@ function editMovie(idx) {
     document.getElementById('f-descarga-raw').value = descLines.join('\n');
   }
   document.getElementById('f-type').value = m.type||'Película';
+  document.getElementById('f-year-filter').value = m.yearFilter||m.year||'';
+  setActiveChip('chips-type', m.type||'Película');
+  setActiveChip('chips-quality', m.quality||'Full HD');
+  setActiveChip('chips-audio', m.audio||'Latino');
+  setActiveChip('chips-source', m.source||'');
   document.getElementById('f-quality').value = m.quality||'Full HD';
   document.getElementById('f-source').value = m.source||'';
-  document.getElementById('f-year-filter').value = m.yearFilter||m.year||'';
   document.getElementById('f-audio').value = m.audio||'Latino';
   document.getElementById('f-image').value = m.image||'';
   document.getElementById('f-screenshot').value = m.screenshot||'';
@@ -762,12 +951,12 @@ function editMovie(idx) {
 
 function deleteMovie(idx) {
   if (!confirm('¿Eliminar este título?')) return;
-  const movies = getMovies(); movies.splice(idx, 1); saveMovies(movies); renderList(); showToast('Eliminado.','info');
+  const movies = getMovies(); movies.splice(idx, 1); saveMovies(movies); renderList(true); showToast('Eliminado.','info');
 }
 
 function clearAll() {
   if (!confirm('¿Eliminar TODO el catálogo del almacenamiento local?')) return;
-  localStorage.removeItem('noctis_movies'); renderList(); updateExport(); showToast('Catálogo vaciado.','info');
+  localStorage.removeItem('noctis_movies'); renderList(true); updateExport(); showToast('Catálogo vaciado.','info');
 }
 
 /* ======================== STATS ======================== */
@@ -785,9 +974,9 @@ function updateExport() { document.getElementById('export-preview').textContent 
 function loadGhConfig() {
   try {
     const cfg = JSON.parse(localStorage.getItem('noctis_gh_config') || '{}');
-    document.getElementById('gh-owner').value = cfg.owner || '';
-    document.getElementById('gh-repo').value = cfg.repo || '';
-    document.getElementById('gh-token').value = cfg.token || '';
+    if (document.getElementById('gh-owner')) document.getElementById('gh-owner').value = cfg.owner || '';
+    if (document.getElementById('gh-repo')) document.getElementById('gh-repo').value = cfg.repo || '';
+    if (document.getElementById('gh-token')) document.getElementById('gh-token').value = cfg.token || '';
   } catch {}
 }
 
@@ -795,10 +984,7 @@ function saveGhConfig() {
   const owner = document.getElementById('gh-owner').value.trim();
   const repo = document.getElementById('gh-repo').value.trim();
   const token = document.getElementById('gh-token').value.trim();
-  if (!owner || !repo || !token) {
-    showToast('Completa usuario, repositorio y token.', 'error');
-    return;
-  }
+  if (!owner || !repo || !token) { showToast('Completa usuario, repositorio y token.', 'error'); return; }
   localStorage.setItem('noctis_gh_config', JSON.stringify({ owner, repo, token }));
   showToast('✓ Configuración guardada en este navegador.', 'success');
 }
@@ -808,57 +994,30 @@ async function publishToGithub() {
   const repo = document.getElementById('gh-repo').value.trim();
   const token = document.getElementById('gh-token').value.trim();
   const statusEl = document.getElementById('gh-status');
-
-  if (!owner || !repo || !token) {
-    showToast('Configura usuario, repositorio y token primero.', 'error');
-    return;
-  }
-
+  if (!owner || !repo || !token) { showToast('Configura usuario, repositorio y token primero.', 'error'); return; }
   statusEl.textContent = 'Publicando...';
   statusEl.style.color = 'var(--muted)';
-
   try {
-    const path = 'movies.json';
-    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/movies.json`;
     let sha = null;
-    const getRes = await fetch(apiUrl, {
-      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' }
-    });
-    if (getRes.ok) {
-      const getData = await getRes.json();
-      sha = getData.sha;
-    } else if (getRes.status !== 404) {
-      const err = await getRes.json().catch(() => ({}));
-      throw new Error(err.message || ('Error al leer archivo: ' + getRes.status));
-    }
-
+    const getRes = await fetch(apiUrl, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' } });
+    if (getRes.ok) { const d = await getRes.json(); sha = d.sha; }
+    else if (getRes.status !== 404) { const e = await getRes.json().catch(() => ({})); throw new Error(e.message || 'Error ' + getRes.status); }
     const json = JSON.stringify(getMovies(), null, 2);
-    const utf8Bytes = new TextEncoder().encode(json);
-    const base64Content = btoa(Array.from(utf8Bytes, b => String.fromCharCode(b)).join(''));
-
+    const b64 = btoa(Array.from(new TextEncoder().encode(json), b => String.fromCharCode(b)).join(''));
     const putRes = await fetch(apiUrl, {
       method: 'PUT',
       headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' },
-      body: JSON.stringify({
-        message: 'Actualizar catálogo desde admin — ' + new Date().toLocaleString(),
-        content: base64Content,
-        sha: sha || undefined
-      })
+      body: JSON.stringify({ message: 'Actualizar catálogo — ' + new Date().toLocaleString(), content: b64, ...(sha && { sha }) })
     });
-
-    if (!putRes.ok) {
-      const err = await putRes.json().catch(() => ({}));
-      throw new Error(err.message || ('Error al publicar: ' + putRes.status));
-    }
-
-    statusEl.textContent = '✓ Publicado correctamente. Tarda ~1 min en reflejarse en el sitio.';
+    if (!putRes.ok) { const e = await putRes.json().catch(() => ({})); throw new Error(e.message || 'Error ' + putRes.status); }
+    statusEl.textContent = '✓ Publicado. Tarda ~1 min en reflejarse en el sitio.';
     statusEl.style.color = 'var(--green)';
     showToast('🚀 Catálogo publicado en GitHub', 'success');
-  } catch (e) {
+  } catch(e) {
     statusEl.textContent = '✗ ' + e.message;
     statusEl.style.color = '#e55';
-    showToast('Error al publicar: ' + e.message, 'error');
+    showToast('Error: ' + e.message, 'error');
   }
 }
 
@@ -881,7 +1040,7 @@ function importJSON() {
     if (!Array.isArray(data)) throw new Error('No es un array');
     if (!confirm(`¿Importar ${data.length} títulos? Esto reemplazará el catálogo actual.`)) return;
     saveMovies(data);
-    renderList();
+    renderList(true);
     document.getElementById('import-area').value = '';
     showToast(`✓ ${data.length} títulos importados`,'success');
   } catch(e) {
