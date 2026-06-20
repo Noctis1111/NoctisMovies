@@ -72,9 +72,11 @@
 
     /* DROP ZONE */
     .drop-zone {
-      border: 2px dashed var(--border); border-radius: 10px; padding: 1.25rem;
+      border: 2px dashed var(--border); border-radius: 10px; padding: 0.75rem;
       text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s;
       background: var(--surface2);
+      display: flex; align-items: center; justify-content: center;
+      aspect-ratio: 1280/740;
     }
     .drop-zone:hover, .drop-zone.dragover {
       border-color: var(--gold); background: rgba(201,168,76,0.05);
@@ -225,23 +227,23 @@
             <!-- Tipo: 3 columnas internas -->
             <div class="form-group" style="margin-bottom:0;">
               <label>Tipo</label>
-              <div class="chip-group" style="display:grid;grid-template-columns:repeat(3,auto);gap:0.35rem;" id="chips-type">
-                <!-- Col 1 -->
-                <div style="display:flex;flex-direction:column;gap:0.35rem;">
-                  <button type="button" class="chip chip-type chip-active" data-value="Película" style="--chip-c:#e8a020;">🎬 Película</button>
-                  <button type="button" class="chip chip-type" data-value="Serie" style="--chip-c:#2e86de;">📺 Serie</button>
-                </div>
-                <!-- Col 2 -->
-                <div style="display:flex;flex-direction:column;gap:0.35rem;">
-                  <button type="button" class="chip chip-type" data-value="Anime" style="--chip-c:#e040fb;">⛩ Anime</button>
-                  <button type="button" class="chip chip-type" data-value="Dorama" style="--chip-c:#00b894;">🌸 Dorama</button>
-                </div>
-                <!-- Col 3 -->
-                <div style="display:flex;flex-direction:column;gap:0.35rem;">
-                  <button type="button" class="chip chip-type" data-value="Colección" style="--chip-c:#e17055;">📦 Colección</button>
-                </div>
+              <div class="chip-group" style="display:grid;grid-template-columns:repeat(2,auto);gap:0.35rem;" id="chips-type">
+                <button type="button" class="chip chip-type chip-active" data-value="Película" style="--chip-c:#e8a020;">🎬 Película</button>
+                <button type="button" class="chip chip-type" data-value="Serie" style="--chip-c:#2e86de;">📺 Serie</button>
+                <button type="button" class="chip chip-type" data-value="Anime" style="--chip-c:#e040fb;">⛩ Anime</button>
+                <button type="button" class="chip chip-type" data-value="Dorama, Película" style="--chip-c:#00b894;">🌸 Dorama Película</button>
+                <button type="button" class="chip chip-type" data-value="Dorama, Serie" style="--chip-c:#00cec9;">🌸 Dorama Serie</button>
+                <button type="button" class="chip chip-type" data-value="Colección" style="--chip-c:#e17055;">📦 Colección</button>
               </div>
               <input type="hidden" id="f-type" value="Película"/>
+              <!-- Subtipo: visible solo cuando Anime o Dorama está activo -->
+              <div id="subtipo-wrap" style="display:none;margin-top:0.5rem;">
+                <div style="font-size:0.7rem;color:var(--muted);margin-bottom:0.3rem;letter-spacing:1px;">¿ES PELÍCULA O SERIE?</div>
+                <div style="display:flex;gap:0.35rem;" id="chips-subtipo">
+                  <button type="button" class="chip" data-value="Película" style="font-size:0.75rem;">🎬 Película</button>
+                  <button type="button" class="chip chip-active" data-value="Serie" style="font-size:0.75rem;">📺 Serie</button>
+                </div>
+              </div>
             </div>
             <!-- Año -->
             <div class="form-group" style="margin-bottom:0;min-width:80px;">
@@ -261,45 +263,45 @@
           <div class="form-section">🖼 Imágenes y Medios</div>
 
           <!-- Portada + capturas/trailer en grilla -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.6rem;">
+          <div style="display:grid;grid-template-columns:0.72fr 1fr;gap:0.75rem;margin-bottom:0.6rem;">
 
-            <!-- Izquierda: drop zone / preview + URL -->
+            <!-- Izquierda: SOLO drop zone / preview, angosta -->
             <div class="form-group" style="margin-bottom:0;">
               <label>Portada (poster) *</label>
 
               <!-- Drop zone: se oculta cuando hay imagen -->
-              <div class="drop-zone" id="drop-zone" onclick="document.getElementById('f-image-file').click()" style="padding:0.75rem;">
+              <div class="drop-zone" id="drop-zone" onclick="document.getElementById('f-image-file').click()">
                 <div class="drop-zone-inner" id="drop-zone-inner">
-                  <div style="font-size:1.6rem;margin-bottom:0.3rem;">🖼</div>
-                  <div style="font-size:0.8rem;color:var(--white);font-weight:600;">Arrastra la imagen aquí</div>
-                  <div style="font-size:0.7rem;color:var(--muted);margin-top:0.15rem;">o haz clic para seleccionar</div>
-                  <div style="font-size:0.65rem;color:var(--muted);margin-top:0.1rem;">WEBP · JPG · PNG</div>
+                  <div style="font-size:1.7rem;margin-bottom:0.3rem;">🖼</div>
+                  <div style="font-size:0.78rem;color:var(--white);font-weight:600;">Arrastra la imagen aquí</div>
+                  <div style="font-size:0.68rem;color:var(--muted);margin-top:0.15rem;">o haz clic para seleccionar</div>
+                  <div style="font-size:0.64rem;color:var(--muted);margin-top:0.1rem;">WEBP · JPG · PNG</div>
                 </div>
               </div>
 
-              <!-- Preview: reemplaza el drop-zone cuando hay imagen -->
-              <div id="poster-preview-wrap" style="display:none;position:relative;width:100%;aspect-ratio:2/3;max-height:160px;">
-                <img id="img-preview" src="" alt="Preview" style="width:100%;height:100%;object-fit:cover;border-radius:8px;border:1px solid var(--border);display:block;"/>
+              <!-- Preview: mismo tamaño/ratio que el drop-zone -->
+              <div id="poster-preview-wrap" style="display:none;position:relative;width:100%;aspect-ratio:1280/740;">
+                <img id="img-preview" src="" alt="Preview" style="width:100%;height:100%;object-fit:cover;border-radius:10px;border:1px solid var(--border);display:block;"/>
                 <button onclick="clearPoster()" title="Quitar imagen" style="position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.7);border:1px solid var(--border);color:#fff;font-size:0.7rem;cursor:pointer;line-height:1;">✕</button>
               </div>
 
               <input type="file" id="f-image-file" accept="image/webp,image/jpeg,image/png" style="display:none" onchange="handleImageFile(this.files[0])"/>
-              <div style="display:flex;align-items:center;gap:0.4rem;margin:0.4rem 0;">
-                <div style="flex:1;height:1px;background:var(--border);"></div>
-                <span style="font-size:0.65rem;color:var(--muted);letter-spacing:1px;">O URL</span>
-                <div style="flex:1;height:1px;background:var(--border);"></div>
-              </div>
-              <input type="url" id="f-image" placeholder="https://..." oninput="previewImgUrl(this.value)" style="margin-bottom:0;"/>
             </div>
 
-            <!-- Derecha: capturas + trailer -->
+            <!-- Derecha: URL + capturas + trailer, más ancha -->
             <div style="display:flex;flex-direction:column;gap:0.65rem;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label>URL de la portada</label>
+                <input type="url" id="f-image" placeholder="https://..." oninput="previewImgUrl(this.value)" style="margin-bottom:0;"/>
+                <div class="form-helper">Pega la URL aquí o usa el cuadro de la izquierda para subir un archivo.</div>
+              </div>
               <div class="form-group" style="margin-bottom:0;">
                 <label>URLs Capturas</label>
                 <textarea id="f-screenshot" class="textarea-links" style="min-height:60px;font-size:0.8rem;" placeholder="https://cap1.jpg&#10;https://cap2.jpg"></textarea>
                 <div class="form-helper">Una URL por línea.</div>
               </div>
               <div class="form-group" style="margin-bottom:0;">
+
                 <label>Trailer YouTube</label>
                 <input type="url" id="f-trailer" placeholder="https://www.youtube.com/watch?v=..."/>
               </div>
@@ -566,6 +568,36 @@ function autoRellenarSinopsis() {
 }
 
 // ===== CHIPS DE SELECCIÓN (Calidad / Audio / Fuente) =====
+function updateSubtipo() {
+  const typeVal = document.getElementById('f-type').value;
+  const needsSub = typeVal === 'Anime' || typeVal === 'Dorama';
+  const wrap = document.getElementById('subtipo-wrap');
+  if (!wrap) return;
+  wrap.style.display = needsSub ? 'block' : 'none';
+  // Actualizar f-type combinado si tiene subtipo
+  if (needsSub) {
+    const activeSub = document.querySelector('#chips-subtipo .chip-active');
+    const sub = activeSub ? activeSub.dataset.value : 'Serie';
+    document.getElementById('f-type').value = typeVal + ', ' + sub;
+  }
+}
+
+// Chips subtipo (Película/Serie dentro de Anime o Dorama)
+document.addEventListener('DOMContentLoaded', function() {
+  const subtipoGroup = document.getElementById('chips-subtipo');
+  if (subtipoGroup) {
+    subtipoGroup.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        subtipoGroup.querySelectorAll('.chip').forEach(c => c.classList.remove('chip-active'));
+        chip.classList.add('chip-active');
+        // Reconstruir f-type con el tipo base + subtipo
+        const baseType = document.getElementById('f-type').value.split(',')[0].trim();
+        document.getElementById('f-type').value = baseType + ', ' + chip.dataset.value;
+      });
+    });
+  }
+});
+
 function initChips() {
   document.querySelectorAll('.chip-group').forEach(group => {
     const hiddenInputId = 'f-' + group.id.replace('chips-', '');
@@ -580,7 +612,6 @@ function initChips() {
         // Desactivar todos en el grupo
         group.querySelectorAll('.chip').forEach(c => {
           c.classList.remove('chip-active');
-          // Restaurar chips de fuente (con color propio)
           if (c.dataset.ownColor) {
             c.style.background = '#0a0c12';
             c.style.color = c.dataset.ownColor;
@@ -715,6 +746,15 @@ function clearForm() {
 
 function cancelEdit() { clearForm(); }
 
+function generateSlug(title) {
+  let s = title.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  s = s.toLowerCase();
+  s = s.replace(/[\s\(\)\[\]_\/\\]+/g, '-');
+  s = s.replace(/[^a-z0-9\-]/g, '');
+  s = s.replace(/-+/g, '-').replace(/^-|-$/g, '');
+  return s || 'titulo';
+}
+
 function submitForm() {
   const data = getFormData();
   if (!data.title) { showToast('El título es obligatorio.', 'error'); return; }
@@ -726,6 +766,14 @@ function submitForm() {
 
   const movies = getMovies();
   const isEdit = editingIndex >= 0;
+
+  // Generar slug: conservar el existente si ya tiene uno (al editar)
+  if (isEdit && movies[editingIndex] && movies[editingIndex].slug) {
+    data.slug = movies[editingIndex].slug;
+  } else {
+    data.slug = generateSlug(data.title);
+  }
+
   if (isEdit) {
     movies[editingIndex] = data;
   } else {
@@ -926,9 +974,11 @@ function editMovie(idx) {
     if (m.uploader) descLines.push('por: ' + m.uploader);
     document.getElementById('f-descarga-raw').value = descLines.join('\n');
   }
-  document.getElementById('f-type').value = m.type||'Película';
+  // Restaurar tipo (puede ser "Dorama, Serie" o "Dorama, Película")
+  const typeVal = m.type || 'Película';
+  document.getElementById('f-type').value = typeVal;
   document.getElementById('f-year-filter').value = m.yearFilter||m.year||'';
-  setActiveChip('chips-type', m.type||'Película');
+  setActiveChip('chips-type', typeVal);
   setActiveChip('chips-quality', m.quality||'Full HD');
   setActiveChip('chips-audio', m.audio||'Latino');
   setActiveChip('chips-source', m.source||'');
