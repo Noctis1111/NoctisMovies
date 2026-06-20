@@ -124,13 +124,28 @@
     footer p { color: var(--muted); font-size: 0.8rem; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     @media (max-width: 768px) {
+      /* Header compacto */
+      header { padding: 0 1rem; }
+      .header-inner { height: 64px; gap: 0.75rem; }
+      /* Logo más pequeño */
+      .logo img { height: 36px !important; width: 36px !important; }
+      .logo-text { font-size: 1rem !important; letter-spacing: 1px !important; }
+      /* Nav: ocultar links, mostrar solo búsqueda expandida */
       nav a { display: none; }
-      nav a.active { display: inline; }
-      .nav-search { width: 140px; }
-      .nav-search input { width: 100px; }
-      .main-layout { padding-left: 1rem; padding-right: 1rem; }
-      #movie-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; }
-      .s2026-inner { padding: 0 3rem; }
+      nav a.active { display: none; }
+      nav { flex: 1; justify-content: flex-end; }
+      .nav-search { flex: 1; max-width: 100%; width: auto; }
+      .nav-search input { width: 100%; min-width: 0; }
+      /* Layout y grid */
+      .main-layout { padding-left: 0.75rem; padding-right: 0.75rem; }
+      #movie-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.6rem; }
+      .s2026-inner { padding: 0 2.5rem; }
+      /* Carousel cards más pequeñas */
+      .s2026-title { font-size: 1.4rem !important; }
+    }
+    @media (max-width: 420px) {
+      #movie-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+      .s2026-inner { padding: 0 2rem; }
     }
   </style>
 </head>
@@ -420,7 +435,7 @@ function renderGrid() {
   grid.innerHTML = pageItems.map((m, i) => {
     const realIdx = allMovies.indexOf(m);
     return `
-    <a class="movie-card" href="detalle.html?id=${realIdx}" style="animation-delay:${(i % 20) * 40}ms">
+    <a class="movie-card" href="detalle.html?id=${m.slug || realIdx}" style="animation-delay:${(i % 20) * 40}ms">
       <div class="card-poster">
         <img src="${m.image || ''}" alt="${m.title}" loading="lazy" onerror="this.src='${fallbackSvg}'"/>
       </div>
@@ -509,7 +524,7 @@ function build2026(movies) {
 
   track.innerHTML = items.map((m, i) => {
     const realIdx = movies.indexOf(m);
-    return `<a class="s2026-card" href="detalle.html?id=${realIdx}">
+    return `<a class="s2026-card" href="detalle.html?id=${m.slug || realIdx}">
       <div class="s2026-poster">
         <img src="${m.image||''}" alt="${m.title}" loading="lazy" onerror="this.src='${fallback}'"/>
         <div class="s2026-overlay"></div>
