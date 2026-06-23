@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin — NoctisMovies</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-F18ZM0ZHHJ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-F18ZM0ZHHJ');
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -120,7 +128,7 @@
     .movie-list { display: flex; flex-direction: column; gap: 0.75rem; }
     .movie-item { display: flex; align-items: center; gap: 1rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem 1rem; transition: border-color 0.2s; }
     .movie-item:hover { border-color: rgba(201,168,76,0.2); }
-    .movie-item-poster { width: 48px; height: 72px; object-fit: cover; border-radius: 6px; flex-shrink: 0; background: var(--surface3); }
+    .movie-item-poster { width: 90px; height: 52px; object-fit: cover; border-radius: 6px; flex-shrink: 0; background: var(--surface3); aspect-ratio: 1280/740; }
     .movie-item-info { flex: 1; min-width: 0; }
     .movie-item-title { font-family: 'Barlow Condensed', sans-serif; font-size: 0.95rem; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
     .movie-item-meta { font-size: 0.75rem; color: var(--muted); display: flex; gap: 0.5rem; margin-top: 0.2rem; flex-wrap: wrap; }
@@ -129,10 +137,19 @@
     .badge-1080p { background: #059669; color: #fff; }
     .badge-720p { background: #d97706; color: #fff; }
     .badge-other { background: #374151; color: #9ca3af; }
-    .movie-item-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
-    .item-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: all 0.2s; }
-    .item-btn.edit:hover { background: rgba(59,130,246,0.2); border-color: var(--blue); }
-    .item-btn.delete:hover { background: rgba(239,68,68,0.2); border-color: var(--red); }
+    .movie-item-actions { display: flex; gap: 0.4rem; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+    .item-btn {
+      width: 36px; height: 36px; border-radius: 9px; border: 1px solid var(--border);
+      background: var(--surface3); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: var(--muted); transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.12s;
+    }
+    .item-btn svg { width: 17px; height: 17px; pointer-events: none; }
+    .item-btn:active { transform: scale(0.92); }
+    .item-btn.edit:hover { background: rgba(59,130,246,0.16); border-color: var(--blue); color: var(--blue); }
+    .item-btn.delete:hover { background: rgba(239,68,68,0.16); border-color: var(--red); color: var(--red); }
+    .item-btn.copy-link { color: var(--gold); }
+    .item-btn.copy-link:hover { background: rgba(201,168,76,0.16); border-color: var(--gold); color: var(--gold2); }
+    .item-btn.copy-link.copied { background: rgba(34,197,94,0.18); border-color: var(--green); color: var(--green); }
 
     /* STATS */
     .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
@@ -189,6 +206,9 @@
       .admin-header { padding: 0 1rem; }
       .admin-main { padding: 0.5rem; }
       .stat-num { font-size: 1.4rem; }
+      .movie-item-poster { width: 38px; height: 54px; }
+      .item-btn { width: 32px; height: 32px; }
+      .item-btn svg { width: 15px; height: 15px; }
     }
 
     /* PAGINACIÓN */
@@ -262,8 +282,8 @@
               <!-- Datos+Sinopsis | Tipo | Año -->
               <div style="display:grid;grid-template-columns:1fr auto auto;gap:0.75rem;margin-bottom:0.75rem;align-items:end;">
                 <div class="form-group" style="margin-bottom:0;">
-                  <label>Datos + Sinopsis <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(pega el bloque completo)</span></label>
-                  <textarea id="f-datos-raw" class="textarea-links" style="min-height:105px;font-size:0.82rem;" placeholder="Título Original: ...&#10;Año: ...&#10;País(es): ...&#10;Duración: ...&#10;Género: ...&#10;&#10;Descripción de la película o serie..." onblur="autoRellenarSinopsis()"></textarea>
+                  <label>📋 Pega todo el bloque aquí <span style="color:var(--gold);font-size:0.68rem;font-weight:600;letter-spacing:0;">← TODO junto</span></label>
+                  <textarea id="f-datos-raw" class="textarea-links" style="min-height:105px;font-size:0.82rem;border-color:rgba(201,168,76,0.3);" placeholder="Pega aquí todo el bloque completo:&#10;• Título&#10;• URL&#10;• Título Original / Año / País / Duración / Género&#10;• Sinopsis&#10;• MAS INFO + tamaños temporadas&#10;• Audio / Calidad / Resolución...&#10;• Enlaces&#10;&#10;¡Se separa todo automáticamente!" oninput="autoRellenarTodo()" onpaste="setTimeout(autoRellenarTodo,80)"></textarea>
                   <input type="hidden" id="f-desc"/>
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
@@ -376,12 +396,12 @@
           <div class="form-section">🔗 Enlaces de Descarga</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.6rem;">
             <div class="form-group" style="margin-bottom:0;">
-              <label>Info descarga <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(pega el bloque)</span></label>
-              <textarea id="f-descarga-raw" class="textarea-links" style="min-height:160px;font-size:0.82rem;" placeholder="Audio: Español Latino&#10;Calidad: WEBDL&#10;Resolución: 1920×1080&#10;Formato: MKV&#10;Tamaño: 4.5 GB&#10;Codec: H264&#10;Subtítulos: ..."></textarea>
+              <label>Info descarga <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(auto-rellenado o pega aquí)</span></label>
+              <textarea id="f-descarga-raw" class="textarea-links" style="min-height:160px;font-size:0.82rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;O pega manualmente:&#10;Audio: Español Latino&#10;Calidad: WEBDL&#10;Resolución: 1920×1080&#10;Formato: MKV&#10;Tamaño: 4.5 GB&#10;Codec: H264&#10;Subtítulos: ..." oninput="autoRellenarDescarga()" onpaste="setTimeout(autoRellenarDescarga,50)"></textarea>
             </div>
             <div class="form-group" style="margin-bottom:0;">
-              <label>Enlaces públicos <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(pega el bloque)</span></label>
-              <textarea class="textarea-links" id="f-links" style="min-height:160px;font-size:0.82rem;" placeholder="Servidor 1&#10;https://enlace1.com&#10;&#10;Servidor 2&#10;https://enlace2.com"></textarea>
+              <label>Enlaces públicos <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(auto-rellenado o pega aquí)</span></label>
+              <textarea class="textarea-links" id="f-links" style="min-height:160px;font-size:0.82rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;O pega manualmente:&#10;Servidor 1&#10;https://enlace1.com&#10;&#10;Servidor 2&#10;https://enlace2.com"></textarea>
             </div>
           </div>
 
@@ -546,51 +566,315 @@ function saveMovies(arr) {
 
 let editingIndex = -1;
 
-/* ======================== PARSE DATOS RAW ======================== */
+/* ======================== PARSE BLOQUE COMPLETO ======================== */
+/*
+  Un solo bloque pegado → se divide en 3 zonas:
+    1. Datos/Sinopsis  (Título Original, Año, País, Duración, Género, texto sinopsis)
+    2. Info descarga   (MAS INFO, Temporadas, Audio:, Calidad:, Resolución:, ...)
+    3. Enlaces         (nombres de servidor + URLs)
+*/
+function parseBloqueCompleto(raw) {
+  const r = {
+    titulo:'', originalTitle:'', year:'', country:'', duration:'', genre:'', sinopsis:'',
+    infoDescarga:'', enlaces:'',
+    audio2:'', calidad2:'', resolucion2:'', formato2:'MKV', size2:'', codec2:'H264', subtitles2:''
+  };
+  if (!raw || !raw.trim()) return r;
+  const lineas = raw.split('\n').map(l => l.trim());
+
+  const camposDatos    = ['título original','titulo original','año','ano','país','pais','country','pais(es)','país(es)','duración','duracion','género','genero','genre'];
+  const camposDescarga = ['audio','calidad','resolución','resolucion','formato','tamaño','tamano','codec','códec','subtítulos','subtitulos','subtítulo','subtitulo'];
+  const reMasInfo   = /^mas\s*info\s*$/i;
+  const reTemporada = /^temporada\s*\d+\s*[\|│]\s*[\d.,]+\s*(gb|mb)/i;
+  const reSepDecor  = /^[▬─═]{3,}/;
+  const reEncabezado = /^(datos|sinopsis|descarga|info\s+descarga)\s*$/i;
+
+  // ── Detectar índice de inicio de zona descarga y zona enlaces ──
+  let idxDescarga = -1;
+  let idxEnlaces  = -1;
+  let camposOk    = false;
+
+  for (let i = 0; i < lineas.length; i++) {
+    const l = lineas[i];
+    if (!l) continue;
+
+    const ci  = l.indexOf(':');
+    const key = ci >= 0 ? l.slice(0, ci).toLowerCase().trim() : '';
+
+    if (ci >= 0 && camposDatos.some(c => key === c || key.includes(c))) { camposOk = true; continue; }
+    if (reMasInfo.test(l) || reTemporada.test(l) || reSepDecor.test(l)) {
+      if (idxDescarga < 0) idxDescarga = i; continue;
+    }
+    if (ci >= 0 && camposDescarga.some(c => key === c || key.includes(c))) {
+      if (idxDescarga < 0) idxDescarga = i; continue;
+    }
+    if (/^https?:\/\//i.test(l)) {
+      if (idxEnlaces < 0 && (camposOk || idxDescarga >= 0)) {
+        // buscar línea de servidor antes (línea no-técnica inmediatamente anterior)
+        let srv = i;
+        for (let j = i - 1; j >= Math.max(0, i - 3); j--) {
+          if (!lineas[j]) continue;
+          const ci2 = lineas[j].indexOf(':');
+          const k2  = ci2 >= 0 ? lineas[j].slice(0, ci2).toLowerCase().trim() : '';
+          const esTec = ci2 >= 0 && camposDescarga.some(c => k2 === c || k2.includes(c));
+          const esUrl = /^https?:\/\//i.test(lineas[j]);
+          if (!esTec && !esUrl && !reMasInfo.test(lineas[j]) && !reTemporada.test(lineas[j]) && !reEncabezado.test(lineas[j]) && !reSepDecor.test(lineas[j])) {
+            srv = j;
+          }
+          break;
+        }
+        idxEnlaces = srv;
+      }
+      continue;
+    }
+    // línea de nombre de servidor (texto libre en zona de descarga, con siguiente línea URL)
+    if (idxDescarga >= 0 && i > idxDescarga && idxEnlaces < 0) {
+      const next = lineas.slice(i + 1).find(x => x);
+      if (next && /^https?:\/\//i.test(next)) { idxEnlaces = i; }
+    }
+  }
+
+  // Límites
+  const finDatos    = idxDescarga >= 0 ? idxDescarga : (idxEnlaces >= 0 ? idxEnlaces : lineas.length);
+  const finDescarga = idxEnlaces  >= 0 ? idxEnlaces  : lineas.length;
+
+  const zonaDatos    = lineas.slice(0, finDatos);
+  const zonaDescarga = idxDescarga >= 0 ? lineas.slice(idxDescarga, finDescarga) : [];
+  const zonaEnlaces  = idxEnlaces  >= 0 ? lineas.slice(idxEnlaces)              : [];
+
+  // ── Parsear zona datos ──
+  let camposIniciados = false, titCapt = false;
+  const sinLines = [];
+  for (const l of zonaDatos) {
+    if (!l || reEncabezado.test(l) || reSepDecor.test(l)) continue;
+    const ci  = l.indexOf(':');
+    const key = ci >= 0 ? l.slice(0, ci).toLowerCase().trim() : '';
+    const esDato = ci >= 0 && camposDatos.some(c => key === c || key.includes(c));
+    if (esDato) {
+      camposIniciados = true;
+      const val = l.slice(ci + 1).trim();
+      if (key.includes('título original') || key.includes('titulo original')) r.originalTitle = val;
+      else if (key === 'año' || key === 'ano') r.year = val;
+      else if (key.includes('país') || key.includes('pais') || key === 'country') r.country = val;
+      else if (key.includes('duración') || key.includes('duracion')) r.duration = val;
+      else if (key.includes('género') || key.includes('genero') || key === 'genre') r.genre = val;
+      continue;
+    }
+    if (!camposIniciados) {
+      if (/^https?:\/\//i.test(l)) continue;
+      if (!titCapt) { r.titulo = l; titCapt = true; }
+      continue;
+    }
+    sinLines.push(l);
+  }
+  r.sinopsis = sinLines.join(' ').trim();
+
+  // ── Parsear zona descarga (chips) ──
+  // La zona de descarga termina JUSTO después de la línea Subtítulos (si existe).
+  // Todo lo que venga después va a enlaces, aunque el parser haya puesto ese texto en zonaDescarga.
+  const reSubtitulos = /^subtítulos?\s*:/i;
+  let idxSubtitulosEnDescarga = -1;
+  for (let i = 0; i < zonaDescarga.length; i++) {
+    if (reSubtitulos.test(zonaDescarga[i])) { idxSubtitulosEnDescarga = i; }
+  }
+  // Si encontramos Subtítulos, la info termina ahí y el resto pasa a enlaces
+  let zonaDescargaFinal = zonaDescarga;
+  let sobrante = [];
+  if (idxSubtitulosEnDescarga >= 0 && idxSubtitulosEnDescarga < zonaDescarga.length - 1) {
+    zonaDescargaFinal = zonaDescarga.slice(0, idxSubtitulosEnDescarga + 1);
+    sobrante = zonaDescarga.slice(idxSubtitulosEnDescarga + 1);
+  }
+
+  r.infoDescarga = zonaDescargaFinal.filter(l => l).join('\n');
+  for (const l of zonaDescargaFinal) {
+    const ci = l.indexOf(':'); if (ci < 0) continue;
+    const key = l.slice(0, ci).toLowerCase().trim();
+    const val = l.slice(ci + 1).trim();
+    if (key === 'audio') r.audio2 = val;
+    else if (key === 'calidad') r.calidad2 = val;
+    else if (key === 'resolución' || key === 'resolucion') r.resolucion2 = val;
+    else if (key === 'formato') r.formato2 = val;
+    else if (key === 'tamaño' || key === 'tamano') r.size2 = val;
+    else if (key === 'codec' || key === 'códec') r.codec2 = val;
+    else if (reSubtitulos.test(l)) r.subtitles2 = val;
+  }
+
+  // ── Zona enlaces: lo que detectó el parser + el sobrante después de Subtítulos ──
+  const enlacesBase = zonaEnlaces.filter(l => l);
+  const sobranteBase = sobrante.filter(l => l);
+  // Evitar duplicar: si zonaEnlaces ya contiene el sobrante, no concatenar
+  const enlacesCombinados = sobranteBase.length
+    ? [...sobranteBase, ...enlacesBase.filter(l => !sobranteBase.includes(l))]
+    : enlacesBase;
+  r.enlaces = enlacesCombinados.join('\n');
+  return r;
+}
+
+// Compatibilidad con getFormData que usa parseDatosRaw / parseDescargaRaw
 function parseDatosRaw(raw) {
-  const result = { originalTitle: '', year: '', country: '', duration: '', genre: '', sinopsisDetectada: '' };
+  const result = { title: '', originalTitle: '', year: '', country: '', duration: '', genre: '', sinopsisDetectada: '' };
   if (!raw) return result;
   const lines = raw.split('\n').map(l => l.trim());
 
   const camposReconocidos = ['título original','titulo original','año','ano','país','pais','country','duración','duracion','género','genero','genre'];
+  // Líneas que marcan el inicio del bloque de descarga (parar la sinopsis aquí)
+  const stopPatterns = [
+    /^mas\s*info\s*$/i,
+    /^descarga\s*$/i,
+    /^info\s*descarga\s*$/i,
+    /^temporada\s*\d+/i,
+    /^audio\s*:/i,
+    /^calidad\s*:/i,
+    /^resoluc/i,
+    /^formato\s*:/i,
+    /^tamaño\s*:/i,
+    /^codec\s*:/i,
+    /^subtítulos?\s*:/i,
+    /^subtitulos?\s*:/i,
+    /^▬{3,}/,
+    /^─{3,}/,
+  ];
   const sinopsisRestante = [];
-  let yaTerminaronLosCampos = false;
+  let camposIniciados = false;
+  let tituloCapturado = false;
+  let sinopsisTerminada = false;
 
   for (const line of lines) {
     if (!line) continue;
     // Saltar encabezados sueltos tipo "DATOS" o "SINOPSIS"
-    if (/^(datos|sinopsis)\s*$/i.test(line)) { continue; }
+    if (/^(datos|sinopsis)\s*$/i.test(line)) continue;
+
+    // Si ya terminó la sinopsis, no añadir más
+    if (sinopsisTerminada) continue;
 
     const colonIdx = line.indexOf(':');
     const key = colonIdx >= 0 ? line.slice(0, colonIdx).toLowerCase().trim() : '';
     const esCampoConocido = colonIdx >= 0 && camposReconocidos.some(c => key.includes(c) || key === c);
 
-    if (esCampoConocido && !yaTerminaronLosCampos) {
+    if (esCampoConocido) {
+      camposIniciados = true;
       const val = line.slice(colonIdx + 1).trim();
       if (key.includes('título original') || key.includes('titulo original')) result.originalTitle = val;
       else if (key === 'año' || key === 'ano') result.year = val;
       else if (key.includes('país') || key.includes('pais') || key === 'country') result.country = val;
       else if (key.includes('duración') || key.includes('duracion')) result.duration = val;
       else if (key.includes('género') || key.includes('genero') || key === 'genre') result.genre = val;
-    } else {
-      // Ya no es un campo reconocido → todo lo siguiente es sinopsis
-      yaTerminaronLosCampos = true;
-      sinopsisRestante.push(line);
+      continue;
     }
+
+    if (!camposIniciados) {
+      if (/^https?:\/\//i.test(line)) continue;
+      if (!tituloCapturado) { result.title = line; tituloCapturado = true; }
+      continue;
+    }
+
+    // Detectar si esta línea es inicio del bloque de descarga → parar sinopsis
+    if (stopPatterns.some(p => p.test(line))) {
+      sinopsisTerminada = true;
+      continue;
+    }
+
+    // Es texto de sinopsis
+    sinopsisRestante.push(line);
   }
 
   result.sinopsisDetectada = sinopsisRestante.join(' ').trim();
   return result;
 }
 
-function autoRellenarSinopsis() {
-  const datosRaw = document.getElementById('f-datos-raw').value;
-  const parsed = parseDatosRaw(datosRaw);
-  // Siempre actualiza el hidden f-desc con la sinopsis detectada
-  if (parsed.sinopsisDetectada) {
-    document.getElementById('f-desc').value = parsed.sinopsisDetectada;
+function autoRellenarTodo() {
+  const raw = document.getElementById('f-datos-raw').value;
+  const p = parseBloqueCompleto(raw);
+
+  // Título
+  if (p.titulo) document.getElementById('f-title').value = p.titulo;
+  // Sinopsis oculta
+  if (p.sinopsis) document.getElementById('f-desc').value = p.sinopsis;
+  // Info descarga
+  if (p.infoDescarga) document.getElementById('f-descarga-raw').value = p.infoDescarga;
+  // Enlaces
+  if (p.enlaces) document.getElementById('f-links').value = p.enlaces;
+
+  // Año filtro (primer año de 4 dígitos)
+  if (p.year) {
+    const m = p.year.match(/\d{4}/);
+    if (m) document.getElementById('f-year-filter').value = m[0];
   }
+
+  const tituloUp = (p.titulo || document.getElementById('f-title').value || '').toUpperCase();
+  const resLow   = (p.resolucion2 || '').toLowerCase();
+  const calUp    = (p.calidad2   || '').toUpperCase();
+  const audLow   = (p.audio2     || '').toLowerCase();
+  const genLow   = (p.genre      || '').toLowerCase();
+  const durMin   = parseInt(p.duration) || 0;
+
+  // CALIDAD — revisa resolución, calidad, y título
+  const resUp = (p.resolucion2 || '').toUpperCase();
+  const calQUp = calUp + ' ' + tituloUp + ' ' + resUp;
+  if (calQUp.includes('3840')||calQUp.includes('2160')||calQUp.includes('4K')||calQUp.includes('2K')||calQUp.includes('HDR10')||calQUp.includes('DV HDR'))
+    setActiveChip('chips-quality','4K');
+  else if (calQUp.includes('1920')||calQUp.includes('1080')||calQUp.includes('FULL')||calQUp.includes('FULL HD'))
+    setActiveChip('chips-quality','Full HD');
+  else if (calQUp.includes('1280')||calQUp.includes('720'))
+    setActiveChip('chips-quality','720p');
+  else if (calQUp.includes('480'))
+    setActiveChip('chips-quality','480p');
+
+  // AUDIO
+  if (audLow.includes('latino')||audLow.includes('español')||tituloUp.includes('LATINO'))
+    setActiveChip('chips-audio','Latino');
+  else if (audLow.includes('inglés')||audLow.includes('ingles')||audLow.includes('english')||tituloUp.includes('INGLES')||tituloUp.includes('INGLÉS'))
+    setActiveChip('chips-audio','Inglés');
+  else if (audLow.includes('japon')||audLow.includes('japanese'))
+    setActiveChip('chips-audio','Japonés');
+  else if (audLow.includes('korean')||audLow.includes('coreano')||audLow.includes('koreano'))
+    setActiveChip('chips-audio','Koreano');
+
+  // FUENTE — Prioridad: X265 > REMUX > WEB-DL > WEB-RIP > PLACEBO > BDRIP > BRRIP > HDTS > HDRIP > DVDRIP > 60FPS
+  // También revisar codec: H265/HEVC → X265; y el título
+  const codecUp = (p.codec2 || '').toUpperCase();
+  const combined = calUp + ' ' + tituloUp + ' ' + codecUp; // buscar en todo junto
+  if (combined.includes('X265') || combined.includes('X 265') || combined.includes('HEVC') || codecUp.includes('H265') || codecUp.includes('H.265'))
+    setActiveChip('chips-source','X265');
+  else if (combined.includes('REMUX'))
+    setActiveChip('chips-source','REMUX');
+  else if (combined.includes('WEBDL')||combined.includes('WEB-DL')||combined.includes('WEB DL'))
+    setActiveChip('chips-source','WEB-DL');
+  else if (combined.includes('WEBRIP')||combined.includes('WEB-RIP'))
+    setActiveChip('chips-source','WEB-RIP');
+  else if (combined.includes('PLACEBO'))
+    setActiveChip('chips-source','PLACEBO');
+  else if (combined.includes('BDRIP'))
+    setActiveChip('chips-source','BDRIP');
+  else if (combined.includes('BRRIP'))
+    setActiveChip('chips-source','BRRIP');
+  else if (combined.includes('HDTS'))
+    setActiveChip('chips-source','HDTS');
+  else if (combined.includes('HDRIP'))
+    setActiveChip('chips-source','HDRIP');
+  else if (combined.includes('DVDRIP') || combined.includes('DVDRIP'))
+    setActiveChip('chips-source','HDRIP'); // mapea a HDRIP como fallback
+  else if (combined.includes('60FPS'))
+    setActiveChip('chips-source','60FPS');
+
+  // TIPO — Anime > Dorama (coreano/japonés serie) > Serie > Película
+  const countryLow = (p.country || '').toLowerCase();
+  const isTemporada = tituloUp.includes('TEMPORADA')||tituloUp.includes('SERIE')||tituloUp.includes('SEASON')||tituloUp.includes('COMPLETA');
+  const isAsianCountry = countryLow.includes('japan')||countryLow.includes('korea')||countryLow.includes('south korea')||countryLow.includes('china');
+  if (genLow.includes('anime')||tituloUp.includes('ANIME'))
+    setActiveChip('chips-type','Anime');
+  else if (isAsianCountry && isTemporada)
+    setActiveChip('chips-type','Dorama, Serie');
+  else if (isAsianCountry && durMin>=60)
+    setActiveChip('chips-type','Dorama, Película');
+  else if (isTemporada||(durMin>0&&durMin<60))
+    setActiveChip('chips-type','Serie');
+  else if (durMin>=60)
+    setActiveChip('chips-type','Película');
 }
+
+// Alias para compatibilidad con onpaste/oninput del campo datos
+function autoRellenarSinopsis() { autoRellenarTodo(); }
 
 // ===== CHIPS DE SELECCIÓN (Calidad / Audio / Fuente) =====
 function initChips() {
@@ -684,12 +968,71 @@ function parseDescargaRaw(raw) {
   return result;
 }
 
+function autoRellenarDescarga() {
+  const raw = document.getElementById('f-descarga-raw').value;
+  const dp = parseDescargaRaw(raw);
+
+  // ── Auto-seleccionar CALIDAD ──
+  if (dp.resolucion2) {
+    const res = dp.resolucion2.toLowerCase();
+    if (res.includes('3840') || res.includes('4k') || res.includes('2160')) {
+      setActiveChip('chips-quality', '4K');
+    } else if (res.includes('1920') || res.includes('1080')) {
+      setActiveChip('chips-quality', 'Full HD');
+    } else if (res.includes('1280') || res.includes('720')) {
+      setActiveChip('chips-quality', '720p');
+    }
+  } else if (dp.calidad2) {
+    const cal = dp.calidad2.toLowerCase();
+    if (cal.includes('4k')) setActiveChip('chips-quality', '4K');
+    else if (cal.includes('1080') || cal.includes('full')) setActiveChip('chips-quality', 'Full HD');
+    else if (cal.includes('720')) setActiveChip('chips-quality', '720p');
+  }
+
+  // ── Auto-seleccionar AUDIO ──
+  if (dp.audio2) {
+    const aud = dp.audio2.toLowerCase();
+    if (aud.includes('latino') || aud.includes('español')) setActiveChip('chips-audio', 'Latino');
+    else if (aud.includes('ingles') || aud.includes('inglés') || aud.includes('english')) setActiveChip('chips-audio', 'Inglés');
+    else if (aud.includes('japón') || aud.includes('japon') || aud.includes('japanese')) setActiveChip('chips-audio', 'Japonés');
+    else if (aud.includes('korean') || aud.includes('coreano') || aud.includes('koreano')) setActiveChip('chips-audio', 'Koreano');
+  }
+
+  // ── Auto-seleccionar FUENTE / ENCODE ──
+  // Prioridad: X265 > REMUX > WEB-DL > WEB-RIP > PLACEBO > BDRIP > BRRIP > HDTS > HDRIP
+  // Se revisa calidad, codec y resolución juntos
+  const calUp2  = (dp.calidad2  || '').toUpperCase();
+  const codUp2  = (dp.codec2    || '').toUpperCase();
+  const combined2 = calUp2 + ' ' + codUp2;
+  if (combined2.includes('X265') || combined2.includes('X 265') || combined2.includes('HEVC') || codUp2.includes('H265') || codUp2.includes('H.265'))
+    setActiveChip('chips-source', 'X265');
+  else if (combined2.includes('REMUX'))
+    setActiveChip('chips-source', 'REMUX');
+  else if (combined2.includes('WEBDL') || combined2.includes('WEB-DL') || combined2.includes('WEB DL'))
+    setActiveChip('chips-source', 'WEB-DL');
+  else if (combined2.includes('WEBRIP') || combined2.includes('WEB-RIP'))
+    setActiveChip('chips-source', 'WEB-RIP');
+  else if (combined2.includes('PLACEBO'))
+    setActiveChip('chips-source', 'PLACEBO');
+  else if (combined2.includes('BDRIP'))
+    setActiveChip('chips-source', 'BDRIP');
+  else if (combined2.includes('BRRIP'))
+    setActiveChip('chips-source', 'BRRIP');
+  else if (combined2.includes('HDTS'))
+    setActiveChip('chips-source', 'HDTS');
+  else if (combined2.includes('HDRIP'))
+    setActiveChip('chips-source', 'HDRIP');
+  else if (combined2.includes('60FPS'))
+    setActiveChip('chips-source', '60FPS');
+}
+
 /* ======================== FORM ======================== */
 function getFormData() {
-  const datosRaw = (document.getElementById('f-datos-raw')?.value || '').trim();
-  const parsed = parseDatosRaw(datosRaw);
-  const descRaw = (document.getElementById('f-descarga-raw')?.value || '').trim();
-  const dp = parseDescargaRaw(descRaw);
+  const bloqueRaw = (document.getElementById('f-datos-raw')?.value || '').trim();
+  const parsed    = parseBloqueCompleto(bloqueRaw);
+  // También parsear lo que está en f-descarga-raw por si el usuario lo editó manualmente
+  const descRaw   = (document.getElementById('f-descarga-raw')?.value || '').trim();
+  const dp        = parseDescargaRaw(descRaw);
   return {
     title:         document.getElementById('f-title').value.trim(),
     originalTitle: parsed.originalTitle,
@@ -702,12 +1045,12 @@ function getFormData() {
     source:        document.getElementById('f-source').value,
     yearFilter:    document.getElementById('f-year-filter').value.trim(),
     audio:         document.getElementById('f-audio').value,
-    resolution:    dp.resolucion2 || '',
-    format:        dp.formato2 || 'MKV',
-    size:          dp.size2,
-    codec:         dp.codec2 || 'H264',
-    subtitles:     dp.subtitles2,
-    uploader:      dp.uploader2,
+    resolution:    dp.resolucion2 || parsed.resolucion2 || '',
+    format:        dp.formato2    || parsed.formato2    || 'MKV',
+    size:          dp.size2       || parsed.size2       || '',
+    codec:         dp.codec2      || parsed.codec2      || 'H264',
+    subtitles:     dp.subtitles2  || parsed.subtitles2  || '',
+    uploader:      dp.uploader2   || '',
     image:         posterDataUrl || document.getElementById('f-image').value.trim(),
     screenshot:    document.getElementById('f-screenshot').value.trim(),
     trailer:       document.getElementById('f-trailer').value.trim(),
@@ -961,8 +1304,15 @@ function renderList(resetPage) {
         </div>
       </div>
       <div class="movie-item-actions">
-        <button class="item-btn edit" title="Editar" onclick="editMovie(${ri})">✏️</button>
-        <button class="item-btn delete" title="Eliminar" onclick="deleteMovie(${ri})">🗑</button>
+        <button class="item-btn copy-link" id="copy-btn-${ri}" title="Copiar URL del detalle" onclick="copyDetailUrl(${ri})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l1.42-1.41a5 5 0 0 0-7.07-7.07L10 6"/><path d="M14 11a5 5 0 0 0-7.07 0l-1.42 1.41a5 5 0 0 0 7.07 7.07L14 18"/></svg>
+        </button>
+        <button class="item-btn edit" title="Editar" onclick="editMovie(${ri})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="item-btn delete" title="Eliminar" onclick="deleteMovie(${ri})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
       </div>
     </div>`;
   }).join('');
@@ -1044,6 +1394,50 @@ function editMovie(idx) {
   document.getElementById('form-submit-btn').classList.add('editing');
   document.getElementById('cancel-btn').classList.add('visible');
   window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function detailUrlFor(m, idx) {
+  const ref = m.slug || idx;
+  // admin.html vive en /admin/, detalle.html vive en raíz → subimos un nivel
+  return new URL('../detalle.html?id=' + encodeURIComponent(ref), window.location.href).href;
+}
+
+function copyDetailUrl(idx) {
+  const movies = getMovies();
+  const m = movies[idx];
+  if (!m) return;
+  const url = detailUrlFor(m, idx);
+  const btn = document.getElementById('copy-btn-' + idx);
+
+  function markCopied() {
+    showToast('🔗 URL del detalle copiada', 'success');
+    if (btn) {
+      btn.classList.add('copied');
+      setTimeout(() => btn.classList.remove('copied'), 1200);
+    }
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(markCopied).catch(() => fallbackCopy(url, markCopied));
+  } else {
+    fallbackCopy(url, markCopied);
+  }
+}
+
+function fallbackCopy(text, onSuccess) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    onSuccess();
+  } catch {
+    showToast('No se pudo copiar. URL: ' + text, 'error');
+  }
 }
 
 function deleteMovie(idx) {
