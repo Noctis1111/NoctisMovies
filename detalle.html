@@ -6,6 +6,14 @@
   <title>NoctisMovies — Detalle</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='8' fill='%23080a0f'/><text x='32' y='46' text-anchor='middle' font-family='Georgia,serif' font-weight='bold' font-size='44' fill='%23c9a84c'>N</text></svg>"/>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-F18ZM0ZHHJ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-F18ZM0ZHHJ');
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -26,11 +34,24 @@
     nav { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
     nav a { color: var(--muted); text-decoration: none; font-size: 0.8rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; padding: 0.4rem 0.8rem; border-radius: 6px; transition: all 0.2s; }
     nav a:hover { color: var(--white); background: var(--border); }
-    .nav-search { display: flex; align-items: center; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0 0.75rem; gap: 0.5rem; height: 36px; transition: border-color 0.2s; }
+    .nav-search { position: relative; display: flex; align-items: center; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0 0.75rem; gap: 0.5rem; height: 36px; transition: border-color 0.2s; }
     .nav-search:focus-within { border-color: var(--gold); }
     .nav-search svg { color: var(--muted); flex-shrink: 0; }
     .nav-search input { background: none; border: none; outline: none; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 0.85rem; width: 200px; }
     .nav-search input::placeholder { color: var(--muted); }
+    .search-dropdown { position: absolute; top: calc(100% + 8px); left: 0; right: 0; background: #0e1117; border: 1px solid rgba(201,168,76,0.25); border-radius: 10px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.7); z-index: 999; display: none; min-width: 320px; }
+    .search-dropdown.open { display: block; }
+    .search-dropdown-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.9rem; text-decoration: none; transition: background 0.15s; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .search-dropdown-item:last-child { border-bottom: none; }
+    .search-dropdown-item:hover, .search-dropdown-item.focused { background: rgba(201,168,76,0.08); }
+    .search-dropdown-thumb { width: 36px; height: 54px; object-fit: cover; border-radius: 4px; background: #161b24; flex-shrink: 0; }
+    .search-dropdown-info { flex: 1; min-width: 0; }
+    .search-dropdown-title { font-family: 'Barlow Condensed', sans-serif; font-size: 0.88rem; font-weight: 700; color: #f0f2f5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .search-dropdown-meta { font-size: 0.7rem; color: #6b7280; margin-top: 2px; }
+    .search-dropdown-meta .yr { color: var(--gold); font-weight: 600; margin-right: 4px; }
+    .search-dropdown-more { display: block; text-align: center; padding: 0.55rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 1px; color: var(--gold); background: rgba(201,168,76,0.06); text-decoration: none; transition: background 0.15s; }
+    .search-dropdown-more:hover { background: rgba(201,168,76,0.13); }
+    .search-dropdown-empty { padding: 1rem; text-align: center; color: #6b7280; font-size: 0.82rem; }
 
     /* LAYOUT */
     .page-wrap { max-width: 1600px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 1fr 240px; gap: 1.5rem; align-items: start; }
@@ -253,6 +274,7 @@
       <div class="nav-search">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="nav-search-input" placeholder="Buscar película o serie..." autocomplete="off"/>
+        <div class="search-dropdown" id="search-dropdown"></div>
       </div>
     </nav>
   </div>
@@ -360,17 +382,17 @@
         </div>
       </div>
 
-      <!-- BANNER VIP -->
+      <!-- BANNER VIP — texto oculto hasta que esté disponible -->
       <div class="banner-vip">
         <div class="banner-vip-badge">
           MEMBRESÍA<br><span style="font-size:2rem;">VIP</span>
           <small>NOCTIS</small>
         </div>
         <div class="banner-vip-text">
-          <h3>¿Cansado de los acortadores y publicidad?</h3>
-          <p>Con tu membresía VIP tendrás <strong>enlaces directos sin publicidad</strong>, servidores de descarga privados y contenido exclusivo.</p>
+          <h3 style="visibility:hidden;">¿Cansado de los acortadores y publicidad?</h3>
+          <p style="visibility:hidden;">Con tu membresía VIP tendrás <strong>enlaces directos sin publicidad</strong>, servidores de descarga privados y contenido exclusivo.</p>
         </div>
-        <a class="banner-vip-btn" href="#" target="_blank">ÚNETE AQUÍ</a>
+        <a class="banner-vip-btn" href="#" target="_blank" style="visibility:hidden;">ÚNETE AQUÍ</a>
       </div>
 
       <!-- PELÍCULAS RELACIONADAS / RECIENTES -->
@@ -801,15 +823,121 @@ async function init() {
 
 init();
 
-// Buscador del nav → redirige a index con búsqueda
-const navSearchInput = document.getElementById('nav-search-input');
-if (navSearchInput) {
-  navSearchInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && navSearchInput.value.trim()) {
-      window.location.href = 'index.html?search=' + encodeURIComponent(navSearchInput.value.trim());
+// ── BUSCADOR NAV CON DROPDOWN ──
+(function() {
+  const input    = document.getElementById('nav-search-input');
+  const dropdown = document.getElementById('search-dropdown');
+  if (!input || !dropdown) return;
+
+  const MAX_RESULTS = 6;
+  let allMovies = [];
+  let focusedIdx = -1;
+  let items = [];
+
+  // Carga películas (misma fuente que el resto del sitio)
+  async function loadMovies() {
+    try {
+      const local = localStorage.getItem('noctis_movies');
+      if (local) { allMovies = JSON.parse(local); return; }
+      const res = await fetch('../movies.json?v=' + Date.now());
+      allMovies = await res.json();
+    } catch { allMovies = []; }
+  }
+  loadMovies();
+
+  function norm(s) {
+    return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  }
+
+  function renderDropdown(q) {
+    const qn = norm(q.trim());
+    if (qn.length < 2) { closeDropdown(); return; }
+
+    const results = allMovies
+      .map((m, i) => ({ m, i }))
+      .filter(({ m }) => norm(m.title).includes(qn) || norm(m.originalTitle||'').includes(qn))
+      .slice(0, MAX_RESULTS);
+
+    if (results.length === 0) {
+      dropdown.innerHTML = '<div class="search-dropdown-empty">Sin resultados para "' + q.trim() + '"</div>';
+      dropdown.classList.add('open');
+      items = []; focusedIdx = -1;
+      return;
+    }
+
+    const fallback = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='54'%3E%3Crect fill='%23161b24' width='36' height='54'/%3E%3C/svg%3E";
+    const basePath = window.location.pathname.includes('/admin/') ? '../' : '';
+
+    let html = results.map(({ m, i }) => `
+      <a class="search-dropdown-item" href="${basePath}detalle.html?id=${i}" data-idx="${i}">
+        <img class="search-dropdown-thumb" src="${m.image||fallback}" alt="${m.title}" onerror="this.src='${fallback}'"/>
+        <div class="search-dropdown-info">
+          <div class="search-dropdown-title">${m.title}</div>
+          <div class="search-dropdown-meta">
+            <span class="yr">${m.year||''}</span>${m.type||''}${m.source ? ' · '+m.source : ''}
+          </div>
+        </div>
+      </a>`).join('');
+
+    // "Ver todos" si hay más resultados
+    const total = allMovies.filter(m => norm(m.title).includes(qn)||norm(m.originalTitle||'').includes(qn)).length;
+    if (total > MAX_RESULTS) {
+      html += `<a class="search-dropdown-more" href="${basePath}index.html?search=${encodeURIComponent(q.trim())}">Ver los ${total} resultados →</a>`;
+    }
+
+    dropdown.innerHTML = html;
+    dropdown.classList.add('open');
+    items = Array.from(dropdown.querySelectorAll('.search-dropdown-item'));
+    focusedIdx = -1;
+  }
+
+  function closeDropdown() {
+    dropdown.classList.remove('open');
+    dropdown.innerHTML = '';
+    focusedIdx = -1;
+    items = [];
+  }
+
+  function setFocus(idx) {
+    items.forEach(el => el.classList.remove('focused'));
+    if (idx >= 0 && idx < items.length) {
+      items[idx].classList.add('focused');
+      items[idx].scrollIntoView({ block: 'nearest' });
+    }
+    focusedIdx = idx;
+  }
+
+  input.addEventListener('input', () => renderDropdown(input.value));
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setFocus(Math.min(focusedIdx + 1, items.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setFocus(Math.max(focusedIdx - 1, 0));
+    } else if (e.key === 'Enter') {
+      if (focusedIdx >= 0 && items[focusedIdx]) {
+        items[focusedIdx].click();
+      } else if (input.value.trim()) {
+        const basePath = window.location.pathname.includes('/admin/') ? '../' : '';
+        window.location.href = basePath + 'index.html?search=' + encodeURIComponent(input.value.trim());
+      }
+    } else if (e.key === 'Escape') {
+      closeDropdown();
+      input.blur();
     }
   });
-}
+
+  // Cerrar al hacer click fuera
+  document.addEventListener('click', e => {
+    if (!input.closest('.nav-search').contains(e.target)) closeDropdown();
+  });
+
+  input.addEventListener('focus', () => {
+    if (input.value.trim().length >= 2) renderDropdown(input.value);
+  });
+})();
 
 </script>
 </body>
