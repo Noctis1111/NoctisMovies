@@ -483,6 +483,24 @@ const params = new URLSearchParams(window.location.search);
 const rawId = params.get('id');
 const legacyIdx = parseInt(rawId);
 
+// ===== CONTADOR DE VISTAS (CounterAPI — gratis, sin token) =====
+// Namespace único para que no choque con contadores de otros sitios.
+// Si quieres, cámbialo por algo aún más único; debe ser IGUAL aquí y en admin.html.
+const VIEWS_NAMESPACE = 'noctis1111-noctismovies-7c3a';
+
+function viewKeyFor(slugOrIdx) {
+  return encodeURIComponent(String(slugOrIdx));
+}
+
+function registerView(m, idx) {
+  const key = viewKeyFor(m.slug || ('idx-' + idx));
+  const sessionFlag = 'noctis_viewed_' + key;
+  // Evita sumar vistas de más si el usuario recarga la página en la misma sesión
+  if (sessionStorage.getItem(sessionFlag)) return;
+  sessionStorage.setItem(sessionFlag, '1');
+  fetch(`https://api.counterapi.dev/v1/${VIEWS_NAMESPACE}/${key}/up`).catch(() => {});
+}
+
 function qualityClass(q = '') {
   const u = q.toLowerCase();
   if (u.includes('4k')) return 'q-4k';
@@ -644,6 +662,9 @@ async function init() {
   }
 
   const m = movies[idx];
+
+  // Sumar 1 vista para esta película
+  registerView(m, idx);
 
   // Breadcrumb & title
   document.title = m.title + ' — NoctisMovies';
