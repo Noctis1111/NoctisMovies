@@ -5,14 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin — NoctisMovies</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet"/>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-F18ZM0ZHHJ"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-F18ZM0ZHHJ');
-  </script>
+  <!-- GA no se carga en el admin para no contaminar las métricas del sitio -->
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -464,10 +457,11 @@
             <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total</div></div>
             <div class="stat-card"><div class="stat-num" id="stat-movies">0</div><div class="stat-label">Películas</div></div>
             <div class="stat-card"><div class="stat-num" id="stat-series">0</div><div class="stat-label">Series/Anime</div></div>
-            <div class="stat-card" id="stat-home-card" title="Visitas únicas (por sesión) a la página principal" style="cursor:default;position:relative;">
-              <div class="stat-num" id="stat-home-visits" style="font-size:1.5rem;">—</div>
+            <div class="stat-card" id="stat-home-card" title="Visitas totales a la página principal (contador propio)" style="cursor:default;position:relative;">
+              <div class="stat-num" id="stat-home-visits" style="font-size:1.5rem;">…</div>
               <div class="stat-label">Visitas Index</div>
-              <button onclick="fetchHomeVisits()" title="Actualizar" style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.9rem;padding:0;line-height:1;" id="home-visits-refresh">🔄</button>
+              <button onclick="fetchHomeVisits()" title="Actualizar contador" style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.9rem;padding:0;line-height:1;" id="home-visits-refresh">🔄</button>
+              <a href="https://analytics.google.com/analytics/web/#/a398963885p542866698/reports/intelligenthome" target="_blank" rel="noopener" title="Ver en Google Analytics" style="position:absolute;bottom:6px;right:8px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.75rem;padding:0;line-height:1;text-decoration:none;">GA↗</a>
             </div>
           </div>
         </div>
@@ -1266,13 +1260,16 @@ async function fetchHomeVisits() {
   const el = document.getElementById('stat-home-visits');
   const btn = document.getElementById('home-visits-refresh');
   if (btn) btn.style.opacity = '0.4';
+  // Mostrar caché mientras carga
+  const cached = localStorage.getItem('noctis_home_visits_cache');
+  if (el && cached !== null) el.textContent = Number(cached).toLocaleString('es') + '…';
   try {
     const count = await fetchCounterApiCount('home');
     if (el) el.textContent = count.toLocaleString('es');
     try { localStorage.setItem('noctis_home_visits_cache', String(count)); } catch {}
   } catch (err) {
-    const cached = localStorage.getItem('noctis_home_visits_cache');
-    if (el) el.textContent = cached ? Number(cached).toLocaleString('es') + '*' : '—';
+    // Si falla, mostrar caché con asterisco o 0 (nunca —)
+    if (el) el.textContent = cached !== null ? Number(cached).toLocaleString('es') + '*' : '0*';
     console.warn('fetchHomeVisits error:', err.message);
   } finally {
     if (btn) btn.style.opacity = '1';
