@@ -543,7 +543,7 @@ function checkAuth() {
       if (Date.now() - d.timestamp < EXPIRATION_TIME) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('admin-screen').style.display = 'block';
-        renderList(true); updateExport(); refreshViews(false); return;
+        renderList(true); updateExport(); refreshViews(false); fetchHomeVisits(); return;
       } else { localStorage.removeItem('noctis_auth_data'); }
     } catch { localStorage.removeItem('noctis_auth_data'); }
   }
@@ -1251,19 +1251,29 @@ function viewKeyFor(m, idx) {
   return raw.slice(0, 55) + '-' + h.toString(36);
 }
 
+// ── Helper: fetch a counterapi.dev con manejo de CORS ────────────────────
+async function fetchCounterApiCount(key) {
+  const url = `https://api.counterapi.dev/v1/${VIEWS_NAMESPACE}/${key}/`;
+  const res = await fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' }, mode: 'cors' });
+  if (!res.ok) throw new Error('http ' + res.status);
+  const data = await res.json();
+  // counterapi puede devolver { count: N } o { value: N } segun version
+  return Number(data.count ?? data.value ?? data.Count ?? 0);
+}
+
 // ── Visitas a la página principal (index) ────────────────────────────────
 async function fetchHomeVisits() {
   const el = document.getElementById('stat-home-visits');
   const btn = document.getElementById('home-visits-refresh');
   if (btn) btn.style.opacity = '0.4';
   try {
-    const res = await fetch(`https://api.counterapi.dev/v1/${VIEWS_NAMESPACE}/home/`);
-    if (!res.ok) throw new Error('http ' + res.status);
-    const data = await res.json();
-    const count = Number(data.count) || 0;
+    const count = await fetchCounterApiCount('home');
     if (el) el.textContent = count.toLocaleString('es');
-  } catch {
-    if (el) el.textContent = '—';
+    try { localStorage.setItem('noctis_home_visits_cache', String(count)); } catch {}
+  } catch (err) {
+    const cached = localStorage.getItem('noctis_home_visits_cache');
+    if (el) el.textContent = cached ? Number(cached).toLocaleString('es') + '*' : '—';
+    console.warn('fetchHomeVisits error:', err.message);
   } finally {
     if (btn) btn.style.opacity = '1';
   }
@@ -1275,17 +1285,24 @@ async function refreshViews(showFeedback) {
   if (!movies.length) { if (showFeedback) showToast('No hay títulos en el catálogo.', 'info'); return; }
   if (btn) btn.classList.add('loading');
   if (showFeedback) showToast('Actualizando vistas...', 'info');
-  const results = await Promise.all(movies.map(async (m, idx) => {
-    const key = viewKeyFor(m, idx);
-    try {
-      const res = await fetch(`https://api.counterapi.dev/v1/${VIEWS_NAMESPACE}/${key}/`);
-      if (!res.ok) throw new Error('http ' + res.status);
-      const data = await res.json();
-      return [key, Number(data.count) || 0];
-    } catch {
-      return [key, viewsCache[key] ?? 0];
-    }
-  }));
+  // Procesar en lotes de 5 para no saturar la API
+  const BATCH = 5;
+  const results = [];
+  for (let i = 0; i < movies.length; i += BATCH) {
+    const batch = movies.slice(i, i + BATCH);
+    const batchRes = await Promise.all(batch.map(async (m, bi) => {
+      const idx = i + bi;
+      const key = viewKeyFor(m, idx);
+      try {
+        const count = await fetchCounterApiCount(key);
+        return [key, count];
+      } catch {
+        return [key, viewsCache[key] ?? 0];
+      }
+    }));
+    results.push(...batchRes);
+    if (i + BATCH < movies.length) await new Promise(r => setTimeout(r, 120));
+  }
   results.forEach(([key, count]) => { viewsCache[key] = count; });
   try { localStorage.setItem('noctis_views_cache', JSON.stringify(viewsCache)); } catch {}
   if (btn) btn.classList.remove('loading');
