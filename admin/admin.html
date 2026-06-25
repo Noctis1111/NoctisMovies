@@ -152,7 +152,7 @@
     .item-btn.copy-link.copied { background: rgba(34,197,94,0.18); border-color: var(--green); color: var(--green); }
 
     /* STATS */
-    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
     .stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; text-align: center; }
     .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--gold); line-height: 1; }
     .stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.25rem; }
@@ -464,6 +464,11 @@
             <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total</div></div>
             <div class="stat-card"><div class="stat-num" id="stat-movies">0</div><div class="stat-label">Películas</div></div>
             <div class="stat-card"><div class="stat-num" id="stat-series">0</div><div class="stat-label">Series/Anime</div></div>
+            <div class="stat-card" id="stat-home-card" title="Visitas únicas (por sesión) a la página principal" style="cursor:default;position:relative;">
+              <div class="stat-num" id="stat-home-visits" style="font-size:1.5rem;">—</div>
+              <div class="stat-label">Visitas Index</div>
+              <button onclick="fetchHomeVisits()" title="Actualizar" style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.9rem;padding:0;line-height:1;" id="home-visits-refresh">🔄</button>
+            </div>
           </div>
         </div>
         <div class="admin-search">
@@ -512,6 +517,7 @@ function doLogin() {
     }
     renderList(true); updateExport();
     refreshViews(false);
+    fetchHomeVisits();
   } else {
     document.getElementById('login-error').style.display = 'block';
     document.getElementById('login-pass').value = '';
@@ -1235,7 +1241,32 @@ let viewsCache = {};
 try { viewsCache = JSON.parse(localStorage.getItem('noctis_views_cache') || '{}'); } catch { viewsCache = {}; }
 
 function viewKeyFor(m, idx) {
-  return encodeURIComponent(String(m.slug || ('idx-' + idx)));
+  const raw = String(m.slug || ('idx-' + idx));
+  // counterapi tiene límite de 64 chars en la key.
+  // Usamos los primeros 48 chars del slug + un hash de 8 chars para que sea único y corto.
+  if (raw.length <= 64) return raw;
+  // djb2 hash rápido
+  let h = 5381;
+  for (let i = 0; i < raw.length; i++) h = (((h << 5) + h) + raw.charCodeAt(i)) >>> 0;
+  return raw.slice(0, 55) + '-' + h.toString(36);
+}
+
+// ── Visitas a la página principal (index) ────────────────────────────────
+async function fetchHomeVisits() {
+  const el = document.getElementById('stat-home-visits');
+  const btn = document.getElementById('home-visits-refresh');
+  if (btn) btn.style.opacity = '0.4';
+  try {
+    const res = await fetch(`https://api.counterapi.dev/v1/${VIEWS_NAMESPACE}/home/`);
+    if (!res.ok) throw new Error('http ' + res.status);
+    const data = await res.json();
+    const count = Number(data.count) || 0;
+    if (el) el.textContent = count.toLocaleString('es');
+  } catch {
+    if (el) el.textContent = '—';
+  } finally {
+    if (btn) btn.style.opacity = '1';
+  }
 }
 
 async function refreshViews(showFeedback) {
