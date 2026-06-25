@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NoctisMovies — Cinema</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='8' fill='%23080a0f'/><text x='32' y='46' text-anchor='middle' font-family='Georgia,serif' font-weight='bold' font-size='44' fill='%23c9a84c'>N</text></svg>"/>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-F18ZM0ZHHJ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-F18ZM0ZHHJ');
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -598,6 +606,17 @@ function build2026(movies) {
 }
 
 loadMovies();
+
+// ── Contador de visitas a la página principal ──────────────────────────────
+(function() {
+  const NS = 'noctis1111-noctismovies-7c3a';
+  const KEY = 'home';
+  // Solo cuenta una vez por sesión
+  if (!sessionStorage.getItem('noctis_home_counted')) {
+    sessionStorage.setItem('noctis_home_counted', '1');
+    fetch(`https://api.counterapi.dev/v1/${NS}/${KEY}/up`).catch(() => {});
+  }
+})();
 </script>
 </body>
 </html>
