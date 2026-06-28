@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin — NoctisMovies</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet"/>
-  <!-- GA no se carga en el admin para no contaminar las métricas del sitio -->
+  <!-- GA no se carga en el admin para no contar visitas falsas en las metricas -->
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -457,11 +457,10 @@
             <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total</div></div>
             <div class="stat-card"><div class="stat-num" id="stat-movies">0</div><div class="stat-label">Películas</div></div>
             <div class="stat-card"><div class="stat-num" id="stat-series">0</div><div class="stat-label">Series/Anime</div></div>
-            <div class="stat-card" id="stat-home-card" title="Visitas totales a la página principal (contador propio)" style="cursor:default;position:relative;">
-              <div class="stat-num" id="stat-home-visits" style="font-size:1.5rem;">…</div>
+            <div class="stat-card" id="stat-home-card" title="Visitas únicas (por sesión) a la página principal" style="cursor:default;position:relative;">
+              <div class="stat-num" id="stat-home-visits" style="font-size:1.5rem;">—</div>
               <div class="stat-label">Visitas Index</div>
-              <button onclick="fetchHomeVisits()" title="Actualizar contador" style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.9rem;padding:0;line-height:1;" id="home-visits-refresh">🔄</button>
-              <a href="https://analytics.google.com/analytics/web/#/a398963885p542866698/reports/intelligenthome" target="_blank" rel="noopener" title="Ver en Google Analytics" style="position:absolute;bottom:6px;right:8px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.75rem;padding:0;line-height:1;text-decoration:none;">GA↗</a>
+              <button onclick="fetchHomeVisits()" title="Actualizar" style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.9rem;padding:0;line-height:1;" id="home-visits-refresh">🔄</button>
             </div>
           </div>
         </div>
@@ -1247,12 +1246,14 @@ function viewKeyFor(m, idx) {
 
 // ── Helper: fetch a counterapi.dev con manejo de CORS ────────────────────
 async function fetchCounterApiCount(key) {
-  const url = `https://api.counterapi.dev/v1/${VIEWS_NAMESPACE}/${key}/`;
-  const res = await fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' }, mode: 'cors' });
+  // CountAPI: GET /get/{namespace}/{key} -> { value: N }
+  // Funciona con CORS desde GitHub Pages sin problemas
+  const safeKey = encodeURIComponent(key).slice(0, 120);
+  const url = `https://api.countapi.xyz/get/${VIEWS_NAMESPACE}/${safeKey}`;
+  const res = await fetch(url, { mode: 'cors' });
   if (!res.ok) throw new Error('http ' + res.status);
   const data = await res.json();
-  // counterapi puede devolver { count: N } o { value: N } segun version
-  return Number(data.count ?? data.value ?? data.Count ?? 0);
+  return Number(data.value ?? 0);
 }
 
 // ── Visitas a la página principal (index) ────────────────────────────────
@@ -1260,17 +1261,17 @@ async function fetchHomeVisits() {
   const el = document.getElementById('stat-home-visits');
   const btn = document.getElementById('home-visits-refresh');
   if (btn) btn.style.opacity = '0.4';
-  // Mostrar caché mientras carga
+  // Mostrar cache mientras carga
   const cached = localStorage.getItem('noctis_home_visits_cache');
-  if (el && cached !== null) el.textContent = Number(cached).toLocaleString('es') + '…';
+  if (el) el.textContent = cached !== null ? Number(cached).toLocaleString('es') + '…' : '…';
   try {
     const count = await fetchCounterApiCount('home');
     if (el) el.textContent = count.toLocaleString('es');
     try { localStorage.setItem('noctis_home_visits_cache', String(count)); } catch {}
   } catch (err) {
-    // Si falla, mostrar caché con asterisco o 0 (nunca —)
-    if (el) el.textContent = cached !== null ? Number(cached).toLocaleString('es') + '*' : '0*';
-    console.warn('fetchHomeVisits error:', err.message);
+    // Si falla la API mostrar cache o 0, nunca —
+    if (el) el.textContent = cached !== null ? Number(cached).toLocaleString('es') + '*' : '0';
+    console.warn('fetchHomeVisits:', err.message);
   } finally {
     if (btn) btn.style.opacity = '1';
   }
