@@ -614,7 +614,8 @@ loadMovies();
   // Solo cuenta una vez por sesión
   if (!sessionStorage.getItem('noctis_home_counted')) {
     sessionStorage.setItem('noctis_home_counted', '1');
-    fetch(`https://api.counterapi.dev/v1/${NS}/${KEY}/up`).catch(() => {});
+    // CountAPI: /hit/{namespace}/{key} incrementa Y devuelve el valor
+    fetch(`https://api.countapi.xyz/hit/${NS}/${KEY}`).catch(() => {});
   }
 })();
 </script>
