@@ -524,7 +524,8 @@ function registerView(m, idx) {
   // Evita sumar vistas de más si el usuario recarga la página en la misma sesión
   if (sessionStorage.getItem(sessionFlag)) return;
   sessionStorage.setItem(sessionFlag, '1');
-  fetch(`https://api.counterapi.dev/v1/${VIEWS_NAMESPACE}/${key}/up`).catch(() => {});
+  // CountAPI: /hit/{namespace}/{key} incrementa Y devuelve el valor
+  fetch(`https://api.countapi.xyz/hit/${VIEWS_NAMESPACE}/${encodeURIComponent(key).slice(0,120)}`).catch(() => {});
 }
 
 function qualityClass(q = '') {
