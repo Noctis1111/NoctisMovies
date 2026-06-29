@@ -45,6 +45,32 @@
     .search-dropdown-item:last-child { border-bottom: none; }
     .search-dropdown-item:hover, .search-dropdown-item.focused { background: rgba(201,168,76,0.08); }
     .search-dropdown-thumb { width: 96px; height: 56px; object-fit: cover; border-radius: 6px; background: #161b24; flex-shrink: 0; aspect-ratio: 1280/740; }
+    .search-dropdown-item.item-h .search-dropdown-thumb-wrap { position: relative; width: 96px; height: 56px; flex-shrink: 0; border-radius: 6px; overflow: hidden; }
+    .search-dropdown-item.item-h .search-dropdown-thumb { filter: blur(10px) brightness(0.6); transition: filter 0.25s ease-in-out; }
+    .search-dropdown-item.item-h:hover .search-dropdown-thumb { filter: blur(0) brightness(1); }
+    .search-dropdown-item.item-h .h-ribbon-sm {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.92rem;
+      letter-spacing: 0.5px;
+      line-height: 0.95;
+      color: #fff;
+      background: linear-gradient(180deg, #ffffff 0%, #cccccc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 1px 4px rgba(0,0,0,0.9));
+      opacity: 1;
+      transition: opacity 0.25s ease-in-out;
+      pointer-events: none;
+      text-align: center;
+      padding: 0 3px;
+    }
+    .search-dropdown-item.item-h:hover .h-ribbon-sm { opacity: 0; }
     .search-dropdown-info { flex: 1; min-width: 0; }
     .search-dropdown-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; color: #f0f2f5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .search-dropdown-meta { font-size: 0.75rem; color: #6b7280; margin-top: 3px; }
@@ -78,6 +104,66 @@
     /* POSTER — respeta proporción natural */
     .poster-wrap { position: relative; padding: 1.5rem 1rem 1.5rem 1.5rem; display: flex; align-items: flex-start; }
     .poster-img { width: 100%; height: auto; max-height: 500px; object-fit: contain; object-position: top center; border-radius: 12px; border: 1px solid var(--border); display: block; box-shadow: 0 8px 40px rgba(0,0,0,0.7); }
+
+    /* ── Camuflaje activo: efecto Adult/Hentai (poster principal) ── */
+    .poster-wrap.card-h .poster-img {
+      transition: border 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+    .poster-wrap.card-h:hover .poster-img {
+      border: 2px solid #ff4a75;
+      box-shadow: 0 0 20px 4px rgba(255,74,117,0.6), 0 0 44px rgba(255,74,117,0.3);
+    }
+    .poster-wrap.card-h .h-ribbon {
+      position: absolute;
+      top: 28px; left: 0;
+      padding: 4px 14px 4px 10px;
+      background: linear-gradient(135deg, #ff4a75, #b31c43);
+      color: #fff;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      border-radius: 0 4px 4px 0;
+      box-shadow: 0 2px 10px rgba(255,74,117,0.5);
+      z-index: 5;
+      opacity: 0;
+      transform: translateX(-10px);
+      transition: all 0.3s ease-in-out;
+      pointer-events: none;
+    }
+    .poster-wrap.card-h:hover .h-ribbon {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .poster-wrap.card-h .poster-img {
+      filter: blur(28px) brightness(0.6);
+    }
+    .poster-wrap.card-h:hover .poster-img {
+      filter: blur(0) brightness(1);
+    }
+    .poster-wrap.card-h .h-hint {
+      position: absolute;
+      inset: 1.5rem 1rem 1.5rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 3px;
+      background: linear-gradient(180deg, #ffffff 0%, #cccccc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 2px 10px rgba(0,0,0,0.95));
+      opacity: 1;
+      transition: opacity 0.3s ease-in-out;
+      pointer-events: none;
+      z-index: 4;
+      text-align: center;
+      line-height: 1.2;
+    }
+    .poster-wrap.card-h:hover .h-hint {
+      opacity: 0;
+    }
 
     /* DATOS + SINOPSIS juntos en la columna derecha */
     .datos-sinopsis-col { padding: 1.5rem 1.5rem 1.5rem 1rem; display: flex; flex-direction: column; gap: 1rem; }
@@ -177,6 +263,69 @@
     .related-poster { position: relative; aspect-ratio: 1280/740; overflow: hidden; border-radius: 8px; }
     .related-poster img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s; }
     .related-card:hover .related-poster img { transform: scale(1.04); }
+
+    /* ── Camuflaje activo: efecto Adult/Hentai (tarjetas relacionadas) ── */
+    .related-card.card-h .related-poster {
+      transition: border 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      border: 2px solid transparent;
+    }
+    .related-card.card-h:hover .related-poster {
+      border: 2px solid #ff4a75;
+      box-shadow: 0 0 14px 3px rgba(255,74,117,0.6), 0 0 30px rgba(255,74,117,0.3);
+    }
+    .related-card.card-h .h-ribbon {
+      position: absolute;
+      top: 8px; left: -6px;
+      padding: 3px 12px 3px 8px;
+      background: linear-gradient(135deg, #ff4a75, #b31c43);
+      color: #fff;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 1px;
+      border-radius: 0 4px 4px 0;
+      box-shadow: 0 2px 8px rgba(255,74,117,0.5);
+      z-index: 5;
+      opacity: 0;
+      transform: translateX(-10px);
+      transition: all 0.3s ease-in-out;
+      pointer-events: none;
+    }
+    .related-card.card-h:hover .h-ribbon {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .related-card.card-h .related-poster img {
+      filter: blur(16px) brightness(0.65);
+      transition: filter 0.3s ease-in-out;
+    }
+    .related-card.card-h:hover .related-poster img {
+      filter: blur(0) brightness(1);
+    }
+    .related-card.card-h .h-hint {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.35rem;
+      letter-spacing: 2px;
+      background: linear-gradient(180deg, #ffffff 0%, #cccccc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.9));
+      opacity: 1;
+      transition: opacity 0.3s ease-in-out;
+      pointer-events: none;
+      z-index: 4;
+      text-align: center;
+      padding: 0 0.5rem;
+      line-height: 1.2;
+    }
+    .related-card.card-h:hover .h-hint {
+      opacity: 0;
+    }
     .related-info { padding: 0; margin-top: 0.5rem; background: none; }
     .related-info-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 500; letter-spacing: 0.5px; line-height: 1.35; color: #fff; word-break: break-word; }
     .related-info-meta { display: none; }
@@ -253,6 +402,7 @@
     .title-tags-wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; margin-top: 0.75rem; }
     .title-year { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; color: var(--gold); letter-spacing: 2px; background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.35); border-radius: 6px; padding: 2px 10px; line-height: 1.6; }
     .title-tag { padding: 3px 10px; border-radius: 20px; border: 1px solid rgba(201,168,76,0.3); color: rgba(201,168,76,0.85); font-family: 'Barlow Condensed', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; line-height: 1.6; }
+    .title-tag.tag-hentai { font-size: 0.95rem; padding: 5px 14px; border: 1px solid rgba(255,74,117,0.5); color: #ff4a75; background: rgba(255,74,117,0.08); }
 
     /* NOT FOUND */
     .not-found { text-align: center; padding: 6rem 2rem; }
@@ -413,7 +563,7 @@
           <a class="side-tag" href="index.html?filter=pelicula">PELÍCULAS</a>
           <a class="side-tag" href="index.html?filter=anime">ANIME</a>
           <a class="side-tag" href="index.html?filter=dorama">DORAMA</a>
-          <a class="side-tag" href="index.html?filter=coleccion">COLECCIÓN</a>
+          <a class="side-tag" href="index.html?filter=hentai">🔞 ADULT/HENTAI</a>
         </div>
       </div>
     </div>
@@ -650,9 +800,11 @@ function renderRelated(movies, currentIdx) {
   grid.innerHTML = related.map(m => {
     const ri = movies.indexOf(m);
     const fallback = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='130' height='195'%3E%3Crect fill='%230e1117' width='130' height='195'/%3E%3C/svg%3E`;
+    const isH = /hentai|adult/.test((m.type || '').toLowerCase());
     return `
-    <a class="related-card" href="detalle.html?id=${movies[ri].slug || ri}">
+    <a class="related-card${isH ? ' card-h' : ''}" href="detalle.html?id=${movies[ri].slug || ri}">
       <div class="related-poster">
+        ${isH ? '<span class="h-ribbon">+18</span><span class="h-hint">CONTENIDO EXPLÍCITO</span>' : ''}
         <img src="${m.image || ''}" alt="${m.title}" onerror="this.src='${fallback}'"/>
       </div>
       <div class="related-info">
@@ -703,8 +855,11 @@ async function init() {
   const tags = [];
   // Audio: primera palabra (Latino, Subtitulado, Inglés…)
   if (m.audio) tags.push(m.audio.split(/[\s\-–]/)[0].toUpperCase());
-  // Tipo: Película / Serie / Anime…
-  if (m.type) tags.push(m.type.toUpperCase());
+  // Tipo: Película / Serie / Anime… (camuflado si es contenido adulto)
+  if (m.type) {
+    const isAdultType = /hentai|adult/.test(m.type.toLowerCase());
+    tags.push(isAdultType ? '+18' : m.type.toUpperCase());
+  }
   // Resolución (quality): Full 1080p, 4K, 720p…
   if (m.quality) tags.push(m.quality.toUpperCase());
   // Fuente/Encode: WEB-DL, REMUX, HDTS, X265…
@@ -713,7 +868,7 @@ async function init() {
   if (m.genre) m.genre.split(',').slice(0,3).forEach(g => { const t = g.trim(); if(t) tags.push(t.toUpperCase()); });
   // Año destacado al inicio
   const yearHtml = m.year ? `<span class="title-year">${m.year}</span>` : '';
-  tagsEl.innerHTML = yearHtml + tags.map(t => `<span class="title-tag">${t}</span>`).join('');
+  tagsEl.innerHTML = yearHtml + tags.map(t => `<span class="title-tag${t === '+18' ? ' tag-hentai' : ''}">${t}</span>`).join('');
 
   // Poster
   const posterEl = document.getElementById('d-poster');
@@ -722,6 +877,32 @@ async function init() {
   posterEl.onerror = function() {
     this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='300'%3E%3Crect fill='%230e1117' width='200' height='300'/%3E%3Ctext fill='%236b7280' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='40'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E";
   };
+
+  // Camuflaje activo: marcar el poster si el tipo es Adult/Hentai
+  const posterWrapEl = document.querySelector('.poster-wrap');
+  if (posterWrapEl) {
+    const isH = /hentai|adult/.test((m.type || '').toLowerCase());
+    posterWrapEl.classList.toggle('card-h', isH);
+    let ribbon = posterWrapEl.querySelector('.h-ribbon');
+    let hint = posterWrapEl.querySelector('.h-hint');
+    if (isH) {
+      if (!ribbon) {
+        ribbon = document.createElement('span');
+        ribbon.className = 'h-ribbon';
+        ribbon.textContent = '+18';
+        posterWrapEl.appendChild(ribbon);
+      }
+      if (!hint) {
+        hint = document.createElement('span');
+        hint.className = 'h-hint';
+        hint.textContent = 'CONTENIDO EXPLÍCITO';
+        posterWrapEl.appendChild(hint);
+      }
+    } else {
+      if (ribbon) ribbon.remove();
+      if (hint) hint.remove();
+    }
+  }
 
   // Quality badge — eliminado (el usuario agrega su propio SVG)
 
@@ -873,16 +1054,22 @@ init();
     const fallback = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='56'%3E%3Crect fill='%23161b24' width='96' height='56'/%3E%3C/svg%3E";
     const basePath = window.location.pathname.includes('/admin/') ? '../' : '';
 
-    let html = results.map(({ m, i }) => `
-      <a class="search-dropdown-item" href="${basePath}detalle.html?id=${m.slug || i}" data-idx="${i}">
-        <img class="search-dropdown-thumb" src="${m.image||fallback}" alt="${m.title}" onerror="this.src='${fallback}'"/>
+    let html = results.map(({ m, i }) => {
+      const isH = /hentai|adult/.test((m.type || '').toLowerCase());
+      return `
+      <a class="search-dropdown-item${isH ? ' item-h' : ''}" href="${basePath}detalle.html?id=${m.slug || i}" data-idx="${i}">
+        <span class="search-dropdown-thumb-wrap">
+          <img class="search-dropdown-thumb" src="${m.image||fallback}" alt="${m.title}" onerror="this.src='${fallback}'"/>
+          ${isH ? '<span class="h-ribbon-sm">CONTENIDO<br>EXPLÍCITO</span>' : ''}
+        </span>
         <div class="search-dropdown-info">
           <div class="search-dropdown-title">${m.title}</div>
           <div class="search-dropdown-meta">
             <span class="yr">${m.year||''}</span>${m.type||''}${m.source ? ' · '+m.source : ''}
           </div>
         </div>
-      </a>`).join('');
+      </a>`;
+    }).join('');
 
     // "Ver todos" si hay más resultados
     const total = allMovies.filter(m => norm(m.title).includes(qn)||norm(m.originalTitle||'').includes(qn)).length;
