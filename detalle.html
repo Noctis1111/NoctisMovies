@@ -50,6 +50,22 @@
     .search-dropdown-item.item-h:hover .search-dropdown-thumb { filter: blur(0) brightness(1); }
     .search-dropdown-item.item-h .h-ribbon-sm {
       position: absolute;
+      top: 4px; left: 0;
+      padding: 2px 8px 2px 5px;
+      background: linear-gradient(135deg, #ff4a75, #b31c43);
+      color: #fff;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 1.5px;
+      border-radius: 0 4px 4px 0;
+      z-index: 6;
+      opacity: 1;
+      transition: opacity 0.25s;
+      pointer-events: none;
+    }
+    .search-dropdown-item.item-h:hover .h-ribbon-sm { opacity: 0; }
+    .search-dropdown-item.item-h .h-hint-sm {
+      position: absolute;
       inset: 0;
       display: flex;
       align-items: center;
@@ -70,7 +86,7 @@
       text-align: center;
       padding: 0 3px;
     }
-    .search-dropdown-item.item-h:hover .h-ribbon-sm { opacity: 0; }
+    .search-dropdown-item.item-h:hover .h-hint-sm { opacity: 0; }
     .search-dropdown-info { flex: 1; min-width: 0; }
     .search-dropdown-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; color: #f0f2f5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .search-dropdown-meta { font-size: 0.75rem; color: #6b7280; margin-top: 3px; }
@@ -116,18 +132,17 @@
     .poster-wrap.card-h .h-ribbon {
       position: absolute;
       top: 28px; left: 0;
-      padding: 4px 14px 4px 10px;
+      padding: 6px 18px 6px 12px;
       background: linear-gradient(135deg, #ff4a75, #b31c43);
       color: #fff;
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 0.7rem;
-      letter-spacing: 1px;
-      border-radius: 0 4px 4px 0;
-      box-shadow: 0 2px 10px rgba(255,74,117,0.5);
+      font-size: 1.3rem;
+      letter-spacing: 2px;
+      border-radius: 0 6px 6px 0;
+      box-shadow: 0 2px 14px rgba(255,74,117,0.7);
       z-index: 5;
-      opacity: 0;
-      transform: translateX(-10px);
-      transition: all 0.3s ease-in-out;
+      opacity: 1;
+      transform: translateX(0);
       pointer-events: none;
     }
     .poster-wrap.card-h:hover .h-ribbon {
@@ -275,24 +290,24 @@
     }
     .related-card.card-h .h-ribbon {
       position: absolute;
-      top: 8px; left: -6px;
-      padding: 3px 12px 3px 8px;
+      top: 8px; left: 0;
+      padding: 4px 14px 4px 8px;
       background: linear-gradient(135deg, #ff4a75, #b31c43);
       color: #fff;
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 0.6rem;
-      letter-spacing: 1px;
-      border-radius: 0 4px 4px 0;
-      box-shadow: 0 2px 8px rgba(255,74,117,0.5);
+      font-size: 1rem;
+      letter-spacing: 2px;
+      border-radius: 0 5px 5px 0;
+      box-shadow: 0 2px 10px rgba(255,74,117,0.7);
       z-index: 5;
-      opacity: 0;
-      transform: translateX(-10px);
-      transition: all 0.3s ease-in-out;
+      opacity: 1;
+      transform: translateX(0);
+      transition: opacity 0.25s, transform 0.25s;
       pointer-events: none;
     }
     .related-card.card-h:hover .h-ribbon {
-      opacity: 1;
-      transform: translateX(0);
+      opacity: 0;
+      transform: translateX(-6px);
     }
     .related-card.card-h .related-poster img {
       filter: blur(16px) brightness(0.65);
@@ -522,6 +537,13 @@
               </button>
             </div>
 
+            <!-- Contraseña (solo si existe) -->
+            <div id="password-row" style="display:none;align-items:center;gap:0.6rem;margin-top:0.5rem;padding:0.45rem 0.75rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;width:fit-content;">
+              <span style="font-size:0.72rem;color:var(--muted);letter-spacing:1px;font-weight:600;white-space:nowrap;">🔒 PASSWORD:</span>
+              <span id="password-val" style="font-size:0.85rem;color:var(--gold);font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;"></span>
+              <button onclick="copyPassword()" style="background:var(--surface3);border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:3px 10px;font-size:0.7rem;cursor:pointer;transition:all 0.2s;white-space:nowrap;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">📋 Copiar</button>
+            </div>
+
             <!-- Panel desplegable de enlaces -->
             <div class="enlaces-panel" id="enlaces-panel">
               <div class="enlaces-panel-inner" id="enlaces-content">
@@ -697,6 +719,15 @@ function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function copyPassword() {
+  const pw = document.getElementById('password-val')?.textContent || '';
+  if (!pw) return;
+  navigator.clipboard.writeText(pw).then(() => {
+    const btn = document.querySelector('#password-row button');
+    if (btn) { const orig = btn.textContent; btn.textContent = '✅ Copiado'; setTimeout(() => btn.textContent = orig, 1500); }
+  });
 }
 
 function copyText(text) {
@@ -992,6 +1023,18 @@ async function init() {
   // Renderizar enlaces desplegables
   renderEnlaces(m.links || m.link || '');
 
+  // Mostrar contraseña si existe
+  const pwRow = document.getElementById('password-row');
+  const pwVal = document.getElementById('password-val');
+  if (pwRow && pwVal) {
+    if (m.password && m.password.trim()) {
+      pwVal.textContent = m.password.trim();
+      pwRow.style.display = 'flex';
+    } else {
+      pwRow.style.display = 'none';
+    }
+  }
+
   // Relacionadas
   renderRelated(movies, idx);
 
@@ -1060,7 +1103,7 @@ init();
       <a class="search-dropdown-item${isH ? ' item-h' : ''}" href="${basePath}detalle.html?id=${m.slug || i}" data-idx="${i}">
         <span class="search-dropdown-thumb-wrap">
           <img class="search-dropdown-thumb" src="${m.image||fallback}" alt="${m.title}" onerror="this.src='${fallback}'"/>
-          ${isH ? '<span class="h-ribbon-sm">CONTENIDO<br>EXPLÍCITO</span>' : ''}
+          ${isH ? '<span class="h-ribbon-sm">+18</span><span class="h-hint-sm">CONTENIDO<br>EXPLÍCITO</span>' : ''}
         </span>
         <div class="search-dropdown-info">
           <div class="search-dropdown-title">${m.title}</div>
