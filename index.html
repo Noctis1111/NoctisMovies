@@ -74,6 +74,65 @@
     .s2026-dots { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.25rem; }
     .s2026-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); border: 1px solid rgba(255,255,255,0.15); cursor: pointer; transition: all 0.3s; }
     .s2026-dot.active { background: var(--gold); border-color: var(--gold); transform: scale(1.3); }
+
+    /* ── Camuflaje activo en carrusel 2026 ── */
+    .s2026-card.card-h .s2026-poster img {
+      filter: blur(22px) brightness(0.65);
+      transition: filter 0.3s ease-in-out, transform 0.4s ease;
+    }
+    .s2026-card.card-h:hover .s2026-poster img {
+      filter: blur(0) brightness(1);
+      transform: scale(1);
+    }
+    .s2026-card.card-h:hover {
+      border-color: #ff4a75 !important;
+      box-shadow: 0 0 20px 6px rgba(255,74,117,0.6), 0 0 50px 10px rgba(255,74,117,0.25) !important;
+    }
+    .s2026-card.card-h .h-ribbon {
+      position: absolute;
+      top: 3px; left: 25px;
+      padding: 3px 8px;
+      background: rgba(160,20,55,0.92);
+      color: #fff;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 2px;
+      border-radius: 3px;
+      z-index: 10;
+      opacity: 0;
+      transform: translateY(-3px);
+      transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none;
+    }
+    .s2026-card.card-h:hover .h-ribbon {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .s2026-card.card-h .h-hint {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+      background: linear-gradient(180deg, #ffffff 0%, #cccccc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.9));
+      opacity: 1;
+      transition: opacity 0.3s ease-in-out;
+      pointer-events: none;
+      z-index: 4;
+      text-align: center;
+      padding: 0 1rem;
+      line-height: 1.2;
+    }
+    .s2026-card.card-h:hover .h-hint {
+      opacity: 0;
+    }
     .main-layout { max-width: 1600px; margin: 0 auto; padding: 0 2rem 4rem; display: grid; grid-template-columns: 1fr 220px; gap: 2rem; align-items: start; }
     @media (max-width: 1000px) { .main-layout { grid-template-columns: 1fr; } .sidebar-filters { display: none; } }
 
@@ -101,6 +160,71 @@
     .movie-card:hover .card-poster img { transform: scale(1.05); }
     .card-overlay { display: none; }
     .card-title { margin-top: 0.5rem; font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 500; letter-spacing: 0.5px; color: #fff; line-height: 1.35; word-break: break-word; }
+
+    /* ── Camuflaje activo: efecto Adult/Hentai solo en hover ── */
+    .movie-card.card-h .card-poster {
+      transition: outline 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      outline: 2px solid transparent;
+      outline-offset: 0px;
+    }
+    .movie-card.card-h:hover .card-poster {
+      outline: 2px solid #ff4a75;
+      outline-offset: 3px;
+      box-shadow: 0 0 20px 6px rgba(255,74,117,0.7), 0 0 50px 10px rgba(255,74,117,0.3);
+    }
+    .movie-card.card-h .h-ribbon {
+      position: absolute;
+      top: 3px; left: 25px;
+      padding: 3px 8px;
+      background: rgba(160,20,55,0.92);
+      color: #fff;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 2px;
+      border-radius: 3px;
+      z-index: 10;
+      opacity: 0;
+      transform: translateY(-3px);
+      transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none;
+    }
+    .movie-card.card-h:hover .h-ribbon {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .movie-card.card-h .card-poster img {
+      filter: blur(22px) brightness(0.65);
+      transition: filter 0.3s ease-in-out;
+    }
+    .movie-card.card-h:hover .card-poster img {
+      filter: blur(0) brightness(1);
+      transform: scale(1);
+    }
+    .movie-card.card-h .h-hint {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.35rem;
+      letter-spacing: 2px;
+      background: linear-gradient(180deg, #ffffff 0%, #cccccc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.9));
+      opacity: 1;
+      transition: opacity 0.3s ease-in-out;
+      pointer-events: none;
+      z-index: 4;
+      text-align: center;
+      padding: 0 0.75rem;
+      line-height: 1.2;
+    }
+    .movie-card.card-h:hover .h-hint {
+      opacity: 0;
+    }
 
     .empty-state { text-align: center; padding: 5rem 2rem; color: var(--muted); display: none; }
     .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
@@ -199,7 +323,7 @@
       <button class="filter-tab" data-filter="serie">Series</button>
       <button class="filter-tab" data-filter="anime">Anime</button>
       <button class="filter-tab" data-filter="dorama">Doramas</button>
-      <button class="filter-tab" data-filter="coleccion">Colecciones</button>
+      <button class="filter-tab" data-filter="hentai">🔞 Adult/Hentai</button>
       <button class="filter-tab" data-filter="4k">4K</button>
       <button class="filter-tab" data-filter="1080p">1080p</button>
       <button class="filter-tab" data-filter="latino">Latino</button>
@@ -235,7 +359,7 @@
           <a class="side-tag" href="index.html?filter=serie">SERIES</a>
           <a class="side-tag" href="index.html?filter=anime">ANIME</a>
           <a class="side-tag" href="index.html?filter=dorama">DORAMAS</a>
-          <a class="side-tag" href="index.html?filter=coleccion">COLECCIÓN</a>
+          <a class="side-tag" href="index.html?filter=hentai">🔞 ADULT/HENTAI</a>
         </div>
       </div>
     </div>
@@ -387,7 +511,7 @@ function renderGrid() {
     let matchFilter = true;
     if (activeFilter !== 'all') {
       const f = norm(activeFilter);
-      // Tipo (Película, Serie, Anime, Dorama, Colección)
+      // Tipo (Película, Serie, Anime, Dorama, Hentai)
       const typeMatch   = norm(m.type).includes(f);
       // Resolución (quality): 4k, 1080p, 720p, 2k…
       const qualMatch   = norm(m.quality).includes(f);
@@ -442,9 +566,11 @@ function renderGrid() {
 
   grid.innerHTML = pageItems.map((m, i) => {
     const realIdx = allMovies.indexOf(m);
+    const isH = isAdultContent(m);
     return `
-    <a class="movie-card" href="detalle.html?id=${m.slug || realIdx}" style="animation-delay:${(i % 20) * 40}ms">
+    <a class="movie-card${isH ? ' card-h' : ''}" href="detalle.html?id=${m.slug || realIdx}" style="animation-delay:${(i % 20) * 40}ms">
       <div class="card-poster">
+        ${isH ? '<span class="h-ribbon">+18</span><span class="h-hint">CONTENIDO EXPLÍCITO</span>' : ''}
         <img src="${m.image || ''}" alt="${m.title}" loading="lazy" onerror="this.src='${fallbackSvg}'"/>
       </div>
       <div class="card-title">${m.title}</div>
@@ -453,6 +579,11 @@ function renderGrid() {
 
   // Renderizar paginación
   renderPagination(totalPages, filtered.length);
+}
+
+function isAdultContent(m) {
+  const t = norm(m.type || '');
+  return t.includes('hentai') || t.includes('adult');
 }
 
 function renderPagination(totalPages, totalItems) {
@@ -532,10 +663,12 @@ function build2026(movies) {
 
   track.innerHTML = items.map((m, i) => {
     const realIdx = movies.indexOf(m);
-    return `<a class="s2026-card" href="detalle.html?id=${m.slug || realIdx}">
+    const isH = isAdultContent(m);
+    return `<a class="s2026-card${isH ? ' card-h' : ''}" href="detalle.html?id=${m.slug || realIdx}">
       <div class="s2026-poster">
         <img src="${m.image||''}" alt="${m.title}" loading="lazy" onerror="this.src='${fallback}'"/>
         <div class="s2026-overlay"></div>
+        ${isH ? '<span class="h-ribbon">+18</span><span class="h-hint">CONTENIDO EXPLÍCITO</span>' : ''}
       </div>
     </a>`;
   }).join('');
