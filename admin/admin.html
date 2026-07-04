@@ -811,15 +811,28 @@ function autoRellenarTodo() {
   const calUp    = (p.calidad2   || '').toUpperCase();
   const audLow   = (p.audio2     || '').toLowerCase();
   const genLow   = (p.genre      || '').toLowerCase();
-  const durMin   = parseInt(p.duration) || 0;
+  // durMin: extraer número de minutos de strings como "65 min por cap. aprox."
+  const durStr   = (p.duration || '').toLowerCase();
+  const durMatch = durStr.match(/(\d+)/);
+  const durMin   = durMatch ? parseInt(durMatch[1]) : 0;
+  // isEpisodic: detectar si la duración indica que es por capítulo/episodio
+  const isEpisodic = /por\s*cap|per\s*ep|por\s*epis|x\s*ep|por\s*capitulo|cap\.\s*aprox|min\.?\s*por/i.test(durStr);
 
   // CALIDAD — revisa resolución, calidad, y título
   const resUp = (p.resolucion2 || '').toUpperCase();
   const calQUp = calUp + ' ' + tituloUp + ' ' + resUp;
   if (calQUp.includes('3840')||calQUp.includes('2160')||calQUp.includes('4K')||calQUp.includes('2K')||calQUp.includes('HDR10')||calQUp.includes('DV HDR'))
     setActiveChip('chips-quality','4K');
-  else if (calQUp.includes('1920')||calQUp.includes('1080')||calQUp.includes('FULL')||calQUp.includes('FULL HD'))
+  else if (calQUp.includes('FULL HD')||(()=>{
+    // 1080 real: ancho x alto donde alto === 1080 (1920x1080, 1440x1080, etc.)
+    const resRaw = (p.resolucion2||'').replace(/[×x\s]+/,'x');
+    const parts  = resRaw.split('x');
+    const alto   = parseInt(parts[1]||'0');
+    return alto === 1080 || calQUp.includes('1080') || calQUp.includes('1920X1080') || calQUp.includes('1920 X 1080') || calQUp.includes('1920×1080');
+  })())
     setActiveChip('chips-quality','Full HD');
+  else if (calQUp.includes('1920')||calQUp.includes('FULL'))
+    setActiveChip('chips-quality','1080p');
   else if (calQUp.includes('1280')||calQUp.includes('720'))
     setActiveChip('chips-quality','720p');
   else if (calQUp.includes('480'))
@@ -864,15 +877,21 @@ function autoRellenarTodo() {
 
   // TIPO — Anime > Dorama (coreano/japonés serie) > Serie > Película
   const countryLow = (p.country || '').toLowerCase();
+  // isTemporada: título contiene palabras que indican serie/temporada
   const isTemporada = tituloUp.includes('TEMPORADA')||tituloUp.includes('SERIE')||tituloUp.includes('SEASON')||tituloUp.includes('COMPLETA');
+  // isEpisodic ya definido arriba — "65 min por cap" etc.
+  // isManyEps: título tiene patrón [N/N] con N > 1, indica múltiples episodios
+  const epsMatch = tituloUp.match(/\[(\d+)\/(\d+)\]/);
+  const isManyEps = epsMatch && parseInt(epsMatch[2]) > 1;
+  const isSerieSignal = isTemporada || isEpisodic || isManyEps;
   const isAsianCountry = countryLow.includes('japan')||countryLow.includes('korea')||countryLow.includes('south korea')||countryLow.includes('china');
   if (genLow.includes('anime')||tituloUp.includes('ANIME'))
     setActiveChip('chips-type','Anime');
-  else if (isAsianCountry && isTemporada)
+  else if (isAsianCountry && isSerieSignal)
     setActiveChip('chips-type','Dorama, Serie');
-  else if (isAsianCountry && durMin>=60)
+  else if (isAsianCountry && !isSerieSignal && durMin>=60)
     setActiveChip('chips-type','Dorama, Película');
-  else if (isTemporada||(durMin>0&&durMin<60))
+  else if (isSerieSignal)
     setActiveChip('chips-type','Serie');
   else if (durMin>=60)
     setActiveChip('chips-type','Película');
