@@ -349,6 +349,7 @@
                   <button type="button" class="chip" data-value="PLACEBO" style="border-color:#6ac2eb;color:#6ac2eb;">PLACEBO</button>
                   <button type="button" class="chip" data-value="HDRIP" style="border-color:#f8b800;color:#f8b800;">HDRip</button>
                   <button type="button" class="chip" data-value="HDTS" style="border-color:#3330ac;color:#3330ac;">HDTS</button>
+                  <button type="button" class="chip" data-value="DCP-RIP" style="border-color:#b05a00;color:#b05a00;">DCP-RIP</button>
                 </div>
                 <input type="hidden" id="f-source" value=""/>
               </div>
@@ -473,7 +474,6 @@
               <button onclick="fetchHomeVisits()" title="Actualizar" style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.9rem;padding:0;line-height:1;" id="home-visits-refresh">🔄</button>
             </div>
           </div>
-          <!-- Mini filtro por tipo -->
           <div class="type-filter-row" id="type-filter-row">
             <button class="tf-btn" data-type="Película" onclick="toggleTypeFilter(this)">🎬 Película</button>
             <button class="tf-btn" data-type="Serie" onclick="toggleTypeFilter(this)">📺 Serie</button>
@@ -882,10 +882,12 @@ function autoRellenarTodo() {
     setActiveChip('chips-source','HDRIP');
   else if (combined.includes('DVDRIP') || combined.includes('DVDRIP'))
     setActiveChip('chips-source','HDRIP'); // mapea a HDRIP como fallback
+  else if (/DCP/i.test(calQUp + ' ' + tituloUp))
+    setActiveChip('chips-source','DCP-RIP');
   else if (combined.includes('60FPS'))
     setActiveChip('chips-source','60FPS');
 
-  // TIPO — Anime > Dorama > Serie > Película
+  // TIPO — Anime > Dorama (coreano/japonés serie) > Serie > Película
   const countryLow = (p.country || '').toLowerCase();
   const isTemporada = tituloUp.includes('TEMPORADA')||tituloUp.includes('SERIE')||tituloUp.includes('SEASON')||tituloUp.includes('COMPLETA');
   const epsMatch = tituloUp.match(/\[(\d+)\/(\d+)\]/);
@@ -1341,13 +1343,10 @@ async function refreshViews(showFeedback) {
   if (showFeedback) showToast('✓ Vistas actualizadas', 'success');
 }
 
-// ── Filtro de tipo en el panel admin ────────────────────────────────────────
-let adminTypeFilter = null; // null = sin filtro
-
+let adminTypeFilter = null;
 function toggleTypeFilter(btn) {
   const type = btn.dataset.type;
   if (adminTypeFilter === type) {
-    // Clic en el mismo → desactivar
     adminTypeFilter = null;
     document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('tf-active'));
   } else {
@@ -1356,7 +1355,6 @@ function toggleTypeFilter(btn) {
   }
   renderList(true);
 }
-
 function renderList(resetPage) {
   if (resetPage) currentPage = 1;
   const movies = getMovies();
