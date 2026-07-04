@@ -145,7 +145,11 @@
     .item-btn.copy-link.copied { background: rgba(34,197,94,0.18); border-color: var(--green); color: var(--green); }
 
     /* STATS */
-    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 0.5rem; }
+    .type-filter-row { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.9rem; }
+    .tf-btn { font-size: 0.65rem; padding: 0.22rem 0.55rem; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.18s; white-space: nowrap; font-family: 'Barlow', sans-serif; letter-spacing: 0.3px; }
+    .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .tf-btn.tf-active { background: var(--gold); border-color: var(--gold); color: #000; font-weight: 600; }
     .stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; text-align: center; }
     .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--gold); line-height: 1; }
     .stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.25rem; }
@@ -468,6 +472,15 @@
               <div class="stat-label">Visitas Index</div>
               <button onclick="fetchHomeVisits()" title="Actualizar" style="position:absolute;top:6px;right:8px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.9rem;padding:0;line-height:1;" id="home-visits-refresh">🔄</button>
             </div>
+          </div>
+          <!-- Mini filtro por tipo -->
+          <div class="type-filter-row" id="type-filter-row">
+            <button class="tf-btn" data-type="Película" onclick="toggleTypeFilter(this)">🎬 Película</button>
+            <button class="tf-btn" data-type="Serie" onclick="toggleTypeFilter(this)">📺 Serie</button>
+            <button class="tf-btn" data-type="Anime" onclick="toggleTypeFilter(this)">⛩ Anime</button>
+            <button class="tf-btn" data-type="Dorama, Película" onclick="toggleTypeFilter(this)">🌸 Dorama P.</button>
+            <button class="tf-btn" data-type="Dorama, Serie" onclick="toggleTypeFilter(this)">🌸 Dorama S.</button>
+            <button class="tf-btn" data-type="Hentai" onclick="toggleTypeFilter(this)">🔞 Adult/Hentai</button>
           </div>
         </div>
         <div class="admin-search">
@@ -811,11 +824,9 @@ function autoRellenarTodo() {
   const calUp    = (p.calidad2   || '').toUpperCase();
   const audLow   = (p.audio2     || '').toLowerCase();
   const genLow   = (p.genre      || '').toLowerCase();
-  // durMin: extraer número de minutos de strings como "65 min por cap. aprox."
   const durStr   = (p.duration || '').toLowerCase();
   const durMatch = durStr.match(/(\d+)/);
   const durMin   = durMatch ? parseInt(durMatch[1]) : 0;
-  // isEpisodic: detectar si la duración indica que es por capítulo/episodio
   const isEpisodic = /por\s*cap|per\s*ep|por\s*epis|x\s*ep|por\s*capitulo|cap\.\s*aprox|min\.?\s*por/i.test(durStr);
 
   // CALIDAD — revisa resolución, calidad, y título
@@ -824,7 +835,6 @@ function autoRellenarTodo() {
   if (calQUp.includes('3840')||calQUp.includes('2160')||calQUp.includes('4K')||calQUp.includes('2K')||calQUp.includes('HDR10')||calQUp.includes('DV HDR'))
     setActiveChip('chips-quality','4K');
   else if (calQUp.includes('FULL HD')||(()=>{
-    // 1080 real: ancho x alto donde alto === 1080 (1920x1080, 1440x1080, etc.)
     const resRaw = (p.resolucion2||'').replace(/[×x\s]+/,'x');
     const parts  = resRaw.split('x');
     const alto   = parseInt(parts[1]||'0');
@@ -875,12 +885,9 @@ function autoRellenarTodo() {
   else if (combined.includes('60FPS'))
     setActiveChip('chips-source','60FPS');
 
-  // TIPO — Anime > Dorama (coreano/japonés serie) > Serie > Película
+  // TIPO — Anime > Dorama > Serie > Película
   const countryLow = (p.country || '').toLowerCase();
-  // isTemporada: título contiene palabras que indican serie/temporada
   const isTemporada = tituloUp.includes('TEMPORADA')||tituloUp.includes('SERIE')||tituloUp.includes('SEASON')||tituloUp.includes('COMPLETA');
-  // isEpisodic ya definido arriba — "65 min por cap" etc.
-  // isManyEps: título tiene patrón [N/N] con N > 1, indica múltiples episodios
   const epsMatch = tituloUp.match(/\[(\d+)\/(\d+)\]/);
   const isManyEps = epsMatch && parseInt(epsMatch[2]) > 1;
   const isSerieSignal = isTemporada || isEpisodic || isManyEps;
@@ -1334,6 +1341,22 @@ async function refreshViews(showFeedback) {
   if (showFeedback) showToast('✓ Vistas actualizadas', 'success');
 }
 
+// ── Filtro de tipo en el panel admin ────────────────────────────────────────
+let adminTypeFilter = null; // null = sin filtro
+
+function toggleTypeFilter(btn) {
+  const type = btn.dataset.type;
+  if (adminTypeFilter === type) {
+    // Clic en el mismo → desactivar
+    adminTypeFilter = null;
+    document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('tf-active'));
+  } else {
+    adminTypeFilter = type;
+    document.querySelectorAll('.tf-btn').forEach(b => b.classList.toggle('tf-active', b.dataset.type === type));
+  }
+  renderList(true);
+}
+
 function renderList(resetPage) {
   if (resetPage) currentPage = 1;
   const movies = getMovies();
@@ -1342,7 +1365,11 @@ function renderList(resetPage) {
   const empty = document.getElementById('list-empty');
   const paginationEl = document.getElementById('pagination');
   document.getElementById('count-badge').textContent = movies.length;
-  const filtered = movies.filter(m => !q || (m.title||'').toLowerCase().includes(q) || (m.year||'').includes(q));
+  const filtered = movies.filter(m => {
+    const matchQ = !q || (m.title||'').toLowerCase().includes(q) || (m.year||'').includes(q);
+    const matchType = !adminTypeFilter || (m.type||'') === adminTypeFilter;
+    return matchQ && matchType;
+  });
 
   // Orden seleccionado: subida (default), más vistas o menos vistas
   const sortMode = currentSortMode;
