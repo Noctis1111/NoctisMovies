@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NoctisMovies — Cinema</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='8' fill='%23080a0f'/><text x='32' y='46' text-anchor='middle' font-family='Georgia,serif' font-weight='bold' font-size='44' fill='%23c9a84c'>N</text></svg>"/>
+  <link rel="icon" type="image/png" href="Isotipo.png"/>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-F18ZM0ZHHJ"></script>
   <script>
@@ -160,7 +160,8 @@
     .card-poster img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block; }
     .movie-card:hover .card-poster img { transform: scale(1.05); }
     .card-overlay { display: none; }
-    .card-title { margin-top: 0.5rem; font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 500; letter-spacing: 0.5px; color: #fff; line-height: 1.35; word-break: break-word; }
+    .card-title { margin-top: 0.5rem; font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 500; letter-spacing: 0.5px; color: #fff; line-height: 1.35; word-break: break-word; transition: text-shadow 0.25s, color 0.25s, transform 0.25s; display: inline-block; }
+    .movie-card:hover .card-title { color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.9), 0 0 18px rgba(255,255,255,0.55), 0 0 32px rgba(201,168,76,0.4); transform: scale(1.03); }
 
     /* ── Camuflaje activo: efecto Adult/Hentai solo en hover ── */
     .movie-card.card-h .card-poster {
@@ -281,9 +282,51 @@
       #movie-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
       .s2026-inner { padding: 0 2rem; }
     }
+  <style>
+    /* ── SPLASH SCREEN ─────────────────────────────────────────── */
+    #splash {
+      position: fixed; inset: 0; z-index: 9999;
+      background: #080a0f;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1.2rem;
+      transition: opacity 0.6s ease;
+    }
+    #splash.hidden { opacity: 0; pointer-events: none; }
+    #splash img { width: 120px; height: auto; animation: splashPulse 1.6s ease-in-out infinite; }
+    #splash-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      letter-spacing: 6px;
+      color: #fff;
+      line-height: 1;
+    }
+    #splash-title span { color: #c9a84c; }
+    #splash-sub {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      animation: splashBlink 1.2s ease-in-out infinite;
+    }
+    @keyframes splashPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.75; transform: scale(0.96); }
+    }
+    @keyframes splashBlink {
+      0%, 100% { opacity: 0.35; }
+      50% { opacity: 0.9; }
+    }
   </style>
 </head>
 <body>
+<!-- ── SPLASH SCREEN ─────────────────────────────────────────────── -->
+<div id="splash">
+  <img src="Imagotipo.png" alt="NoctisMovies" onerror="this.style.display='none'"/>
+  <div id="splash-title">NOCTIS<span>MOVIES</span></div>
+  <div id="splash-sub">CINEMA</div>
+</div>
 <header>
   <div class="header-inner">
     <a href="index.html" class="logo">
@@ -339,6 +382,7 @@
       <button class="filter-tab" data-filter="placebo">PLACEBO</button>
       <button class="filter-tab" data-filter="hdrip">HDRip</button>
       <button class="filter-tab" data-filter="hdts">HDTS</button>
+      <button class="filter-tab" data-filter="dcp-rip">DCP-RIP</button>
     </div>
 
     <h2 class="section-title" id="section-label">Últimos Aportes</h2>
@@ -751,6 +795,21 @@ loadMovies();
     sessionStorage.setItem('noctis_home_counted', '1');
     // CountAPI: /hit/{namespace}/{key} incrementa Y devuelve el valor
     fetch(`https://api.countapi.xyz/hit/${NS}/${KEY}`).catch(() => {});
+  }
+})();
+// ── Splash screen ──────────────────────────────────────────────────────────
+(function() {
+  var splash = document.getElementById('splash');
+  if (!splash) return;
+  function hideSplash() {
+    splash.classList.add('hidden');
+    setTimeout(function() { splash.style.display = 'none'; }, 650);
+  }
+  if (document.readyState === 'complete') {
+    setTimeout(hideSplash, 400);
+  } else {
+    window.addEventListener('load', function() { setTimeout(hideSplash, 400); });
+    setTimeout(hideSplash, 3000);
   }
 })();
 </script>
