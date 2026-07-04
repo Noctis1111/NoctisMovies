@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NoctisMovies — Detalle</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='8' fill='%23080a0f'/><text x='32' y='46' text-anchor='middle' font-family='Georgia,serif' font-weight='bold' font-size='44' fill='%23c9a84c'>N</text></svg>"/>
+  <link rel="icon" type="image/png" href="Isotipo.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet"/>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-F18ZM0ZHHJ"></script>
@@ -342,7 +342,8 @@
       opacity: 0;
     }
     .related-info { padding: 0; margin-top: 0.5rem; background: none; }
-    .related-info-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 500; letter-spacing: 0.5px; line-height: 1.35; color: #fff; word-break: break-word; }
+    .related-info-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 500; letter-spacing: 0.5px; line-height: 1.35; color: #fff; word-break: break-word; transition: text-shadow 0.25s, transform 0.25s; display: inline-block; }
+    .related-card:hover .related-info-title { text-shadow: 0 0 8px rgba(255,255,255,0.9), 0 0 18px rgba(255,255,255,0.55), 0 0 32px rgba(201,168,76,0.4); transform: scale(1.03); }
     .related-info-meta { display: none; }
     .related-year { display: none; }
 
@@ -424,9 +425,51 @@
     .not-found h2 { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; margin-bottom: 1rem; }
     .not-found p { color: var(--muted); margin-bottom: 1.5rem; }
     .not-found a { color: var(--gold); text-decoration: none; font-weight: 600; }
+  <style>
+    /* ── SPLASH SCREEN ─────────────────────────────────────────── */
+    #splash {
+      position: fixed; inset: 0; z-index: 9999;
+      background: #080a0f;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1.2rem;
+      transition: opacity 0.6s ease;
+    }
+    #splash.hidden { opacity: 0; pointer-events: none; }
+    #splash img { width: 120px; height: auto; animation: splashPulse 1.6s ease-in-out infinite; }
+    #splash-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      letter-spacing: 6px;
+      color: #fff;
+      line-height: 1;
+    }
+    #splash-title span { color: #c9a84c; }
+    #splash-sub {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      animation: splashBlink 1.2s ease-in-out infinite;
+    }
+    @keyframes splashPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.75; transform: scale(0.96); }
+    }
+    @keyframes splashBlink {
+      0%, 100% { opacity: 0.35; }
+      50% { opacity: 0.9; }
+    }
   </style>
 </head>
 <body>
+<!-- ── SPLASH SCREEN ─────────────────────────────────────────────── -->
+<div id="splash">
+  <img src="Imagotipo.png" alt="NoctisMovies" onerror="this.style.display='none'"/>
+  <div id="splash-title">NOCTIS<span>MOVIES</span></div>
+  <div id="splash-sub">CINEMA</div>
+</div>
 
 <header>
   <div class="header-inner">
@@ -618,6 +661,7 @@
           <a class="side-tag" href="index.html?source=PLACEBO">PLACEBO</a>
           <a class="side-tag" href="index.html?source=HDRIP">HDRip</a>
           <a class="side-tag" href="index.html?source=HDTS">HDTS</a>
+          <a class="side-tag" href="index.html?source=DCP-RIP">DCP-RIP</a>
         </div>
       </div>
     </div>
@@ -1174,6 +1218,21 @@ init();
   });
 })();
 
+// ── Splash screen ──────────────────────────────────────────────────────────
+(function() {
+  var splash = document.getElementById('splash');
+  if (!splash) return;
+  function hideSplash() {
+    splash.classList.add('hidden');
+    setTimeout(function() { splash.style.display = 'none'; }, 650);
+  }
+  if (document.readyState === 'complete') {
+    setTimeout(hideSplash, 400);
+  } else {
+    window.addEventListener('load', function() { setTimeout(hideSplash, 400); });
+    setTimeout(hideSplash, 3000);
+  }
+})();
 </script>
 </body>
 </html>
