@@ -293,13 +293,16 @@
     .nav-search svg { color: var(--muted); flex-shrink: 0; }
     .nav-search input { background: none; border: none; outline: none; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 0.85rem; width: 200px; }
     .nav-search input::placeholder { color: var(--muted); }
-    .search-dropdown { position: absolute; top: calc(100% + 8px); right: 0; background: #0e1117; border: 1px solid rgba(201,168,76,0.25); border-radius: 10px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.7); z-index: 999; display: none; width: 480px; }
-    .search-dropdown.open { display: block; }
-    .search-dropdown-item { display: flex; align-items: center; gap: 0.9rem; padding: 0.7rem 1rem; text-decoration: none; transition: background 0.15s; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .search-dropdown { position: absolute; top: calc(100% + 8px); right: 0; background: #0e1117; border: 1px solid rgba(201,168,76,0.25); border-radius: 10px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.7); z-index: 999; display: none; width: 560px; max-height: 70vh; overflow-y: auto; }
+    .search-dropdown.open { display: block; animation: sdFadeIn 0.22s cubic-bezier(0.25,1,0.5,1); }
+    @keyframes sdFadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes sdItemIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+    .search-dropdown-item { display: flex; align-items: flex-start; gap: 1rem; padding: 0.8rem 1rem; text-decoration: none; transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease; border-bottom: 1px solid rgba(255,255,255,0.04); border-left: 3px solid transparent; animation: sdItemIn 0.3s ease backwards; }
     .search-dropdown-item:last-child { border-bottom: none; }
-    .search-dropdown-item:hover, .search-dropdown-item.focused { background: rgba(201,168,76,0.08); }
-    .search-dropdown-thumb { width: 96px; height: 56px; object-fit: cover; border-radius: 6px; background: #161b24; flex-shrink: 0; aspect-ratio: 1280/740; }
-    .search-dropdown-item.item-h .search-dropdown-thumb-wrap { position: relative; width: 96px; height: 56px; flex-shrink: 0; border-radius: 6px; overflow: hidden; }
+    .search-dropdown-item:hover, .search-dropdown-item.focused { background: rgba(201,168,76,0.09); border-left-color: var(--gold); transform: translateX(2px); }
+    .search-dropdown-thumb { width: 130px; height: 78px; object-fit: cover; border-radius: 6px; background: #161b24; flex-shrink: 0; aspect-ratio: 1280/740; transition: transform 0.25s ease, box-shadow 0.25s ease; }
+    .search-dropdown-item:hover .search-dropdown-thumb { transform: scale(1.04); box-shadow: 0 0 0 1px rgba(201,168,76,0.4), 0 6px 16px rgba(0,0,0,0.5); }
+    .search-dropdown-item.item-h .search-dropdown-thumb-wrap { position: relative; width: 130px; height: 78px; flex-shrink: 0; border-radius: 6px; overflow: hidden; }
     .search-dropdown-item.item-h .search-dropdown-thumb { filter: blur(10px) brightness(0.6); transition: filter 0.25s ease-in-out; }
     .search-dropdown-item.item-h:hover .search-dropdown-thumb { filter: blur(0) brightness(1); }
     .search-dropdown-item.item-h .h-ribbon-sm {
@@ -341,12 +344,14 @@
       padding: 0 3px;
     }
     .search-dropdown-item.item-h:hover .h-hint-sm { opacity: 0; }
-    .search-dropdown-info { flex: 1; min-width: 0; }
-    .search-dropdown-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; color: #f0f2f5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .search-dropdown-meta { font-size: 0.75rem; color: #6b7280; margin-top: 3px; }
-    .search-dropdown-meta .yr { color: var(--gold); font-weight: 600; margin-right: 4px; }
-    .search-dropdown-more { display: block; text-align: center; padding: 0.6rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 1px; color: var(--gold); background: rgba(201,168,76,0.06); text-decoration: none; transition: background 0.15s; }
-    .search-dropdown-more:hover { background: rgba(201,168,76,0.13); }
+    .search-dropdown-info { flex: 1; min-width: 0; padding-top: 2px; }
+    .search-dropdown-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; color: #f0f2f5; white-space: normal; overflow: visible; text-overflow: unset; line-height: 1.25; transition: color 0.2s ease; }
+    .search-dropdown-item:hover .search-dropdown-title { color: var(--gold); }
+    .search-dropdown-meta { font-size: 0.75rem; color: #6b7280; margin-top: 5px; display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+    .search-dropdown-meta .yr { color: var(--gold); font-weight: 600; margin-right: -1px; }
+    .sd-badge { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.4px; color: #fff; line-height: 1.5; }
+    .search-dropdown-more { display: block; text-align: center; padding: 0.7rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 1px; color: var(--gold); background: rgba(201,168,76,0.06); text-decoration: none; transition: background 0.2s ease, letter-spacing 0.2s ease; }
+    .search-dropdown-more:hover { background: rgba(201,168,76,0.15); letter-spacing: 1.5px; }
     .search-dropdown-empty { padding: 1rem; text-align: center; color: #6b7280; font-size: 0.82rem; }
 
     /* LAYOUT */
@@ -789,11 +794,11 @@
 /* Título de Servidor */
 .enlaces-server-name {
   font-family: 'Bebas Neue', sans-serif !important; 
-  font-size: 0.88rem !important; 
+  font-size: 1.05rem !important; 
   letter-spacing: 1.5px !important;
   color: #e5bc4b !important; 
-  margin-bottom: 0.4rem !important; 
-  padding-bottom: 0.25rem !important;
+  margin-bottom: 0.5rem !important; 
+  padding-bottom: 0.3rem !important;
   border-bottom: 1px solid rgba(229, 188, 75, 0.2) !important;
 }
 
@@ -802,8 +807,8 @@
   display: flex !important; 
   align-items: center !important; 
   gap: 0.8rem !important; 
-  padding: 0.35rem 0.6rem !important; /* Espaciado interno pequeño */
-  margin-bottom: 0.3rem !important;
+  padding: 0.5rem 0.7rem !important; /* Espaciado interno pequeño */
+  margin-bottom: 0.35rem !important;
   background: rgba(255, 255, 255, 0.01) !important; /* Fondo apenas perceptible */
   border: 1px solid rgba(255, 255, 255, 0.02) !important;
   border-radius: 6px !important;
@@ -820,7 +825,7 @@
 /* El Link: Azul gélido ultra limpio */
 .enlace-item a {
   color: #bae6fd !important; 
-  font-size: 0.82rem !important; 
+  font-size: 0.95rem !important; 
   text-decoration: none !important; 
   word-break: break-all !important;
   flex: 1 !important; 
@@ -833,7 +838,7 @@
 
 /* Etiqueta Opción */
 .enlace-label { 
-  font-size: 0.7rem !important; 
+  font-size: 0.82rem !important; 
   font-weight: 700 !important;
   color: rgba(255, 255, 255, 0.3) !important; 
   min-width: 55px !important; 
@@ -847,10 +852,10 @@
   border: 1px solid rgba(229, 188, 75, 0.4) !important; /* Contorno dorado fino */
   color: #e5bc4b !important; /* Texto dorado */
   border-radius: 4px !important; 
-  padding: 3px 8px !important; 
+  padding: 5px 10px !important; 
   font-family: 'Barlow Condensed', sans-serif !important;
   font-weight: 700 !important;
-  font-size: 0.68rem !important; 
+  font-size: 0.8rem !important; 
   letter-spacing: 0.5px !important;
   text-transform: uppercase !important;
   cursor: pointer !important;
@@ -872,7 +877,35 @@
   transform: scale(0.97) !important;
 }
 
-.no-enlaces { color: rgba(255, 255, 255, 0.2) !important; font-size: 0.82rem !important; text-align: center !important; padding: 0.5rem !important; }
+.no-enlaces { color: rgba(255, 255, 255, 0.2) !important; font-size: 0.9rem !important; text-align: center !important; padding: 0.5rem !important; }
+
+/* Ícono(s) del servidor detectado por nombre (no por la URL, porque siempre es un acortador tpi.li) */
+.enlace-icon {
+  width: 26px !important;
+  height: 26px !important;
+  flex-shrink: 0 !important;
+  border-radius: 5px !important;
+  background: rgba(18, 22, 32, 0.85) !important;
+  padding: 3px !important;
+  object-fit: contain !important;
+  border: 1px solid rgba(229, 188, 75, 0.25) !important;
+}
+.enlace-icon-generic {
+  width: 26px !important;
+  height: 26px !important;
+  flex-shrink: 0 !important;
+  border-radius: 5px !important;
+  background: rgba(255,255,255,0.06) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.9rem !important;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.08) !important;
+}
+.enlaces-server-name { display: flex !important; align-items: center !important; gap: 0.45rem !important; }
+.enlaces-server-name .enlace-icon,
+.enlaces-server-name .enlace-icon-generic { width: 22px !important; height: 22px !important; }
+
 
 
 
@@ -1023,7 +1056,12 @@
       .detail-info { padding: 1rem !important; }
       .detail-title { font-size: 1.4rem !important; }
       .links-section { padding: 0 0.75rem 0.75rem !important; }
-      .media-row { grid-template-columns: 1fr !important; padding: 0 0.75rem 0.75rem !important; }
+      .media-row { grid-template-columns: 1fr 1fr !important; gap: 0.6rem !important; padding: 0 0.75rem 0.75rem !important; }
+      /* DATOS + SINOPSIS: mitad y mitad, misma altura, en vez de apilados */
+      .datos-sinopsis-col { flex-direction: row !important; align-items: stretch !important; gap: 0.6rem !important; padding: 0.75rem !important; }
+      .datos-sinopsis-col .section-box { width: 50% !important; padding: 0.85rem 0.9rem !important; }
+      .dato-row { flex-wrap: wrap !important; gap: 0.2rem !important; }
+      .dato-label { min-width: auto !important; }
     }
     @media (max-width: 600px) {
       .banner-vip { grid-template-columns: 1fr; gap: 0.75rem; text-align: center; }
@@ -1094,12 +1132,6 @@
     </nav>
   </div>
 </header>
-
-<div class="breadcrumb" id="breadcrumb">
-  <a href="index.html">Inicio</a>
-  <span>›</span>
-  <strong id="bc-title">Cargando...</strong>
-</div>
 
 <div class="page-wrap">
   <!-- CONTENIDO PRINCIPAL -->
@@ -1379,6 +1411,61 @@ function copyText(text) {
 }
 
 // =============================================
+// ÍCONOS DE SERVIDOR: se detectan por el NOMBRE que escribís
+// (mega, mediafire, 1fichier, terabox, akirabox, pixeldrain, pixelcloud,
+// 1cloudfile, filemirage, transfer.it, google drive...) — no por la URL,
+// porque tus links siempre son acortadores tpi.li y ahí no hay pista.
+// Si combinás dos servidores en una fila (ej "1Cloudfile + AkiraBox")
+// muestra los dos íconos. Si no reconoce nada (Multiserver, texto libre,
+// servidor nuevo que no agregué), muestra un ícono genérico 🔗 en vez de
+// romper o mostrar algo incorrecto.
+// =============================================
+const SERVER_MAP = [
+  { re: /1\s*fichier|\bfichier\b/i, domain: '1fichier.com' },
+  { re: /mediafire/i,               domain: 'mediafire.com' },
+  { re: /1024\s*terabox|terabox/i,  domain: 'terabox.com' },
+  { re: /1\s*cloudfile|cloudfile/i, domain: '1cloudfile.com' },
+  { re: /akirabox/i,                domain: 'akirabox.com' },
+  { re: /pixeldrain/i,              domain: 'pixeldrain.com' },
+  { re: /pixelcloud/i,              domain: 'pixelcloud.app' },
+  { re: /filemirage/i,              domain: 'filemirage.com' },
+  { re: /transfer\.?it/i,           domain: 'transfer.it' },
+  { re: /\bmega\b/i,                domain: 'mega.nz' },
+  { re: /drive\.google|google\s*drive|\bgdrive\b/i, domain: 'drive.google.com' },
+];
+const MULTI_RE = /multi\s*server|multiservidor/i;
+
+function isKnownServerLine(line) {
+  return MULTI_RE.test(line) || SERVER_MAP.some(s => s.re.test(line));
+}
+
+function detectServerDomains(text) {
+  if (!text) return [];
+  const found = [];
+  for (const s of SERVER_MAP) {
+    if (s.re.test(text) && !found.includes(s.domain)) found.push(s.domain);
+  }
+  return found;
+}
+
+function multiIconFallback(el) {
+  el.outerHTML = '<span class="enlace-icon-generic" title="Multi-servidor">🔗</span>';
+}
+
+function getServerIconsHtml(text, url) {
+  let domains = detectServerDomains(text);
+  if (!domains.length && url) {
+    try { domains = detectServerDomains(new URL(url).hostname); } catch (e) {}
+  }
+  if (!domains.length) {
+    return `<img class="enlace-icon" src="server/multiserver.png" alt="" title="Multi-servidor / no identificado" onerror="multiIconFallback(this)"/>`;
+  }
+  return domains.map(d =>
+    `<img class="enlace-icon" src="https://www.google.com/s2/favicons?sz=64&domain=${d}" alt="" onerror="this.style.display='none'"/>`
+  ).join('');
+}
+
+// =============================================
 // LÓGICA ENLACES: parsear CUALQUIER formato
 // Acepta: 1. url, 1) url, Etiqueta: url, url sola, Nombre servidor + url
 // =============================================
@@ -1387,6 +1474,7 @@ function parseEnlaces(raw) {
   const lines = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
   const servers = [];
   let currentServer = '';
+  let pendingLabel = '';
 
   function extractUrl(line) {
     const m = line.match(/https?:\/\/\S+/i);
@@ -1402,14 +1490,25 @@ function parseEnlaces(raw) {
   for (const line of lines) {
     const url = extractUrl(line);
     if (url) {
-      const label = extractLabel(line, url);
+      const inlineLabel = extractLabel(line, url);
+      const label = inlineLabel || pendingLabel;
       const groupName = currentServer || 'Servidores';
       let group = servers.find(s => s.name === groupName);
       if (!group) { group = { name: groupName, links: [] }; servers.push(group); }
       group.links.push({ label, url });
+      pendingLabel = '';
     } else {
       if (line.length > 1 && !/^[\d\s.)\-]+$/.test(line)) {
-        currentServer = line;
+        // Solo pisa el servidor actual si la línea es un nombre de servidor
+        // reconocido (o si todavía no había ninguno). Así "part1.rar",
+        // "Temporada 1:", "1 acortador", etc. no borran el servidor real
+        // (ej. AkiraBox) y quedan como etiqueta del link siguiente.
+        if (!currentServer || isKnownServerLine(line)) {
+          currentServer = line;
+          pendingLabel = '';
+        } else {
+          pendingLabel = line;
+        }
       }
     }
   }
@@ -1426,15 +1525,18 @@ function renderEnlaces(raw) {
   content.innerHTML = servers.map(s => {
     // Si solo hay un grupo llamado 'Servidores' y un solo link, no mostrar header
     const showHeader = !(s.name === 'Servidores' && servers.length === 1 && s.links.length === 1);
+    const headerContext = s.name + ' ' + s.links.map(l => l.label).join(' ');
     return `
     <div class="enlaces-section">
-      ${showHeader ? `<div class="enlaces-server-name">🌐 ${s.name}</div>` : ''}
+      ${showHeader ? `<div class="enlaces-server-name">${getServerIconsHtml(headerContext)}${s.name}</div>` : ''}
       ${s.links.map((lk, i) => {
         const safeUrl = lk.url.replace(/'/g, "\\'");
         // Nombre visible del link: label > número si hay varios > URL corta
         const display = lk.label || (s.links.length > 1 ? String(i+1) : '');
+        const iconsHtml = getServerIconsHtml(s.name + ' ' + lk.label, lk.url);
         return `
         <div class="enlace-item">
+          ${iconsHtml}
           ${display ? `<span class="enlace-label">${display}</span>` : ''}
           <a href="${lk.url}" target="_blank" rel="noopener">${lk.url}</a>
           <button class="btn-copiar-link" onclick="copyText('${safeUrl}')">Copiar</button>
@@ -1523,9 +1625,8 @@ async function init() {
   // Sumar 1 vista para esta película
   registerView(m, idx);
 
-  // Breadcrumb & title
+  // Título de la pestaña
   document.title = m.title + ' — NoctisMovies';
-  document.getElementById('bc-title').textContent = m.title;
   document.getElementById('d-title').textContent = m.title;
 
   // Tags del título — solo campos del filtrado admin
@@ -1742,13 +1843,39 @@ init();
       return;
     }
 
+    // Colores de CALIDAD (resolución) — igual paleta que el panel admin
+    function sdQualityColor(q) {
+      const u = (q || '').toLowerCase();
+      if (u.includes('4k')) return '#7c3aed';
+      if (u.includes('1080')) return '#059669';
+      if (u.includes('720')) return '#d97706';
+      if (u.includes('full hd') || u.includes('fullhd')) return '#2563eb';
+      return '#374151';
+    }
+    // Colores de FUENTE/ENCODE — igual paleta que el panel admin
+    function sdSourceColor(s) {
+      const u = (s || '').toUpperCase();
+      if (u.includes('X265') || u.includes('HEVC')) return '#6e6e6e';
+      if (u.includes('REMUX')) return '#d39407';
+      if (u.includes('WEB-DL') || u.includes('WEBDL')) return '#0fb528';
+      if (u.includes('WEB-RIP') || u.includes('WEBRIP')) return '#ee4394';
+      if (u.includes('PLACEBO')) return '#6ac2eb';
+      if (u.includes('BDRIP')) return '#5e37b6';
+      if (u.includes('BRRIP')) return '#046fb6';
+      if (u.includes('HDTS')) return '#3330ac';
+      if (u.includes('DCP')) return '#b05a00';
+      if (u.includes('HDRIP') || u.includes('HDRip')) return '#f8b800';
+      if (u.includes('60FPS')) return '#cf0f0f';
+      return '#4b5563';
+    }
+
     const fallback = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='56'%3E%3Crect fill='%23161b24' width='96' height='56'/%3E%3C/svg%3E";
     const basePath = window.location.pathname.includes('/admin/') ? '../' : '';
 
     let html = results.map(({ m, i }) => {
       const isH = /hentai|adult/.test((m.type || '').toLowerCase());
       return `
-      <a class="search-dropdown-item${isH ? ' item-h' : ''}" href="${basePath}detalle.html?id=${m.slug || i}" data-idx="${i}">
+      <a class="search-dropdown-item${isH ? ' item-h' : ''}" href="${basePath}detalle.html?id=${m.slug || i}" data-idx="${i}" style="animation-delay:${Math.min(i*0.04,0.3)}s">
         <span class="search-dropdown-thumb-wrap">
           <img class="search-dropdown-thumb" src="${m.image||fallback}" alt="${m.title}" onerror="this.src='${fallback}'"/>
           ${isH ? '<span class="h-ribbon-sm">+18</span><span class="h-hint-sm">CONTENIDO<br>EXPLÍCITO</span>' : ''}
@@ -1756,7 +1883,9 @@ init();
         <div class="search-dropdown-info">
           <div class="search-dropdown-title">${m.title}</div>
           <div class="search-dropdown-meta">
-            <span class="yr">${m.year||''}</span>${m.type||''}${m.source ? ' · '+m.source : ''}
+            <span class="yr">${m.year||''}</span>${m.type||''}
+            ${m.quality ? `<span class="sd-badge" style="background:${sdQualityColor(m.quality)}">${m.quality.toUpperCase()}</span>` : ''}
+            ${m.source ? `<span class="sd-badge" style="background:${sdSourceColor(m.source)}">${m.source.toUpperCase()}</span>` : ''}
           </div>
         </div>
       </a>`;
