@@ -13,7 +13,9 @@
       --border: rgba(255,255,255,0.08); --gold: #c9a84c; --gold2: #e8c76a;
       --white: #f0f2f5; --muted: #6b7280; --green: #22c55e; --red: #ef4444; --blue: #3b82f6;
     }
-    body { background: var(--bg); color: var(--white); font-family: 'Barlow', sans-serif; min-height: 100vh; }
+    /* FIX: texto general más chico (equivalente a como se veía al 90% de zoom) */
+    html { font-size: 90%; }
+    body { background: var(--bg); color: var(--white); font-family: 'Barlow', sans-serif; min-height: 100vh; overflow-x: hidden; }
 
     /* ==========================================================================
    LOGIN - NOCTISMOVIES (DISEÑO PREMIUM Y CINEMATOGRÁFICO)
@@ -314,6 +316,15 @@
   align-items: start !important; 
 }
 
+/* FIX: evitar que las columnas del grid se desborden más allá de max-width
+   (bug clásico de CSS Grid: los items no se achican debajo de su min-content
+   por defecto, lo que empujaba todo el panel fuera de pantalla y rompía el
+   centrado a 100% de zoom) */
+.admin-main > div { min-width: 0 !important; }
+.panel-body > div[style*="grid-template-columns"] > div { min-width: 0 !important; }
+.enlaces-grid > * { min-width: 0 !important; }
+#gh-config-form > * { min-width: 0 !important; }
+
 @media (max-width: 1100px) { 
   .admin-main { 
     grid-template-columns: 1fr !important; 
@@ -446,7 +457,12 @@
 
 /* Cajas de Info descarga / Enlaces públicos */
 #f-descarga-raw, #f-links {
-  min-height: 210px !important;
+  min-height: 200px !important;
+}
+
+/* URLs Capturas (screenshots) */
+#f-screenshot {
+  min-height: 90px !important;
 }
 
 /* 5. EFECTO DE ENFOQUE: Se mantiene el destello dorado */
@@ -662,7 +678,8 @@
     .badge { padding: 1px 7px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
     .badge-4k { background: #7c3aed; color: #fff; }
     .badge-1080p { background: #059669; color: #fff; }
-    .badge-720p { background: #d97706; color: #fff; }admin-screen
+    .badge-720p { background: #d97706; color: #fff; }
+    .badge-fullhd { background: #2563eb; color: #fff; }
     .badge-other { background: #374151; color: #9ca3af; }
     .movie-item-actions { display: flex; gap: 0.4rem; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
     .item-btn {
@@ -680,13 +697,13 @@
 
     /* STATS */
     .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 0.5rem; }
-    .type-filter-row { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.9rem; }
+    .type-filter-row { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.4rem; }
     .tf-btn { font-size: 0.75rem; padding: 0.22rem 0.55rem; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.18s; white-space: nowrap; font-family: 'Barlow', sans-serif; letter-spacing: 0.3px; }
     .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
     .tf-btn.tf-active { background: var(--gold); border-color: var(--gold); color: #000; font-weight: 600; }
-    .stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; text-align: center; }
-    .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.9rem; color: var(--gold); line-height: 1; }
-    .stat-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.25rem; }
+    .stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 0.55rem; text-align: center; }
+    .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--gold); line-height: 1; }
+    .stat-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.2rem; }
 
     /* EXPORT / IMPORT */
     .io-section { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-top: 1rem; }
@@ -699,7 +716,7 @@
     .import-area { background: #0a0c10; border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; color: var(--white); font-family: monospace; font-size: 0.85rem; width: 100%; min-height: 80px; resize: vertical; outline: none; margin-bottom: 0.5rem; }
     .import-area:focus { border-color: var(--gold); }
 
-    .admin-search { padding: 1rem 1.5rem 0; }
+    .admin-search { padding: 0.35rem 1.5rem 0; }
     .admin-search input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 1rem; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 0.95rem; outline: none; }
     .admin-search input:focus { border-color: var(--gold); }
     .admin-search input::placeholder { color: var(--muted); }
@@ -712,13 +729,14 @@
     .views-refresh-btn:hover { color: var(--gold); border-color: var(--gold); }
     .views-refresh-btn.loading { opacity: 0.5; pointer-events: none; }
     .badge-views { font-size: 0.82rem; color: var(--gold2); font-weight: 600; display: inline-flex; align-items: center; gap: 0.2rem; }
+    .badge-source { padding: 1px 7px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border: 1px solid var(--border); color: var(--muted); }
 
     /* RESPONSIVE */
     @media (max-width: 700px) {
       .admin-main { padding: 0.75rem; gap: 1rem; }
       .panel-body { padding: 0.75rem; }
       /* El layout de 2 cols dentro del formulario se apila */
-      .admin-main > div:first-child > .panel > .panel-body > div[style*="grid-template-columns:1fr 300px"] {
+      .admin-main > div:first-child > .panel > .panel-body > div[style*="grid-template-columns:1fr 230px"] {
         grid-template-columns: 1fr !important;
       }
       /* Datos+Sinopsis / Tipo / Año también en columna */
@@ -799,7 +817,7 @@
         <div class="panel-body">
 
           <!-- ══ 2 COLUMNAS: Info básica+Filtrado | Imágenes ══ -->
-          <div style="display:grid;grid-template-columns:1fr 300px;gap:1rem;align-items:start;margin-bottom:0.75rem;">
+          <div style="display:grid;grid-template-columns:1fr 230px;gap:1rem;align-items:start;margin-bottom:0.75rem;">
 
             <!-- COLUMNA IZQUIERDA: Título / Datos+Sinopsis / Tipo / Año + FILTRADO -->
             <div>
@@ -845,49 +863,50 @@
               <div class="form-section">🎛 Filtrado</div>
 
               <div class="form-group">
-                <label>Calidad</label>
-                <div class="chip-group" id="chips-quality">
-                  <button type="button" class="chip" data-value="4K">4K</button>
-                  <button type="button" class="chip chip-active" data-value="Full HD">Full HD</button>
-                  <button type="button" class="chip" data-value="1080p">1080p</button>
-                  <button type="button" class="chip" data-value="720p">720p</button>
-                  <button type="button" class="chip" data-value="480p">480p</button>
-                  <button type="button" class="chip" data-value="CAM">CAM</button>
-                  <button type="button" class="chip chip-colored" data-value="FLAC 16-24 Bits" style="--chip-c:#d39407;border-color:#d39407;color:#d39407;">16-24 bits Flac</button>
-                  <button type="button" class="chip chip-colored" data-value="320Kbps" style="--chip-c:#e05252;border-color:#e05252;color:#e05252;">320Kbps</button>
-                </div>
-                <input type="hidden" id="f-quality" value="Full HD"/>
+              <label>Calidad</label>
+              <div class="chip-group" id="chips-quality">
+                <button type="button" class="chip" data-value="4K">4K</button>
+                <button type="button" class="chip chip-active" data-value="Full HD">Full HD</button>
+                <button type="button" class="chip" data-value="1080p">1080p</button>
+                <button type="button" class="chip" data-value="720p">720p</button>
+                <button type="button" class="chip" data-value="480p">480p</button>
+                <button type="button" class="chip" data-value="CAM">CAM</button>
+                <button type="button" class="chip chip-colored" data-value="FLAC 16-24 Bits" style="--chip-c:#d39407;border-color:#d39407;color:#d39407;">16-24 bits Flac</button>
+                <button type="button" class="chip chip-colored" data-value="320Kbps" style="--chip-c:#e05252;border-color:#e05252;color:#e05252;">320Kbps</button>
+              </div>
+              <input type="hidden" id="f-quality" value="Full HD"/>
               </div>
 
               <div class="form-group">
-                <label>Audio</label>
-                <div class="chip-group" id="chips-audio">
-                  <button type="button" class="chip chip-active" data-value="Latino">Latino</button>
-                  <button type="button" class="chip" data-value="Inglés">Inglés</button>
-                  <button type="button" class="chip" data-value="Japonés">Japonés</button>
-                  <button type="button" class="chip" data-value="Koreano">Koreano</button>
-                  <button type="button" class="chip" data-value="Chino">Chino</button>
-                </div>
-                <input type="hidden" id="f-audio" value="Latino"/>
+              <label>Audio</label>
+              <div class="chip-group" id="chips-audio">
+                <button type="button" class="chip chip-active" data-value="Latino">Latino</button>
+                <button type="button" class="chip" data-value="Inglés">Inglés</button>
+                <button type="button" class="chip" data-value="Japonés">Japonés</button>
+                <button type="button" class="chip" data-value="Koreano">Koreano</button>
+                <button type="button" class="chip" data-value="Chino">Chino</button>
+              </div>
+              <input type="hidden" id="f-audio" value="Latino"/>
               </div>
 
               <div class="form-group">
-                <label>Fuente / Encode</label>
-                <div class="chip-group" id="chips-source" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;">
-                  <button type="button" class="chip" data-value="60FPS" style="border-color:#cf0f0f;color:#cf0f0f;">60FPS</button>
-                  <button type="button" class="chip" data-value="REMUX" style="border-color:#d39407;color:#d39407;">REMUX</button>
-                  <button type="button" class="chip" data-value="BDRIP" style="border-color:#5e37b6;color:#5e37b6;">BDRIP</button>
-                  <button type="button" class="chip" data-value="BRRIP" style="border-color:#046fb6;color:#046fb6;">BRRIP</button>
-                  <button type="button" class="chip" data-value="X265" style="border-color:#6e6e6e;color:#6e6e6e;">X265</button>
-                  <button type="button" class="chip" data-value="WEB-DL" style="border-color:#0fb528;color:#0fb528;">WEB-DL</button>
-                  <button type="button" class="chip" data-value="WEB-RIP" style="border-color:#ee4394;color:#ee4394;">WEB-RIP</button>
-                  <button type="button" class="chip" data-value="PLACEBO" style="border-color:#6ac2eb;color:#6ac2eb;">PLACEBO</button>
-                  <button type="button" class="chip" data-value="HDRIP" style="border-color:#f8b800;color:#f8b800;">HDRip</button>
-                  <button type="button" class="chip" data-value="HDTS" style="border-color:#3330ac;color:#3330ac;">HDTS</button>
-                  <button type="button" class="chip" data-value="DCP-RIP" style="border-color:#b05a00;color:#b05a00;">DCP-RIP</button>
-                </div>
-                <input type="hidden" id="f-source" value=""/>
+              <label>Fuente / Encode</label>
+              <div class="chip-group" id="chips-source" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;gap:0.25rem;">
+                <button type="button" class="chip" data-value="60FPS" style="border-color:#cf0f0f;color:#cf0f0f;">60FPS</button>
+                <button type="button" class="chip" data-value="REMUX" style="border-color:#d39407;color:#d39407;">REMUX</button>
+                <button type="button" class="chip" data-value="BDRIP" style="border-color:#5e37b6;color:#5e37b6;">BDRIP</button>
+                <button type="button" class="chip" data-value="BRRIP" style="border-color:#046fb6;color:#046fb6;">BRRIP</button>
+                <button type="button" class="chip" data-value="X265" style="border-color:#6e6e6e;color:#6e6e6e;">X265</button>
+                <button type="button" class="chip" data-value="WEB-DL" style="border-color:#0fb528;color:#0fb528;">WEB-DL</button>
+                <button type="button" class="chip" data-value="WEB-RIP" style="border-color:#ee4394;color:#ee4394;">WEB-RIP</button>
+                <button type="button" class="chip" data-value="PLACEBO" style="border-color:#6ac2eb;color:#6ac2eb;">PLACEBO</button>
+                <button type="button" class="chip" data-value="HDRIP" style="border-color:#f8b800;color:#f8b800;">HDRip</button>
+                <button type="button" class="chip" data-value="HDTS" style="border-color:#3330ac;color:#3330ac;">HDTS</button>
+                <button type="button" class="chip" data-value="DCP-RIP" style="border-color:#b05a00;color:#b05a00;">DCP-RIP</button>
               </div>
+              <input type="hidden" id="f-source" value=""/>
+              </div>
+
             </div>
 
             <!-- COLUMNA DERECHA: IMÁGENES Y MEDIOS -->
@@ -914,8 +933,8 @@
                 <input type="url" id="f-image" placeholder="https://..." oninput="previewImgUrl(this.value)" style="margin-bottom:0;"/>
               </div>
               <div class="form-group">
-                <label>URLs Capturas</label>
-                <textarea id="f-screenshot" class="textarea-links" style="min-height:65px;font-size:0.9rem;" placeholder="https://cap1.jpg&#10;https://cap2.jpg"></textarea>
+                <label>URLs Capturas <span id="screenshot-count" style="color:var(--gold);font-weight:700;">(0)</span></label>
+                <textarea id="f-screenshot" class="textarea-links" style="min-height:165px;font-size:0.9rem;" placeholder="https://cap1.jpg&#10;https://cap2.jpg" oninput="updateScreenshotCount()"></textarea>
               </div>
               <div class="form-group">
                 <label>Trailer YouTube</label>
@@ -924,6 +943,7 @@
             </div>
 
           </div><!-- fin 2 cols filtrado+imagenes -->
+
 
           <!-- ── ENLACES DE DESCARGA: 2 columnas ── -->
           <div class="form-section" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
@@ -936,11 +956,11 @@
           <div class="enlaces-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;margin-bottom:0.6rem;align-items:start;">
             <div class="form-group" style="margin-bottom:0;">
               <label>Info descarga <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(auto-rellenado o pega aquí)</span></label>
-              <textarea id="f-descarga-raw" class="textarea-links" style="min-height:150px;font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;O pega manualmente:&#10;Audio: Español Latino&#10;Calidad: WEBDL&#10;Resolución: 1920×1080&#10;Formato: MKV&#10;Tamaño: 4.5 GB&#10;Codec: H264&#10;Subtítulos: ..." oninput="autoRellenarDescarga()" onpaste="setTimeout(autoRellenarDescarga,50)"></textarea>
+              <textarea id="f-descarga-raw" class="textarea-links" style="min-height:150px;font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;Audio: Español Latino&#10;Calidad: WEBDL&#10;Resolución: 1920×1080&#10;Formato: MKV&#10;Tamaño: 4.5 GB&#10;Codec: H264&#10;Subtítulos: ..." oninput="autoRellenarDescarga()" onpaste="setTimeout(autoRellenarDescarga,50)"></textarea>
             </div>
             <div class="form-group" style="margin-bottom:0;">
               <label>Enlaces públicos <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(auto-rellenado o pega aquí)</span></label>
-              <textarea class="textarea-links" id="f-links" style="min-height:150px;font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;O pega manualmente:&#10;Servidor 1&#10;https://enlace1.com&#10;&#10;Servidor 2&#10;https://enlace2.com"></textarea>
+              <textarea class="textarea-links" id="f-links" style="min-height:150px;font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;Servidor 1&#10;https://enlace1.com&#10;&#10;Servidor 2&#10;https://enlace2.com"></textarea>
             </div>
             <div class="form-group" style="margin-bottom:0;">
               <label>🔄 Sincronización GitHub <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(config única)</span></label>
@@ -1626,6 +1646,13 @@ function getFormData() {
   };
 }
 
+function updateScreenshotCount() {
+  const val = document.getElementById('f-screenshot')?.value || '';
+  const count = val.split('\n').map(s => s.trim()).filter(Boolean).length;
+  const el = document.getElementById('screenshot-count');
+  if (el) el.textContent = '(' + count + ')';
+}
+
 function clearForm() {
   ['f-title','f-datos-raw','f-desc','f-image','f-screenshot','f-trailer','f-links','f-descarga-raw','f-password'
   ].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
@@ -1647,6 +1674,7 @@ function clearForm() {
   document.getElementById('form-submit-btn').textContent = '+ AGREGAR AL CATÁLOGO';
   document.getElementById('form-submit-btn').classList.remove('editing');
   document.getElementById('cancel-btn').classList.remove('visible');
+  updateScreenshotCount();
 }
 
 function cancelEdit() { clearForm(); }
@@ -1791,6 +1819,7 @@ function qualityBadge(q = '') {
   if (u.includes('4k')) return 'badge-4k';
   if (u.includes('1080')) return 'badge-1080p';
   if (u.includes('720')) return 'badge-720p';
+  if (u.includes('full hd') || u.includes('fullhd')) return 'badge-fullhd';
   return 'badge-other';
 }
 
@@ -1887,6 +1916,21 @@ function toggleTypeFilter(btn) {
   }
   renderList(true);
 }
+// Colores de cada Fuente/Encode (deben coincidir con los chips #chips-source)
+const SOURCE_COLORS = {
+  '60FPS': '#cf0f0f',
+  'REMUX': '#d39407',
+  'BDRIP': '#5e37b6',
+  'BRRIP': '#046fb6',
+  'X265': '#6e6e6e',
+  'WEB-DL': '#0fb528',
+  'WEB-RIP': '#ee4394',
+  'PLACEBO': '#6ac2eb',
+  'HDRIP': '#f8b800',
+  'HDTS': '#3330ac',
+  'DCP-RIP': '#b05a00'
+};
+
 function renderList(resetPage) {
   if (resetPage) currentPage = 1;
   const movies = getMovies();
@@ -1928,6 +1972,7 @@ function renderList(resetPage) {
         <div class="movie-item-title">${m.title}</div>
         <div class="movie-item-meta">
           <span class="badge ${qualityBadge(m.quality)}">${m.quality||'HD'}</span>
+          ${m.source ? `<span class="badge-source" style="${SOURCE_COLORS[m.source] ? `color:${SOURCE_COLORS[m.source]};border-color:${SOURCE_COLORS[m.source]};` : ''}">${m.source}</span>` : ''}
           <span>${m.year||''}</span><span>${m.type||''}</span>
           <span class="badge-views">👁 ${views !== undefined ? views : '—'}</span>
         </div>
@@ -2013,6 +2058,7 @@ function editMovie(idx) {
   document.getElementById('f-audio').value = m.audio||'Latino';
   document.getElementById('f-image').value = m.image||'';
   document.getElementById('f-screenshot').value = m.screenshot||'';
+  updateScreenshotCount();
   document.getElementById('f-trailer').value = m.trailer||'';
   document.getElementById('f-links').value = m.links||m.link||'';
   const pwEl = document.getElementById('f-password'); if (pwEl) pwEl.value = m.password||'';
