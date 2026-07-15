@@ -4,6 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin — NoctisMovies</title>
+  <link rel="icon" type="image/png" href="favicon.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet"/>
   <!-- GA no se carga en el admin para no contar visitas falsas en las metricas -->
   <style>
@@ -206,7 +207,7 @@
 
 /* Reducción de altura a 48px para un look más fino y elegante */
 .admin-header-inner { 
-  max-width: 1800px !important; 
+  max-width: 1900px !important; 
   margin: 0 auto !important; 
   display: flex !important; 
   align-items: center !important; 
@@ -307,11 +308,11 @@
 
 /* 5. MAQUETA PRINCIPAL (Mantiene tus rejillas intactas) */
 .admin-main { 
-  max-width: 1800px !important; 
+  max-width: 1900px !important; 
   margin: 0 auto !important; 
   padding: 0 2rem 1.25rem !important; 
   display: grid !important; 
-  grid-template-columns: 1fr 600px !important; 
+  grid-template-columns: 1fr 620px !important; 
   gap: 1.5rem !important; 
   align-items: start !important; 
 }
@@ -457,7 +458,7 @@
 
 /* Cajas de Info descarga / Enlaces públicos */
 #f-descarga-raw, #f-links {
-  min-height: 200px !important;
+  min-height: 175px !important;
 }
 
 /* URLs Capturas (screenshots) */
@@ -628,7 +629,17 @@
     /* Chips de color especial (FLAC, 320Kbps) → activos igual que Fuente/Encode */
     .chip.chip-colored { }
     .chip.chip-colored:hover { background: rgba(255,255,255,0.06); }
-    .chip.chip-colored.chip-active { background: var(--chip-c); border-color: var(--chip-c); color: #fff; box-shadow: 0 0 12px color-mix(in srgb, var(--chip-c) 60%, transparent); }
+    .chip.chip-colored.chip-active { background: var(--chip-c); border-color: var(--chip-c); color: #fff !important; box-shadow: 0 0 12px color-mix(in srgb, var(--chip-c) 60%, transparent); }
+    /* Chips de Formato de Audio (MP3/AAC/Lossless/Hi-Res/Master) → título + subtítulo en una sola fila */
+    .chip.chip-audiofmt { display: inline-flex; flex-direction: row; align-items: baseline; gap: 0.35rem; padding: 0.62rem 0.65rem; white-space: nowrap; }
+    .chip.chip-audiofmt .chip-aft-title { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.3px; }
+    .chip.chip-audiofmt .chip-aft-sub { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.2px; opacity: 0.7; }
+    .chip.chip-audiofmt.chip-active .chip-aft-sub { opacity: 0.9; }
+    /* Master 32-bit: dorado platino/blanco muy claro → texto oscuro para legibilidad al activarse */
+    .chip.chip-master32.chip-active { color: #2a2410 !important; box-shadow: 0 0 12px rgba(232,219,160,0.6); }
+    .chip.chip-master32.chip-active .chip-aft-sub { color: #4a3f1a; }
+    /* Fuente/Encode → misma altura más generosa que Formato de Audio */
+    #chips-source.chip-group .chip { padding: 0.62rem 0.9rem; white-space: nowrap; }
     /* Chips de Tipo → cada uno con su color definido por --chip-c */
     .chip-type { text-align: left; border-radius: 8px; padding: 0.5rem 0.75rem; }
     .chip-type:hover { border-color: var(--chip-c); color: var(--chip-c); background: rgba(255,255,255,0.04); }
@@ -838,9 +849,10 @@
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
                   <label>Tipo</label>
-                  <div class="chip-group" style="display:grid;grid-template-columns:repeat(2,auto);gap:0.35rem;" id="chips-type">
+                  <div class="chip-group" style="display:grid;grid-template-columns:repeat(3,auto);gap:0.35rem;" id="chips-type">
                     <button type="button" class="chip chip-type chip-active" data-value="Película" style="--chip-c:#e8a020;">🎬 Película</button>
                     <button type="button" class="chip chip-type" data-value="Serie" style="--chip-c:#2e86de;">📺 Serie</button>
+                    <button type="button" class="chip chip-type" data-value="Música" style="--chip-c:#1db954;">🎵 Música</button>
                     <button type="button" class="chip chip-type" data-value="Anime" style="--chip-c:#e040fb;">⛩ Anime</button>
                     <button type="button" class="chip chip-type" data-value="Dorama, Película" style="--chip-c:#00b894;">🌸 Dorama P.</button>
                     <button type="button" class="chip chip-type" data-value="Dorama, Serie" style="--chip-c:#00cec9;">🌸 Dorama S.</button>
@@ -862,6 +874,7 @@
 
               <div class="form-section">🎛 Filtrado</div>
 
+              <div class="form-row">
               <div class="form-group">
               <label>Calidad</label>
               <div class="chip-group" id="chips-quality">
@@ -871,8 +884,6 @@
                 <button type="button" class="chip" data-value="720p">720p</button>
                 <button type="button" class="chip" data-value="480p">480p</button>
                 <button type="button" class="chip" data-value="CAM">CAM</button>
-                <button type="button" class="chip chip-colored" data-value="FLAC 16-24 Bits" style="--chip-c:#d39407;border-color:#d39407;color:#d39407;">16-24 bits Flac</button>
-                <button type="button" class="chip chip-colored" data-value="320Kbps" style="--chip-c:#e05252;border-color:#e05252;color:#e05252;">320Kbps</button>
               </div>
               <input type="hidden" id="f-quality" value="Full HD"/>
               </div>
@@ -888,10 +899,33 @@
               </div>
               <input type="hidden" id="f-audio" value="Latino"/>
               </div>
+              </div>
+
+              <div class="form-group">
+              <label>🎧 Formato de Audio</label>
+              <div class="chip-group" id="chips-audioformat" style="flex-wrap:wrap;gap:0.35rem;">
+                <button type="button" class="chip chip-audiofmt chip-colored" data-value="MP3" style="--chip-c:#5b8ba8;border-color:#5b8ba8;color:#5b8ba8;">
+                  <span class="chip-aft-title">MP3</span><span class="chip-aft-sub">320 kbps</span>
+                </button>
+                <button type="button" class="chip chip-audiofmt chip-colored" data-value="AAC" style="--chip-c:#2f7fe0;border-color:#2f7fe0;color:#2f7fe0;">
+                  <span class="chip-aft-title">AAC</span><span class="chip-aft-sub">Calidad Apple</span>
+                </button>
+                <button type="button" class="chip chip-audiofmt chip-colored" data-value="Lossless 16-bit" style="--chip-c:#1a4fa0;border-color:#1a4fa0;color:#1a4fa0;">
+                  <span class="chip-aft-title">Lossless 16-bit</span><span class="chip-aft-sub">16-bit / 44.1 kHz</span>
+                </button>
+                <button type="button" class="chip chip-audiofmt chip-colored" data-value="Hi-Res 24-bit" style="--chip-c:#c9a84c;border-color:#c9a84c;color:#c9a84c;">
+                  <span class="chip-aft-title">Hi-Res 24-bit</span><span class="chip-aft-sub">24-bit / 96-192 kHz</span>
+                </button>
+                <button type="button" class="chip chip-audiofmt chip-colored chip-master32" data-value="Master 32-bit" style="--chip-c:#e8dba0;border-color:#e8dba0;color:#e8dba0;">
+                  <span class="chip-aft-title">Master 32-bit</span><span class="chip-aft-sub">32-bit / 192 kHz</span>
+                </button>
+              </div>
+              <input type="hidden" id="f-audioformat" value=""/>
+              </div>
 
               <div class="form-group">
               <label>Fuente / Encode</label>
-              <div class="chip-group" id="chips-source" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;gap:0.25rem;">
+              <div class="chip-group" id="chips-source" style="flex-wrap:wrap;gap:0.35rem;">
                 <button type="button" class="chip" data-value="60FPS" style="border-color:#cf0f0f;color:#cf0f0f;">60FPS</button>
                 <button type="button" class="chip" data-value="REMUX" style="border-color:#d39407;color:#d39407;">REMUX</button>
                 <button type="button" class="chip" data-value="BDRIP" style="border-color:#5e37b6;color:#5e37b6;">BDRIP</button>
@@ -1029,6 +1063,7 @@
           <div class="type-filter-row" id="type-filter-row">
             <button class="tf-btn" data-type="Película" onclick="toggleTypeFilter(this)">🎬 Película</button>
             <button class="tf-btn" data-type="Serie" onclick="toggleTypeFilter(this)">📺 Serie</button>
+            <button class="tf-btn" data-type="Música" onclick="toggleTypeFilter(this)">🎵 Música</button>
             <button class="tf-btn" data-type="Anime" onclick="toggleTypeFilter(this)">⛩ Anime</button>
             <button class="tf-btn" data-type="Dorama, Película" onclick="toggleTypeFilter(this)">🌸 Dorama P.</button>
             <button class="tf-btn" data-type="Dorama, Serie" onclick="toggleTypeFilter(this)">🌸 Dorama S.</button>
@@ -1381,40 +1416,62 @@ function autoRellenarTodo() {
   const durMin   = durMatch ? parseInt(durMatch[1]) : 0;
   const isEpisodic = /por\s*cap|per\s*ep|por\s*epis|x\s*ep|por\s*capitulo|cap\.\s*aprox|min\.?\s*por/i.test(durStr);
 
+  // MÚSICA — detecta formato de audio (mp3/flac/wav) en TODO el bloque pegado (título, info descarga, formato, enlaces...)
+  const rawUp      = (raw || '').toUpperCase();
+  const formatoUp  = (p.formato2 || '').toUpperCase();
+  const musicaUp   = rawUp + ' ' + formatoUp;
+  const isMusicFormat = /\.MP3\b|\.FLAC\b|\.WAV\b|\.M4A\b|\bMP3\b|\bFLAC\b|\bWAV\b|\bAAC\b/.test(musicaUp);
+
   // CALIDAD — revisa resolución, calidad, y título
   const resUp = (p.resolucion2 || '').toUpperCase();
   const calQUp = calUp + ' ' + tituloUp + ' ' + resUp;
-  if (calQUp.includes('3840')||calQUp.includes('2160')||calQUp.includes('4K')||calQUp.includes('2K')||calQUp.includes('HDR10')||calQUp.includes('DV HDR'))
+  const resRaw   = (p.resolucion2||'').replace(/[×xX]+/,'x').replace(/\s+/g,'');
+  const resParts = resRaw.split('x');
+  const anchoRes = parseInt(resParts[0]||'0');
+  const altoRes  = parseInt(resParts[1]||'0');
+  const esFullHDExacta = anchoRes === 1920 && altoRes === 1080;
+  if (isMusicFormat) {
+    // Música: Calidad y Audio (idioma) no aplican — se limpian (siguen siendo activables a mano)
+    setActiveChip('chips-quality','');
+    setActiveChip('chips-audio','');
+    // Formato de audio — multi-selección: detecta TODOS los formatos que aparezcan en el bloque pegado
+    const formatosDetectados = [];
+    if (/24[\s\-]?BITS?|HI[\s\-]?RES|96\s*KHZ|192\s*KHZ/.test(musicaUp)) formatosDetectados.push('Hi-Res 24-bit');
+    if (/16[\s\-]?BITS?|44[.,]?1\s*KHZ|\bFLAC\b|LOSSLESS|\bWAV\b/.test(musicaUp)) formatosDetectados.push('Lossless 16-bit');
+    if (/\bAAC\b|\.M4A\b/.test(musicaUp)) formatosDetectados.push('AAC');
+    if (/\bMP3\b|320\s*KBPS/.test(musicaUp)) formatosDetectados.push('MP3');
+    // Master 32-bit solo si se menciona explícitamente "32-bit"/"32 bit" (no se asume por defecto)
+    if (/32[\s\-]?BITS?/.test(musicaUp)) formatosDetectados.push('Master 32-bit');
+    setActiveChips('chips-audioformat', formatosDetectados);
+  }
+  else if (calQUp.includes('3840')||calQUp.includes('2160')||calQUp.includes('4K')||calQUp.includes('2K')||calQUp.includes('HDR10')||calQUp.includes('DV HDR'))
     setActiveChip('chips-quality','4K');
-  else if (calQUp.includes('FULL HD')||(()=>{
-    const resRaw = (p.resolucion2||'').replace(/[×x\s]+/,'x');
-    const parts  = resRaw.split('x');
-    const alto   = parseInt(parts[1]||'0');
-    return alto === 1080 || calQUp.includes('1080') || calQUp.includes('1920X1080') || calQUp.includes('1920 X 1080') || calQUp.includes('1920×1080');
-  })())
+  else if (esFullHDExacta || (!p.resolucion2 && calQUp.includes('FULL HD')))
     setActiveChip('chips-quality','Full HD');
-  else if (calQUp.includes('1920')||calQUp.includes('FULL'))
+  else if (calQUp.includes('1920')||calQUp.includes('1080')||calQUp.includes('FULL HD')||calQUp.includes('FULL'))
     setActiveChip('chips-quality','1080p');
   else if (calQUp.includes('1280')||calQUp.includes('720'))
     setActiveChip('chips-quality','720p');
   else if (calQUp.includes('480'))
     setActiveChip('chips-quality','480p');
 
-  // AUDIO
-  if (audLow.includes('latino')||audLow.includes('español')||tituloUp.includes('LATINO'))
-    setActiveChip('chips-audio','Latino');
-  else if (audLow.includes('inglés')||audLow.includes('ingles')||audLow.includes('english')||tituloUp.includes('INGLES')||tituloUp.includes('INGLÉS'))
-    setActiveChip('chips-audio','Inglés');
-  else if (audLow.includes('japon')||audLow.includes('japanese'))
-    setActiveChip('chips-audio','Japonés');
-  else if (audLow.includes('korean')||audLow.includes('coreano')||audLow.includes('koreano'))
-    setActiveChip('chips-audio','Koreano');
+  // AUDIO (idioma) — no aplica para música, ya se limpió arriba
+  if (!isMusicFormat) {
+    if (audLow.includes('latino')||audLow.includes('español')||tituloUp.includes('LATINO'))
+      setActiveChip('chips-audio','Latino');
+    else if (audLow.includes('inglés')||audLow.includes('ingles')||audLow.includes('english')||tituloUp.includes('INGLES')||tituloUp.includes('INGLÉS'))
+      setActiveChip('chips-audio','Inglés');
+    else if (audLow.includes('japon')||audLow.includes('japanese'))
+      setActiveChip('chips-audio','Japonés');
+    else if (audLow.includes('korean')||audLow.includes('coreano')||audLow.includes('koreano'))
+      setActiveChip('chips-audio','Koreano');
+  }
+
 
   // FUENTE — Prioridad: X265 > REMUX > WEB-DL > WEB-RIP > PLACEBO > BDRIP > BRRIP > HDTS > HDRIP > DVDRIP > 60FPS
-  // También revisar codec: H265/HEVC → X265; y el título
-  const codecUp = (p.codec2 || '').toUpperCase();
-  const combined = calUp + ' ' + tituloUp + ' ' + codecUp; // buscar en todo junto
-  if (combined.includes('X265') || combined.includes('X 265') || combined.includes('HEVC') || codecUp.includes('H265') || codecUp.includes('H.265'))
+  // Solo se detecta por el texto explícito del título/calidad (NO por el codec, ya que casi todo viene en H265 hoy en día)
+  const combined = calUp + ' ' + tituloUp; // buscar en título y calidad, sin el codec
+  if (combined.includes('X265') || combined.includes('X 265') || combined.includes('HEVC'))
     setActiveChip('chips-source','X265');
   else if (combined.includes('REMUX'))
     setActiveChip('chips-source','REMUX');
@@ -1439,14 +1496,16 @@ function autoRellenarTodo() {
   else if (combined.includes('60FPS'))
     setActiveChip('chips-source','60FPS');
 
-  // TIPO — Anime > Dorama (coreano/japonés serie) > Serie > Película
+  // TIPO — Música > Anime > Dorama (coreano/japonés serie) > Serie > Película
   const countryLow = (p.country || '').toLowerCase();
   const isTemporada = tituloUp.includes('TEMPORADA')||tituloUp.includes('SERIE')||tituloUp.includes('SEASON')||tituloUp.includes('COMPLETA');
   const epsMatch = tituloUp.match(/\[(\d+)\/(\d+)\]/);
   const isManyEps = epsMatch && parseInt(epsMatch[2]) > 1;
   const isSerieSignal = isTemporada || isEpisodic || isManyEps;
   const isAsianCountry = countryLow.includes('japan')||countryLow.includes('korea')||countryLow.includes('south korea')||countryLow.includes('china');
-  if (genLow.includes('anime')||tituloUp.includes('ANIME'))
+  if (isMusicFormat)
+    setActiveChip('chips-type','Música');
+  else if (genLow.includes('anime')||tituloUp.includes('ANIME'))
     setActiveChip('chips-type','Anime');
   else if (isAsianCountry && isSerieSignal)
     setActiveChip('chips-type','Dorama, Serie');
@@ -1468,8 +1527,24 @@ function initChips() {
     const hiddenInput = document.getElementById(hiddenInputId);
     if (!hiddenInput) return;
 
+    const isMultiFormat = hiddenInputId === 'f-audioformat';
+
     group.querySelectorAll('.chip').forEach(chip => {
       chip.addEventListener('click', () => {
+
+        // ── FORMATO DE AUDIO: multi-selección (cada chip se activa/desactiva sin afectar a los demás) ──
+        if (isMultiFormat) {
+          const nowActive = !chip.classList.contains('chip-active');
+          chip.classList.toggle('chip-active', nowActive);
+          if (chip.dataset.ownColor) {
+            if (nowActive) { chip.style.background = chip.dataset.ownColor; chip.style.color = '#fff'; }
+            else { chip.style.background = '#0a0c12'; chip.style.color = chip.dataset.ownColor; }
+          }
+          const activos = Array.from(group.querySelectorAll('.chip.chip-active')).map(c => c.dataset.value);
+          hiddenInput.value = activos.join(', ');
+          return;
+        }
+
         const wasActive = chip.classList.contains('chip-active');
         const isSource = hiddenInputId === 'f-source';
 
@@ -1500,6 +1575,13 @@ function initChips() {
         }
 
         hiddenInput.value = chip.dataset.value;
+
+        // Si se elige Tipo = Música, Calidad y Audio (idioma) no aplican → se desactivan
+        // (siguen siendo activables a mano si el caso lo requiere, ej. la colección trae videografía)
+        if (hiddenInputId === 'f-type' && chip.dataset.value === 'Música') {
+          setActiveChip('chips-quality', '');
+          setActiveChip('chips-audio', '');
+        }
       });
     });
   });
@@ -1531,6 +1613,33 @@ function setActiveChip(groupId, value) {
   if (hiddenInput) hiddenInput.value = value;
 }
 
+// Activa varios chips a la vez (usado por Formato de Audio, que es multi-selección)
+function setActiveChips(groupId, values) {
+  const group = document.getElementById(groupId);
+  if (!group) return;
+  const hiddenInputId = 'f-' + groupId.replace('chips-', '');
+  const hiddenInput = document.getElementById(hiddenInputId);
+  const vals = values || [];
+
+  group.querySelectorAll('.chip').forEach(c => {
+    const match = vals.includes(c.dataset.value);
+    c.classList.toggle('chip-active', match);
+    if (c.dataset.ownColor) {
+      c.style.background = '#0a0c12';
+      c.style.color = c.dataset.ownColor;
+    }
+    if (match && c.style.color) {
+      const ownColor = c.dataset.ownColor || c.style.color;
+      c.dataset.ownColor = ownColor;
+      c.style.background = ownColor;
+      c.style.color = '#fff';
+    }
+  });
+
+  if (hiddenInput) hiddenInput.value = vals.join(', ');
+}
+
+
 
 function parseDescargaRaw(raw) {
   const result = { audio2: '', calidad2: '', resolucion2: '', formato2: 'MKV', size2: '', codec2: 'H264', subtitles2: '', uploader2: '' };
@@ -1556,8 +1665,11 @@ function parseDescargaRaw(raw) {
 function autoRellenarDescarga() {
   const raw = document.getElementById('f-descarga-raw').value;
   const dp = parseDescargaRaw(raw);
+  const tipoActual = (document.getElementById('f-type')?.value || '');
+  const esMusica = tipoActual.includes('Música');
 
-  // ── Auto-seleccionar CALIDAD ──
+  // ── Auto-seleccionar CALIDAD (no aplica si el tipo es Música) ──
+  if (!esMusica) {
   if (dp.resolucion2) {
     const res = dp.resolucion2.toLowerCase();
     if (res.includes('3840') || res.includes('4k') || res.includes('2160')) {
@@ -1573,9 +1685,10 @@ function autoRellenarDescarga() {
     else if (cal.includes('1080') || cal.includes('full')) setActiveChip('chips-quality', 'Full HD');
     else if (cal.includes('720')) setActiveChip('chips-quality', '720p');
   }
+  }
 
-  // ── Auto-seleccionar AUDIO ──
-  if (dp.audio2) {
+  // ── Auto-seleccionar AUDIO / idioma (no aplica si el tipo es Música) ──
+  if (!esMusica && dp.audio2) {
     const aud = dp.audio2.toLowerCase();
     if (aud.includes('latino') || aud.includes('español')) setActiveChip('chips-audio', 'Latino');
     else if (aud.includes('ingles') || aud.includes('inglés') || aud.includes('english')) setActiveChip('chips-audio', 'Inglés');
@@ -1585,11 +1698,10 @@ function autoRellenarDescarga() {
 
   // ── Auto-seleccionar FUENTE / ENCODE ──
   // Prioridad: X265 > REMUX > WEB-DL > WEB-RIP > PLACEBO > BDRIP > BRRIP > HDTS > HDRIP
-  // Se revisa calidad, codec y resolución juntos
+  // Solo por texto explícito en calidad (NO por el codec, casi todo es H265 hoy en día)
   const calUp2  = (dp.calidad2  || '').toUpperCase();
-  const codUp2  = (dp.codec2    || '').toUpperCase();
-  const combined2 = calUp2 + ' ' + codUp2;
-  if (combined2.includes('X265') || combined2.includes('X 265') || combined2.includes('HEVC') || codUp2.includes('H265') || codUp2.includes('H.265'))
+  const combined2 = calUp2;
+  if (combined2.includes('X265') || combined2.includes('X 265') || combined2.includes('HEVC'))
     setActiveChip('chips-source', 'X265');
   else if (combined2.includes('REMUX'))
     setActiveChip('chips-source', 'REMUX');
@@ -1627,6 +1739,7 @@ function getFormData() {
     duration:      parsed.duration,
     genre:         parsed.genre,
     quality:       document.getElementById('f-quality').value,
+    audioFormat:   document.getElementById('f-audioformat').value,
     source:        document.getElementById('f-source').value,
     yearFilter:    document.getElementById('f-year-filter').value.trim(),
     audio:         document.getElementById('f-audio').value,
@@ -1662,9 +1775,11 @@ function clearForm() {
   setActiveChip('chips-quality', 'Full HD');
   setActiveChip('chips-audio', 'Latino');
   setActiveChip('chips-source', '');
+  setActiveChip('chips-audioformat', '');
   document.getElementById('f-quality').value = 'Full HD';
   document.getElementById('f-source').value = '';
   document.getElementById('f-audio').value = 'Latino';
+  document.getElementById('f-audioformat').value = '';
   
   posterDataUrl = null;
   hidePosterPreview();
@@ -1971,9 +2086,15 @@ function renderList(resetPage) {
       <div class="movie-item-info">
         <div class="movie-item-title">${m.title}</div>
         <div class="movie-item-meta">
+          ${m.type === 'Música' ? `
+          ${m.audioFormat ? `<span class="badge-source" style="color:#8ab4c9;border-color:#8ab4c9;">🎧 ${m.audioFormat}</span>` : ''}
+          <span class="badge-source" style="color:#1db954;border-color:#1db954;">🎵 ${m.type}</span>
+          <span>${m.year||''}</span>
+          ` : `
           <span class="badge ${qualityBadge(m.quality)}">${m.quality||'HD'}</span>
           ${m.source ? `<span class="badge-source" style="${SOURCE_COLORS[m.source] ? `color:${SOURCE_COLORS[m.source]};border-color:${SOURCE_COLORS[m.source]};` : ''}">${m.source}</span>` : ''}
           <span>${m.year||''}</span><span>${m.type||''}</span>
+          `}
           <span class="badge-views">👁 ${views !== undefined ? views : '—'}</span>
         </div>
       </div>
@@ -2049,13 +2170,16 @@ function editMovie(idx) {
   }
   document.getElementById('f-type').value = m.type||'Película';
   document.getElementById('f-year-filter').value = m.yearFilter||m.year||'';
+  const esMusicaEdit = (m.type||'').includes('Música');
   setActiveChip('chips-type', m.type||'Película');
-  setActiveChip('chips-quality', m.quality||'Full HD');
-  setActiveChip('chips-audio', m.audio||'Latino');
+  setActiveChip('chips-quality', esMusicaEdit ? (m.quality||'') : (m.quality||'Full HD'));
+  setActiveChip('chips-audio', esMusicaEdit ? (m.audio||'') : (m.audio||'Latino'));
   setActiveChip('chips-source', m.source||'');
-  document.getElementById('f-quality').value = m.quality||'Full HD';
+  setActiveChips('chips-audioformat', (m.audioFormat||'').split(',').map(s=>s.trim()).filter(Boolean));
+  document.getElementById('f-quality').value = esMusicaEdit ? (m.quality||'') : (m.quality||'Full HD');
   document.getElementById('f-source').value = m.source||'';
-  document.getElementById('f-audio').value = m.audio||'Latino';
+  document.getElementById('f-audio').value = esMusicaEdit ? (m.audio||'') : (m.audio||'Latino');
+  document.getElementById('f-audioformat').value = m.audioFormat||'';
   document.getElementById('f-image').value = m.image||'';
   document.getElementById('f-screenshot').value = m.screenshot||'';
   updateScreenshotCount();
