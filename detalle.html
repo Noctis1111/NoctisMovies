@@ -560,6 +560,78 @@
     .slider-dot.active { background: var(--gold); }
     .capturas-placeholder { width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.85rem; background: var(--surface3); }
 
+    /* ============================================================
+       CAPTURAS +18 — BLUR / REVELAR / VISOR GRANDE COMPARTIBLE
+       ============================================================ */
+    .media-box-title-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+      padding: 0.75rem 1rem; border-bottom: 1px solid var(--border);
+    }
+    .media-box-title-row .media-box-title { padding: 0; border-bottom: none; }
+    .btn-reveal-nsfw {
+      display: none; align-items: center; gap: 6px;
+      background: rgba(255,74,117,0.12); border: 1px solid rgba(255,74,117,0.45);
+      color: #ff4a75; font-family: 'Barlow Condensed', sans-serif; font-weight: 600;
+      font-size: 0.8rem; letter-spacing: 0.5px; padding: 6px 12px; border-radius: 20px;
+      cursor: pointer; transition: all 0.2s ease; white-space: nowrap;
+    }
+    .btn-reveal-nsfw:hover { background: rgba(255,74,117,0.22); transform: translateY(-1px); }
+    .btn-reveal-nsfw.active { background: rgba(255,74,117,0.85); color: #fff; }
+
+    .capturas-slider.nsfw-hidden img { filter: blur(28px) saturate(0.4) brightness(0.6); transform: scale(1.15); }
+    .capturas-slider.nsfw-hidden { cursor: pointer; }
+    .capturas-slider .nsfw-gate {
+      position: absolute; inset: 0; z-index: 6; display: none;
+      flex-direction: column; align-items: center; justify-content: center; gap: 0.6rem;
+      text-align: center; padding: 1rem; background: rgba(3,4,6,0.25);
+    }
+    .capturas-slider.nsfw-hidden .nsfw-gate { display: flex; }
+    .nsfw-gate .lock-icon { font-size: 2rem; }
+    .nsfw-gate .gate-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; font-size: 1.15rem; color: #fff; }
+    .nsfw-gate .gate-sub { font-size: 0.78rem; color: rgba(255,255,255,0.65); max-width: 220px; line-height: 1.4; }
+    .capturas-slider:not(.nsfw-hidden) img { cursor: zoom-in; }
+
+    /* Visor / Lightbox grande y compartible */
+    .nsfw-lightbox {
+      position: fixed; inset: 0; z-index: 100000; background: rgba(2,3,5,0.96);
+      display: none; align-items: center; justify-content: center; flex-direction: column;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nsfw-lightbox.open { display: flex; }
+    .nsfw-lightbox-stage { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+    .nsfw-lightbox-stage img { max-width: 94vw; max-height: 78vh; object-fit: contain; border-radius: 8px; box-shadow: 0 20px 60px rgba(0,0,0,0.7); user-select: none; -webkit-user-drag: none; }
+    .nsfw-lb-close {
+      position: absolute; top: max(14px, env(safe-area-inset-top)); right: 16px; z-index: 5;
+      width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 1.3rem;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .nsfw-lb-nav {
+      position: absolute; top: 50%; transform: translateY(-50%); width: 46px; height: 46px;
+      border-radius: 50%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+      color: #fff; font-size: 1.4rem; display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .nsfw-lb-nav.prev { left: 12px; }
+    .nsfw-lb-nav.next { right: 12px; }
+    .nsfw-lb-counter { position: absolute; top: max(14px, env(safe-area-inset-top)); left: 16px; color: rgba(255,255,255,0.6); font-size: 0.85rem; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px; }
+    .nsfw-lb-actions {
+      display: flex; gap: 0.75rem; padding: 1rem max(14px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-bottom));
+      width: 100%; max-width: 420px; justify-content: center;
+    }
+    .nsfw-lb-btn {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff;
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 0.9rem;
+      letter-spacing: 0.5px; padding: 0.7rem 0.5rem; border-radius: 10px; cursor: pointer; transition: background 0.2s;
+    }
+    .nsfw-lb-btn:hover { background: rgba(255,255,255,0.12); }
+    .nsfw-lb-btn.share { background: rgba(201,168,76,0.15); border-color: rgba(201,168,76,0.4); color: var(--gold2); }
+    .nsfw-lb-btn.share:hover { background: rgba(201,168,76,0.28); }
+    @media (max-width: 600px) {
+      .nsfw-lb-nav { width: 38px; height: 38px; font-size: 1.15rem; }
+      .nsfw-lightbox-stage img { max-height: 68vh; }
+    }
+
     /* CAPTURAS + TRAILER row */
     .media-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 0 1.5rem 1.5rem; }
     @media (max-width: 600px) { .media-row { grid-template-columns: 1fr; } }
@@ -1216,7 +1288,10 @@
       <!-- CAPTURAS + TRAILER -->
       <div class="media-row">
         <div class="media-box">
-          <div class="media-box-title">CAPTURAS</div>
+          <div class="media-box-title-row">
+            <div class="media-box-title">CAPTURAS</div>
+            <button class="btn-reveal-nsfw" id="btn-reveal-caps" onclick="toggleCapturasNSFW()">🔞 <span id="btn-reveal-caps-txt">Ver capturas</span></button>
+          </div>
           <div id="capturas-container">
             <div class="capturas-placeholder">Sin capturas disponibles</div>
           </div>
@@ -1792,11 +1867,15 @@ async function init() {
     .split(/[\n,]/)
     .map(s => s.trim())
     .filter(s => s && /^https?:\/\//i.test(s) && imageExts.test(s));
+  const isHentaiContent = /hentai|adult/.test((m.type || '').toLowerCase());
+  const btnRevealCaps = document.getElementById('btn-reveal-caps');
+  nsfwScreenshots = screenshots.slice();
   if (screenshots.length === 0) {
     capContainer.innerHTML = `<div class="capturas-placeholder">Sin capturas disponibles</div>`;
+    if (btnRevealCaps) btnRevealCaps.style.display = 'none';
   } else if (screenshots.length >= 1) {
     const imgs = screenshots.map((url, i) =>
-      `<img src="${url}" alt="Captura ${i+1}" class="${i===0?'active':''}" onerror="this.style.display='none'"/>`
+      `<img src="${url}" alt="Captura ${i+1}" class="${i===0?'active':''}" referrerpolicy="no-referrer" loading="lazy" data-src="${url}" onerror="handleCapturaError(this)" onclick="openNsfwLightbox(${i})"/>`
     ).join('');
     const navBtns = screenshots.length > 1 ? `
       <button class="slider-btn prev" onclick="sliderPrev()">&#8249;</button>
@@ -1804,7 +1883,14 @@ async function init() {
     const dotsHtml = screenshots.length > 1 ? `<div class="slider-dots">${
       screenshots.map((_, i) => `<span class="slider-dot ${i===0?'active':''}" onclick="sliderGo(${i})"></span>`).join('')
     }</div>` : '';
-    capContainer.innerHTML = `<div class="capturas-slider" id="capturas-slider">${imgs}${navBtns}${dotsHtml}</div>`;
+    // Overlay de bloqueo (+18) que se muestra mientras las capturas están ocultas
+    const gateHtml = isHentaiContent ? `
+      <div class="nsfw-gate">
+        <span class="lock-icon">🔞</span>
+        <span class="gate-title">CONTENIDO EXPLÍCITO</span>
+        <span class="gate-sub">Toca "Ver capturas" arriba para revelar las imágenes</span>
+      </div>` : '';
+    capContainer.innerHTML = `<div class="capturas-slider${isHentaiContent ? ' nsfw-hidden' : ''}" id="capturas-slider">${imgs}${navBtns}${dotsHtml}${gateHtml}</div>`;
     let sliderIdx = 0;
     const sliderImgs = capContainer.querySelectorAll('.capturas-slider img');
     const sliderDots = capContainer.querySelectorAll('.slider-dot');
@@ -1819,6 +1905,14 @@ async function init() {
     window.sliderPrev = () => sliderShow(sliderIdx - 1);
     window.sliderGo = (n) => sliderShow(n);
     if (screenshots.length > 1) setInterval(() => sliderShow(sliderIdx + 1), 6000);
+
+    // Botón "Ver capturas" — solo visible para contenido +18/hentai
+    if (btnRevealCaps) {
+      btnRevealCaps.style.display = isHentaiContent ? 'inline-flex' : 'none';
+      btnRevealCaps.classList.remove('active');
+      const btnTxt = document.getElementById('btn-reveal-caps-txt');
+      if (btnTxt) btnTxt.textContent = 'Ver capturas';
+    }
   }
 
   // Trailer
@@ -2063,6 +2157,146 @@ init();
 
   setTimeout(flash, 800 + Math.random() * 1200);
 })();
+</script>
+
+<!-- VISOR / LIGHTBOX GRANDE Y COMPARTIBLE PARA CAPTURAS +18 -->
+<div class="nsfw-lightbox" id="nsfw-lightbox">
+  <div class="nsfw-lightbox-stage">
+    <span class="nsfw-lb-counter" id="nsfw-lb-counter"></span>
+    <button class="nsfw-lb-close" onclick="closeNsfwLightbox()">✕</button>
+    <button class="nsfw-lb-nav prev" id="nsfw-lb-prev" onclick="nsfwLbNav(-1)">&#8249;</button>
+    <img id="nsfw-lb-img" src="" alt="Captura"/>
+    <button class="nsfw-lb-nav next" id="nsfw-lb-next" onclick="nsfwLbNav(1)">&#8250;</button>
+  </div>
+  <div class="nsfw-lb-actions">
+    <button class="nsfw-lb-btn share" onclick="shareNsfwImage()">📤 Compartir</button>
+    <button class="nsfw-lb-btn" onclick="downloadNsfwImage()">⬇️ Descargar</button>
+  </div>
+</div>
+<script>
+  // ============================================================
+  // LÓGICA: revelar capturas +18 y visor grande compartible
+  // ============================================================
+  var nsfwScreenshots = [];
+  var nsfwLbIndex = 0;
+
+  // En vez de ocultar la imagen rota (lo que dejaba el cuadro vacío),
+  // mostramos un placeholder visible y dejamos la URL en consola para
+  // poder diagnosticar (link caído, bloqueo de hotlink, http vs https, etc.)
+  var BROKEN_IMG_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='225'%3E%3Crect fill='%231c2230' width='400' height='225'/%3E%3Ctext fill='%236b7280' x='50%25' y='46%25' text-anchor='middle' dy='.3em' font-size='34'%3E%E2%9A%A0%EF%B8%8F%3C/text%3E%3Ctext fill='%236b7280' x='50%25' y='64%25' text-anchor='middle' dy='.3em' font-size='13' font-family='sans-serif'%3ENo se pudo cargar la imagen%3C/text%3E%3C/svg%3E";
+  function handleCapturaError(imgEl) {
+    if (imgEl.dataset.brokenHandled) return; // evita loop si el placeholder también fallara
+    imgEl.dataset.brokenHandled = '1';
+    console.warn('[NoctisMovies] No se pudo cargar la captura:', imgEl.dataset.src);
+    imgEl.src = BROKEN_IMG_SVG;
+    imgEl.style.objectFit = 'contain';
+    imgEl.style.background = '#1c2230';
+  }
+
+  function toggleCapturasNSFW() {
+    var slider = document.getElementById('capturas-slider');
+    var btn = document.getElementById('btn-reveal-caps');
+    var btnTxt = document.getElementById('btn-reveal-caps-txt');
+    if (!slider || !btn) return;
+    var hidden = slider.classList.toggle('nsfw-hidden');
+    btn.classList.toggle('active', !hidden);
+    btnTxt.textContent = hidden ? 'Ver capturas' : 'Ocultar capturas';
+  }
+
+  function openNsfwLightbox(index) {
+    var slider = document.getElementById('capturas-slider');
+    if (slider && slider.classList.contains('nsfw-hidden')) return; // debe revelarse primero
+    if (!nsfwScreenshots.length) return;
+    nsfwLbIndex = ((index % nsfwScreenshots.length) + nsfwScreenshots.length) % nsfwScreenshots.length;
+    renderNsfwLightbox();
+    document.getElementById('nsfw-lightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function renderNsfwLightbox() {
+    var img = document.getElementById('nsfw-lb-img');
+    var counter = document.getElementById('nsfw-lb-counter');
+    img.src = nsfwScreenshots[nsfwLbIndex];
+    counter.textContent = (nsfwLbIndex + 1) + ' / ' + nsfwScreenshots.length;
+    var multi = nsfwScreenshots.length > 1;
+    document.getElementById('nsfw-lb-prev').style.display = multi ? 'flex' : 'none';
+    document.getElementById('nsfw-lb-next').style.display = multi ? 'flex' : 'none';
+  }
+
+  function nsfwLbNav(dir) {
+    if (!nsfwScreenshots.length) return;
+    nsfwLbIndex = ((nsfwLbIndex + dir) % nsfwScreenshots.length + nsfwScreenshots.length) % nsfwScreenshots.length;
+    renderNsfwLightbox();
+  }
+
+  function closeNsfwLightbox() {
+    document.getElementById('nsfw-lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Cerrar con click en el fondo o con tecla Escape
+  document.addEventListener('DOMContentLoaded', function () {
+    var lb = document.getElementById('nsfw-lightbox');
+    if (lb) {
+      lb.addEventListener('click', function (e) {
+        if (e.target === lb) closeNsfwLightbox();
+      });
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    var lb = document.getElementById('nsfw-lightbox');
+    if (!lb || !lb.classList.contains('open')) return;
+    if (e.key === 'Escape') closeNsfwLightbox();
+    if (e.key === 'ArrowRight') nsfwLbNav(1);
+    if (e.key === 'ArrowLeft') nsfwLbNav(-1);
+  });
+
+  // Compartir (funciona en Android/celular vía Web Share API; si el navegador
+  // no lo soporta, hace fallback a copiar el enlace de la imagen)
+  async function shareNsfwImage() {
+    var url = nsfwScreenshots[nsfwLbIndex];
+    if (!url) return;
+    try {
+      // Intento 1: compartir el archivo de imagen directamente (ideal en Android)
+      if (navigator.canShare) {
+        var resp = await fetch(url, { mode: 'cors' });
+        var blob = await resp.blob();
+        var ext = (blob.type && blob.type.split('/')[1]) || 'jpg';
+        var file = new File([blob], 'captura.' + ext, { type: blob.type || 'image/jpeg' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: 'Captura' });
+          return;
+        }
+      }
+      // Intento 2: compartir solo el enlace
+      if (navigator.share) {
+        await navigator.share({ title: 'Captura', url: url });
+        return;
+      }
+      throw new Error('share-not-supported');
+    } catch (err) {
+      // Fallback: copiar el link al portapapeles
+      try {
+        await navigator.clipboard.writeText(url);
+        alert('Tu navegador no soporta compartir directo. Se copió el enlace de la imagen al portapapeles.');
+      } catch (e2) {
+        window.open(url, '_blank');
+      }
+    }
+  }
+
+  function downloadNsfwImage() {
+    var url = nsfwScreenshots[nsfwLbIndex];
+    if (!url) return;
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'captura.jpg';
+    a.target = '_blank';
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
 </script>
 </body>
 </html>
