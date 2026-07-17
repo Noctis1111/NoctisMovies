@@ -1206,11 +1206,11 @@ function parseBloqueCompleto(raw) {
     const ci  = l.indexOf(':');
     const key = ci >= 0 ? l.slice(0, ci).toLowerCase().trim() : '';
 
-    if (ci >= 0 && camposDatos.some(c => key === c || key.includes(c))) { camposOk = true; continue; }
+    if (ci >= 0 && key.length <= 30 && camposDatos.some(c => key === c || key.includes(c))) { camposOk = true; continue; }
     if (reMasInfo.test(l) || reTemporada.test(l) || reSepDecor.test(l)) {
       if (idxDescarga < 0) idxDescarga = i; continue;
     }
-    if (ci >= 0 && camposDescarga.some(c => key === c || key.includes(c))) {
+    if (ci >= 0 && key.length <= 30 && camposDescarga.some(c => key === c || key.includes(c))) {
       if (idxDescarga < 0) idxDescarga = i; continue;
     }
     if (/^https?:\/\//i.test(l)) {
@@ -1221,7 +1221,7 @@ function parseBloqueCompleto(raw) {
           if (!lineas[j]) continue;
           const ci2 = lineas[j].indexOf(':');
           const k2  = ci2 >= 0 ? lineas[j].slice(0, ci2).toLowerCase().trim() : '';
-          const esTec = ci2 >= 0 && camposDescarga.some(c => k2 === c || k2.includes(c));
+          const esTec = ci2 >= 0 && k2.length <= 30 && camposDescarga.some(c => k2 === c || k2.includes(c));
           const esUrl = /^https?:\/\//i.test(lineas[j]);
           if (!esTec && !esUrl && !reMasInfo.test(lineas[j]) && !reTemporada.test(lineas[j]) && !reEncabezado.test(lineas[j]) && !reSepDecor.test(lineas[j])) {
             srv = j;
@@ -1254,7 +1254,7 @@ function parseBloqueCompleto(raw) {
     if (!l || reEncabezado.test(l) || reSepDecor.test(l)) continue;
     const ci  = l.indexOf(':');
     const key = ci >= 0 ? l.slice(0, ci).toLowerCase().trim() : '';
-    const esDato = ci >= 0 && camposDatos.some(c => key === c || key.includes(c));
+    const esDato = ci >= 0 && key.length <= 30 && camposDatos.some(c => key === c || key.includes(c));
     if (esDato) {
       camposIniciados = true;
       const val = l.slice(ci + 1).trim();
