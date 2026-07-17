@@ -1417,7 +1417,12 @@ function autoRellenarTodo() {
   const isEpisodic = /por\s*cap|per\s*ep|por\s*epis|x\s*ep|por\s*capitulo|cap\.\s*aprox|min\.?\s*por/i.test(durStr);
 
   // MÚSICA — detecta formato de audio (mp3/flac/wav) en TODO el bloque pegado (título, info descarga, formato, enlaces...)
-  const rawUp      = (raw || '').toUpperCase();
+  // Se excluye la línea "Audio: ..." porque ahí solo se describe el códec del audio del
+  // video (p.ej. "Coreano AAC 2.0" en una serie normal), no si la publicación ES música.
+  // Si no se excluye, cualquier serie/película con audio AAC (algo muy común) se detecta
+  // por error como "Música".
+  const rawSinLineaAudio = (raw || '').replace(/^[ \t]*audio[ \t]*:.*$/gim, '');
+  const rawUp      = rawSinLineaAudio.toUpperCase();
   const formatoUp  = (p.formato2 || '').toUpperCase();
   const musicaUp   = rawUp + ' ' + formatoUp;
   const isMusicFormat = /\.MP3\b|\.FLAC\b|\.WAV\b|\.M4A\b|\bMP3\b|\bFLAC\b|\bWAV\b|\bAAC\b/.test(musicaUp);
