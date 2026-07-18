@@ -305,6 +305,22 @@
     .search-dropdown-item.item-h .search-dropdown-thumb-wrap { position: relative; width: 130px; height: 78px; flex-shrink: 0; border-radius: 6px; overflow: hidden; }
     .search-dropdown-item.item-h .search-dropdown-thumb { filter: blur(10px) brightness(0.6); transition: filter 0.25s ease-in-out; }
     .search-dropdown-item.item-h:hover .search-dropdown-thumb { filter: blur(0) brightness(1); }
+    /* ── Erótico: camuflaje más bajo/suave que Hentai, se ve más la portada real ── */
+    .search-dropdown-item.item-h.item-e .search-dropdown-thumb { filter: blur(2px) brightness(0.95); }
+    .search-dropdown-item.item-h.item-e:hover .search-dropdown-thumb { filter: blur(0) brightness(1); }
+    /* ── Capa de color sobre el blur, para diferenciar Hentai (rosado) de Erótico (rojo) ── */
+    .search-dropdown-item.item-h .search-dropdown-thumb-wrap::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      border-radius: 6px;
+      background: rgba(255,74,117,0.22);
+      pointer-events: none;
+      transition: opacity 0.25s ease-in-out;
+    }
+    .search-dropdown-item.item-h:hover .search-dropdown-thumb-wrap::before { opacity: 0; }
+    .search-dropdown-item.item-h.item-e .search-dropdown-thumb-wrap::before { background: rgba(230,48,60,0.10); }
     .search-dropdown-item.item-h .h-ribbon-sm {
       position: absolute;
       top: 4px; left: 0;
@@ -324,6 +340,7 @@
     .search-dropdown-item.item-h .h-hint-sm {
       position: absolute;
       inset: 0;
+      z-index: 5;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -452,6 +469,13 @@
     .poster-wrap.card-h:hover .poster-img {
       filter: blur(0) brightness(1);
     }
+    /* ── Erótico: camuflaje más bajo/suave que Hentai, se ve más la portada real ── */
+    .poster-wrap.card-h.card-e .poster-img {
+      filter: blur(6px) brightness(0.95);
+    }
+    .poster-wrap.card-h.card-e:hover .poster-img {
+      filter: blur(0) brightness(1);
+    }
     /* ── Capa de color sobre el blur, para diferenciar Hentai (rosado) de Erótico (rojo) ── */
     .poster-wrap.card-h .poster-frame::before {
       content: '';
@@ -467,7 +491,7 @@
       opacity: 0;
     }
     .poster-wrap.card-h.card-e .poster-frame::before {
-      background: rgba(230,48,60,0.22);
+      background: rgba(230,48,60,0.10);
     }
     .poster-wrap.card-h .h-hint {
       position: absolute;
@@ -1105,6 +1129,14 @@
       filter: blur(0) brightness(1);
       transform: scale(1.08);
     }
+    /* ── Erótico: camuflaje más bajo/suave que Hentai, se ve más la portada real ── */
+    .related-card.card-h.card-e .related-poster img {
+      filter: blur(3px) brightness(0.95);
+    }
+    .related-card.card-h.card-e:hover .related-poster img {
+      filter: blur(0) brightness(1);
+      transform: scale(1.08);
+    }
     /* ── Capa de color sobre el blur, para diferenciar Hentai (rosado) de Erótico (rojo) ── */
     .related-card.card-h .related-poster::before {
       content: '';
@@ -1120,7 +1152,7 @@
       opacity: 0;
     }
     .related-card.card-h.card-e .related-poster::before {
-      background: rgba(230,48,60,0.22);
+      background: rgba(230,48,60,0.10);
     }
     .related-card.card-h .h-hint {
       position: absolute;
@@ -1972,7 +2004,7 @@ async function init() {
       <div class="nsfw-gate">
         <span class="lock-icon">🔞</span>
         <span class="gate-title">CONTENIDO EXPLÍCITO</span>
-        <span class="gate-sub">Toca "Ver capturas" arriba para revelar las imágenes</span>
+        <span class="gate-sub">Doble clic o doble toque aquí, o toca "Ver capturas" arriba, para revelar las imágenes</span>
       </div>` : '';
     capContainer.innerHTML = `<div class="capturas-slider${isHentaiContent ? ' nsfw-hidden' : ''}" id="capturas-slider">${imgs}${navBtns}${dotsHtml}${gateHtml}</div>`;
     let sliderIdx = 0;
@@ -1996,6 +2028,33 @@ async function init() {
       btnRevealCaps.classList.remove('active');
       const btnTxt = document.getElementById('btn-reveal-caps-txt');
       if (btnTxt) btnTxt.textContent = 'Ver capturas';
+    }
+
+    // Doble clic (PC) / doble toque (móvil) sobre la captura para revelarla,
+    // como atajo al botón "Ver capturas". Solo funciona mientras está oculta;
+    // una vez revelada, el clic normal vuelve a abrir el visor de imágenes.
+    if (isHentaiContent) {
+      const sliderEl = document.getElementById('capturas-slider');
+      if (sliderEl) {
+        sliderEl.addEventListener('dblclick', (e) => {
+          if (sliderEl.classList.contains('nsfw-hidden')) {
+            e.preventDefault();
+            toggleCapturasNSFW();
+          }
+        });
+        let lastTapTs = 0;
+        sliderEl.addEventListener('touchend', (e) => {
+          if (!sliderEl.classList.contains('nsfw-hidden')) return; // ya revelada: comportamiento normal (abre el visor)
+          const now = Date.now();
+          if (now - lastTapTs < 350) {
+            e.preventDefault();
+            toggleCapturasNSFW();
+            lastTapTs = 0;
+          } else {
+            lastTapTs = now;
+          }
+        });
+      }
     }
   }
 
