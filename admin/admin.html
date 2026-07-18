@@ -708,7 +708,7 @@
 
     /* STATS */
     .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 0.5rem; }
-    .type-filter-row { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.4rem; }
+    .type-filter-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.3rem; margin-bottom: 0.4rem; }
     .tf-btn { font-size: 0.75rem; padding: 0.22rem 0.55rem; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.18s; white-space: nowrap; font-family: 'Barlow', sans-serif; letter-spacing: 0.3px; }
     .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
     .tf-btn.tf-active { background: var(--gold); border-color: var(--gold); color: #000; font-weight: 600; }
@@ -852,11 +852,13 @@
                   <div class="chip-group" style="display:grid;grid-template-columns:repeat(3,auto);gap:0.35rem;" id="chips-type">
                     <button type="button" class="chip chip-type chip-active" data-value="Película" style="--chip-c:#e8a020;">🎬 Película</button>
                     <button type="button" class="chip chip-type" data-value="Serie" style="--chip-c:#2e86de;">📺 Serie</button>
-                    <button type="button" class="chip chip-type" data-value="Música" style="--chip-c:#1db954;">🎵 Música</button>
+                    <button type="button" class="chip chip-type" data-value="Documental" style="--chip-c:#7f9cd9;">📽 Documental</button>
                     <button type="button" class="chip chip-type" data-value="Anime" style="--chip-c:#e040fb;">⛩ Anime</button>
                     <button type="button" class="chip chip-type" data-value="Dorama, Película" style="--chip-c:#00b894;">🌸 Dorama P.</button>
                     <button type="button" class="chip chip-type" data-value="Dorama, Serie" style="--chip-c:#00cec9;">🌸 Dorama S.</button>
                     <button type="button" class="chip chip-type" data-value="Hentai" style="--chip-c:#ff4a75;">🔞 Adult/Hentai</button>
+                    <button type="button" class="chip chip-type" data-value="Erótico" style="--chip-c:#b83280;">🔥 Erótico</button>
+                    <button type="button" class="chip chip-type" data-value="Música" style="--chip-c:#1db954;">🎵 Música</button>
                   </div>
                   <input type="hidden" id="f-type" value="Película"/>
                 </div>
@@ -1063,11 +1065,13 @@
           <div class="type-filter-row" id="type-filter-row">
             <button class="tf-btn" data-type="Película" onclick="toggleTypeFilter(this)">🎬 Película</button>
             <button class="tf-btn" data-type="Serie" onclick="toggleTypeFilter(this)">📺 Serie</button>
-            <button class="tf-btn" data-type="Música" onclick="toggleTypeFilter(this)">🎵 Música</button>
+            <button class="tf-btn" data-type="Documental" onclick="toggleTypeFilter(this)">📽 Documental</button>
             <button class="tf-btn" data-type="Anime" onclick="toggleTypeFilter(this)">⛩ Anime</button>
             <button class="tf-btn" data-type="Dorama, Película" onclick="toggleTypeFilter(this)">🌸 Dorama P.</button>
             <button class="tf-btn" data-type="Dorama, Serie" onclick="toggleTypeFilter(this)">🌸 Dorama S.</button>
             <button class="tf-btn" data-type="Hentai" onclick="toggleTypeFilter(this)">🔞 Adult/Hentai</button>
+            <button class="tf-btn" data-type="Erótico" onclick="toggleTypeFilter(this)">🔥 Erótico</button>
+            <button class="tf-btn" data-type="Música" onclick="toggleTypeFilter(this)">🎵 Música</button>
           </div>
         </div>
         <div class="admin-search">
@@ -1509,17 +1513,17 @@ function autoRellenarTodo() {
   const isSerieSignal = isTemporada || isEpisodic || isManyEps;
   const isAsianCountry = countryLow.includes('japan')||countryLow.includes('korea')||countryLow.includes('south korea')||countryLow.includes('china');
   if (isMusicFormat)
-    setActiveChip('chips-type','Música');
+    setActiveTypeChips('Música');
   else if (genLow.includes('anime')||tituloUp.includes('ANIME'))
-    setActiveChip('chips-type','Anime');
+    setActiveTypeChips('Anime');
   else if (isAsianCountry && isSerieSignal)
-    setActiveChip('chips-type','Dorama, Serie');
+    setActiveTypeChips('Dorama, Serie');
   else if (isAsianCountry && !isSerieSignal && durMin>=60)
-    setActiveChip('chips-type','Dorama, Película');
+    setActiveTypeChips('Dorama, Película');
   else if (isSerieSignal)
-    setActiveChip('chips-type','Serie');
+    setActiveTypeChips('Serie');
   else if (durMin>=60)
-    setActiveChip('chips-type','Película');
+    setActiveTypeChips('Película');
 }
 
 // Alias para compatibilidad con onpaste/oninput del campo datos
@@ -1533,6 +1537,7 @@ function initChips() {
     if (!hiddenInput) return;
 
     const isMultiFormat = hiddenInputId === 'f-audioformat';
+    const isMultiType = hiddenInputId === 'f-type';
 
     group.querySelectorAll('.chip').forEach(chip => {
       chip.addEventListener('click', () => {
@@ -1547,6 +1552,22 @@ function initChips() {
           }
           const activos = Array.from(group.querySelectorAll('.chip.chip-active')).map(c => c.dataset.value);
           hiddenInput.value = activos.join(', ');
+          return;
+        }
+
+        // ── TIPO: multi-selección manual (ej: Serie + Documental, Película + Erótico) ──
+        // El autodetector sigue marcando un tipo por defecto; el usuario puede sumar/quitar más a mano.
+        if (isMultiType) {
+          const nowActive = !chip.classList.contains('chip-active');
+          chip.classList.toggle('chip-active', nowActive);
+          const activos = Array.from(group.querySelectorAll('.chip.chip-active')).map(c => c.dataset.value);
+          hiddenInput.value = activos.join(' | ');
+
+          // Si Música queda activo, Calidad/Audio no aplican → se desactivan
+          if (nowActive && chip.dataset.value === 'Música') {
+            setActiveChip('chips-quality', '');
+            setActiveChip('chips-audio', '');
+          }
           return;
         }
 
@@ -1580,13 +1601,6 @@ function initChips() {
         }
 
         hiddenInput.value = chip.dataset.value;
-
-        // Si se elige Tipo = Música, Calidad y Audio (idioma) no aplican → se desactivan
-        // (siguen siendo activables a mano si el caso lo requiere, ej. la colección trae videografía)
-        if (hiddenInputId === 'f-type' && chip.dataset.value === 'Música') {
-          setActiveChip('chips-quality', '');
-          setActiveChip('chips-audio', '');
-        }
       });
     });
   });
@@ -1616,6 +1630,18 @@ function setActiveChip(groupId, value) {
   });
 
   if (hiddenInput) hiddenInput.value = value;
+}
+
+// Activa 1 o varios chips de TIPO a la vez (soporta valores combinados con ' | ', ej: "Serie | Documental")
+function setActiveTypeChips(value) {
+  const group = document.getElementById('chips-type');
+  if (!group) return;
+  const parts = (value || '').split('|').map(s => s.trim()).filter(Boolean);
+  group.querySelectorAll('.chip').forEach(c => {
+    c.classList.toggle('chip-active', parts.includes(c.dataset.value));
+  });
+  const hiddenInput = document.getElementById('f-type');
+  if (hiddenInput) hiddenInput.value = parts.join(' | ');
 }
 
 // Activa varios chips a la vez (usado por Formato de Audio, que es multi-selección)
@@ -1776,7 +1802,7 @@ function clearForm() {
   ].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
   document.getElementById('f-type').value = 'Película';
   document.getElementById('f-year-filter').value = '';
-  setActiveChip('chips-type', 'Película');
+  setActiveTypeChips('Película');
   setActiveChip('chips-quality', 'Full HD');
   setActiveChip('chips-audio', 'Latino');
   setActiveChip('chips-source', '');
@@ -2061,7 +2087,8 @@ function renderList(resetPage) {
   document.getElementById('count-badge').textContent = movies.length;
   const filtered = movies.filter(m => {
     const matchQ = !q || (m.title||'').toLowerCase().includes(q) || (m.year||'').includes(q);
-    const matchType = !adminTypeFilter || (m.type||'') === adminTypeFilter;
+    const itemTypes = (m.type||'').split('|').map(s=>s.trim());
+    const matchType = !adminTypeFilter || itemTypes.includes(adminTypeFilter);
     return matchQ && matchType;
   });
 
@@ -2091,7 +2118,7 @@ function renderList(resetPage) {
       <div class="movie-item-info">
         <div class="movie-item-title">${m.title}</div>
         <div class="movie-item-meta">
-          ${m.type === 'Música' ? `
+          ${(m.type||'').includes('Música') ? `
           ${m.audioFormat ? `<span class="badge-source" style="color:#8ab4c9;border-color:#8ab4c9;">🎧 ${m.audioFormat}</span>` : ''}
           <span class="badge-source" style="color:#1db954;border-color:#1db954;">🎵 ${m.type}</span>
           <span>${m.year||''}</span>
@@ -2176,7 +2203,7 @@ function editMovie(idx) {
   document.getElementById('f-type').value = m.type||'Película';
   document.getElementById('f-year-filter').value = m.yearFilter||m.year||'';
   const esMusicaEdit = (m.type||'').includes('Música');
-  setActiveChip('chips-type', m.type||'Película');
+  setActiveTypeChips(m.type||'Película');
   setActiveChip('chips-quality', esMusicaEdit ? (m.quality||'') : (m.quality||'Full HD'));
   setActiveChip('chips-audio', esMusicaEdit ? (m.audio||'') : (m.audio||'Latino'));
   setActiveChip('chips-source', m.source||'');
@@ -2259,8 +2286,8 @@ function clearAll() {
 function updateStats() {
   const m = getMovies();
   document.getElementById('stat-total').textContent = m.length;
-  document.getElementById('stat-movies').textContent = m.filter(x=>x.type==='Película').length;
-  document.getElementById('stat-series').textContent = m.filter(x=>['Serie','Anime','Dorama'].includes(x.type)).length;
+  document.getElementById('stat-movies').textContent = m.filter(x=>(x.type||'').includes('Película')).length;
+  document.getElementById('stat-series').textContent = m.filter(x=>['Serie','Anime','Dorama','Documental'].some(t=>(x.type||'').includes(t))).length;
 }
 
 /* ======================== EXPORT ======================== */
