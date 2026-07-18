@@ -642,6 +642,23 @@ header::after {
       filter: blur(0) brightness(1);
       transform: scale(1.05);
     }
+    /* ── Capa de color sobre el blur, para diferenciar Hentai (rosado) de Erótico (rojo) ── */
+    .s2026-card.card-h .s2026-poster::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      border-radius: 10px;
+      background: rgba(255,74,117,0.22);
+      pointer-events: none;
+      transition: opacity 0.3s ease-in-out;
+    }
+    .s2026-card.card-h:hover .s2026-poster::before {
+      opacity: 0;
+    }
+    .s2026-card.card-h.card-e .s2026-poster::before {
+      background: rgba(230,48,60,0.22);
+    }
     .s2026-card.card-h:hover {
       border-color: #ff4a75 !important;
       box-shadow: 0 0 20px 6px rgba(255,74,117,0.6), 0 0 50px 10px rgba(255,74,117,0.25) !important;
@@ -691,6 +708,15 @@ header::after {
     }
     .s2026-card.card-h:hover .h-hint {
       opacity: 0;
+    }
+    /* ── Erótico: mismo camuflaje que Hentai pero en rojo para diferenciarlo ── */
+    .s2026-card.card-h.card-e:hover {
+      border-color: #e6303c !important;
+      box-shadow: 0 0 20px 6px rgba(230,48,60,0.6), 0 0 50px 10px rgba(230,48,60,0.25) !important;
+    }
+    .s2026-card.card-h.card-e .h-ribbon {
+      background: linear-gradient(135deg, #e6303c, #7a0d14);
+      box-shadow: 0 2px 12px rgba(230,48,60,0.7);
     }
     .main-layout { max-width: 1600px; margin: 0 auto; padding: 0 2rem 4rem; display: grid; grid-template-columns: 1fr 220px; gap: 2rem; align-items: start; }
     @media (max-width: 1000px) { .main-layout { grid-template-columns: 1fr; } .sidebar-filters { display: none; } }
@@ -773,6 +799,23 @@ header::after {
       filter: blur(0) brightness(1);
       transform: scale(1.08);
     }
+    /* ── Capa de color sobre el blur, para diferenciar Hentai (rosado) de Erótico (rojo) ── */
+    .movie-card.card-h .card-poster::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      border-radius: 8px;
+      background: rgba(255,74,117,0.22);
+      pointer-events: none;
+      transition: opacity 0.3s ease-in-out;
+    }
+    .movie-card.card-h:hover .card-poster::before {
+      opacity: 0;
+    }
+    .movie-card.card-h.card-e .card-poster::before {
+      background: rgba(230,48,60,0.22);
+    }
     .movie-card.card-h .h-hint {
       position: absolute;
       inset: 0;
@@ -797,6 +840,15 @@ header::after {
     }
     .movie-card.card-h:hover .h-hint {
       opacity: 0;
+    }
+    /* ── Erótico: mismo camuflaje que Hentai pero en rojo para diferenciarlo ── */
+    .movie-card.card-h.card-e:hover .card-poster {
+      outline: 2px solid #e6303c;
+      box-shadow: 0 0 20px 6px rgba(230,48,60,0.7), 0 0 50px 10px rgba(230,48,60,0.3);
+    }
+    .movie-card.card-h.card-e .h-ribbon {
+      background: linear-gradient(135deg, #e6303c, #7a0d14);
+      box-shadow: 0 2px 12px rgba(230,48,60,0.7);
     }
 
     /* ── Marca de agua para tipo "Música": visible pero discreta, la portada NO se oculta ── */
@@ -958,11 +1010,13 @@ header::after {
   <div class="content-area">
     <div class="filter-tabs">
       <button class="filter-tab active" data-filter="all">Todo</button>
-      <button class="filter-tab" data-filter="pelicula">Películas</button>
-      <button class="filter-tab" data-filter="serie">Series</button>
-      <button class="filter-tab" data-filter="anime">Anime</button>
-      <button class="filter-tab" data-filter="dorama">Doramas</button>
+      <button class="filter-tab" data-filter="pelicula">🎬 Películas</button>
+      <button class="filter-tab" data-filter="serie">📺 Series</button>
+      <button class="filter-tab" data-filter="documental">📽 Documental</button>
+      <button class="filter-tab" data-filter="anime">⛩ Anime</button>
+      <button class="filter-tab" data-filter="dorama">🌸 Doramas</button>
       <button class="filter-tab" data-filter="hentai">🔞 Adult/Hentai</button>
+      <button class="filter-tab" data-filter="erotico">🔥 Erótico</button>
       <button class="filter-tab" data-filter="musica">🎵 Música</button>
       <button class="filter-tab" data-filter="4k">4K</button>
       <button class="filter-tab" data-filter="1080p">1080p</button>
@@ -996,11 +1050,13 @@ header::after {
       <div class="side-box-title">TIPO</div>
       <div class="side-filter-group">
         <div class="side-tags">
-          <a class="side-tag" href="index.html?filter=pelicula">PELÍCULAS</a>
-          <a class="side-tag" href="index.html?filter=serie">SERIES</a>
-          <a class="side-tag" href="index.html?filter=anime">ANIME</a>
-          <a class="side-tag" href="index.html?filter=dorama">DORAMAS</a>
+          <a class="side-tag" href="index.html?filter=pelicula">🎬 PELÍCULAS</a>
+          <a class="side-tag" href="index.html?filter=serie">📺 SERIES</a>
+          <a class="side-tag" href="index.html?filter=documental">📽 DOCUMENTAL</a>
+          <a class="side-tag" href="index.html?filter=anime">⛩ ANIME</a>
+          <a class="side-tag" href="index.html?filter=dorama">🌸 DORAMAS</a>
           <a class="side-tag" href="index.html?filter=hentai">🔞 ADULT/HENTAI</a>
+          <a class="side-tag" href="index.html?filter=erotico">🔥 ERÓTICO</a>
           <a class="side-tag" href="index.html?filter=musica">🎵 MÚSICA</a>
         </div>
       </div>
@@ -1245,9 +1301,10 @@ function renderGrid() {
   grid.innerHTML = pageItems.map((m, i) => {
     const realIdx = allMovies.indexOf(m);
     const isH = isAdultContent(m);
+    const isE = isEroticContent(m);
     const isM = isMusicContent(m);
     return `
-    <a class="movie-card${isH ? ' card-h' : ''}${isM ? ' card-m' : ''}" href="detalle.html?id=${m.slug || realIdx}" style="animation-delay:${(i % 20) * 40}ms">
+    <a class="movie-card${isH ? ' card-h' : ''}${isE ? ' card-e' : ''}${isM ? ' card-m' : ''}" href="detalle.html?id=${m.slug || realIdx}" style="animation-delay:${(i % 20) * 40}ms">
       <div class="card-poster">
         ${isH ? '<span class="h-ribbon">+18</span><span class="h-hint">CONTENIDO EXPLÍCITO</span>' : ''}
         <img src="${m.image || ''}" alt="${m.title}" loading="lazy" onerror="this.src='${fallbackSvg}'"/>
@@ -1263,7 +1320,12 @@ function renderGrid() {
 
 function isAdultContent(m) {
   const t = norm(m.type || '');
-  return t.includes('hentai') || t.includes('adult');
+  return t.includes('hentai') || t.includes('adult') || t.includes('erotico');
+}
+
+function isEroticContent(m) {
+  const t = norm(m.type || '');
+  return t.includes('erotico');
 }
 
 function isMusicContent(m) {
@@ -1349,8 +1411,9 @@ function build2026(movies) {
   track.innerHTML = items.map((m, i) => {
     const realIdx = movies.indexOf(m);
     const isH = isAdultContent(m);
+    const isE = isEroticContent(m);
     const isM = isMusicContent(m);
-    return `<a class="s2026-card${isH ? ' card-h' : ''}${isM ? ' card-m' : ''}" href="detalle.html?id=${m.slug || realIdx}">
+    return `<a class="s2026-card${isH ? ' card-h' : ''}${isE ? ' card-e' : ''}${isM ? ' card-m' : ''}" href="detalle.html?id=${m.slug || realIdx}">
       <div class="s2026-poster">
         <img src="${m.image||''}" alt="${m.title}" loading="lazy" onerror="this.src='${fallback}'"/>
         <div class="s2026-overlay"></div>
