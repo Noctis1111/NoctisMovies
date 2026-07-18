@@ -657,7 +657,15 @@ header::after {
       opacity: 0;
     }
     .s2026-card.card-h.card-e .s2026-poster::before {
-      background: rgba(230,48,60,0.22);
+      background: rgba(230,48,60,0.10);
+    }
+    /* ── Erótico: camuflaje más bajo/suave que Hentai, se ve más la portada real ── */
+    .s2026-card.card-h.card-e .s2026-poster img {
+      filter: blur(4px) brightness(0.95);
+    }
+    .s2026-card.card-h.card-e:hover .s2026-poster img {
+      filter: blur(0) brightness(1);
+      transform: scale(1.05);
     }
     .s2026-card.card-h:hover {
       border-color: #ff4a75 !important;
@@ -729,7 +737,7 @@ header::after {
     .search-bar input:focus { border-color: var(--gold); }
     .search-bar input::placeholder { color: var(--muted); }
 
-    .filter-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .filter-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; scroll-margin-top: 120px; }
     .filter-tab { padding: 0.4rem 1rem; border-radius: 20px; border: 1px solid var(--border); background: rgba(22,27,36,0.65); color: #c2c6cc; font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; text-shadow: 0 1px 2px rgba(0,0,0,0.6); }
     .filter-tab:hover { border-color: var(--gold); color: var(--gold); background: rgba(22,27,36,0.85); }
     .filter-tab.active { background: var(--gold); border-color: var(--gold); color: #000; text-shadow: none; }
@@ -814,7 +822,15 @@ header::after {
       opacity: 0;
     }
     .movie-card.card-h.card-e .card-poster::before {
-      background: rgba(230,48,60,0.22);
+      background: rgba(230,48,60,0.10);
+    }
+    /* ── Erótico: camuflaje más bajo/suave que Hentai, se ve más la portada real ── */
+    .movie-card.card-h.card-e .card-poster img {
+      filter: blur(4px) brightness(0.95);
+    }
+    .movie-card.card-h.card-e:hover .card-poster img {
+      filter: blur(0) brightness(1);
+      transform: scale(1.08);
     }
     .movie-card.card-h .h-hint {
       position: absolute;
@@ -1383,6 +1399,12 @@ document.getElementById('search-input').addEventListener('input', e => {
   searchQuery = norm(e.target.value.trim());
   currentPage = 1;
   renderGrid();
+  // Si el usuario está scrolleado abajo (footer/banner) y escribe una búsqueda,
+  // lo llevamos arriba a donde aparecen los resultados, para que no se quede
+  // viendo una zona vacía mientras el catálogo se actualiza fuera de vista.
+  if (searchQuery) {
+    document.querySelector('.filter-tabs').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 });
 
 function build2026(movies) {
