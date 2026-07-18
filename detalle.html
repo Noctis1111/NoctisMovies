@@ -344,6 +344,10 @@
       padding: 0 3px;
     }
     .search-dropdown-item.item-h:hover .h-hint-sm { opacity: 0; }
+    /* ── Erótico: mismo camuflaje que Hentai pero en rojo, dropdown de búsqueda ── */
+    .search-dropdown-item.item-h.item-e .h-ribbon-sm {
+      background: linear-gradient(135deg, #e6303c, #7a0d14);
+    }
     .search-dropdown-info { flex: 1; min-width: 0; padding-top: 2px; }
     .search-dropdown-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; color: #f0f2f5; white-space: normal; overflow: visible; text-overflow: unset; line-height: 1.25; transition: color 0.2s ease; }
     .search-dropdown-item:hover .search-dropdown-title { color: var(--gold); }
@@ -448,6 +452,23 @@
     .poster-wrap.card-h:hover .poster-img {
       filter: blur(0) brightness(1);
     }
+    /* ── Capa de color sobre el blur, para diferenciar Hentai (rosado) de Erótico (rojo) ── */
+    .poster-wrap.card-h .poster-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      border-radius: 12px;
+      background: rgba(255,74,117,0.22);
+      pointer-events: none;
+      transition: opacity 0.3s ease-in-out;
+    }
+    .poster-wrap.card-h:hover .poster-frame::before {
+      opacity: 0;
+    }
+    .poster-wrap.card-h.card-e .poster-frame::before {
+      background: rgba(230,48,60,0.22);
+    }
     .poster-wrap.card-h .h-hint {
       position: absolute;
       inset: 0;
@@ -471,6 +492,15 @@
     }
     .poster-wrap.card-h:hover .h-hint {
       opacity: 0;
+    }
+    /* ── Erótico: mismo camuflaje que Hentai pero en rojo para diferenciarlo ── */
+    .poster-wrap.card-h.card-e:hover .poster-img {
+      border: 2px solid #e6303c;
+      box-shadow: 0 0 14px 3px rgba(230,48,60,0.6), 0 0 30px rgba(230,48,60,0.3);
+    }
+    .poster-wrap.card-h.card-e .h-ribbon {
+      background: linear-gradient(135deg, #e6303c, #7a0d14);
+      box-shadow: 0 2px 14px rgba(230,48,60,0.7);
     }
 
     /* ── Marca de agua para tipo "Música" (poster principal) — portada bien visible, logo discreto ── */
@@ -549,8 +579,8 @@
 
     /* SLIDER CAPTURAS */
     .capturas-slider { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; background: var(--surface3); }
-    .capturas-slider img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.6s ease; }
-    .capturas-slider img.active { opacity: 1; }
+    .capturas-slider img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.6s ease; pointer-events: none; }
+    .capturas-slider img.active { opacity: 1; pointer-events: auto; }
     .slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); color: var(--white); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; z-index: 5; transition: background 0.2s; }
     .slider-btn:hover { background: rgba(201,168,76,0.5); }
     .slider-btn.prev { left: 8px; }
@@ -908,6 +938,16 @@
   border-bottom: 1px solid rgba(229, 188, 75, 0.2) !important;
 }
 
+/* Título/episodio asociado a esa sección de enlaces (ej. nombre del capítulo) */
+.enlaces-section-subtitle {
+  font-family: 'Barlow Condensed', sans-serif !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.3px !important;
+  color: rgba(255,255,255,0.55) !important;
+  margin: -0.15rem 0 0.5rem 0 !important;
+}
+
 /* FILAS DE ENLACES: Micro-cápsulas compactas */
 .enlace-item { 
   display: flex !important; 
@@ -1065,6 +1105,23 @@
       filter: blur(0) brightness(1);
       transform: scale(1.08);
     }
+    /* ── Capa de color sobre el blur, para diferenciar Hentai (rosado) de Erótico (rojo) ── */
+    .related-card.card-h .related-poster::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      border-radius: 8px;
+      background: rgba(255,74,117,0.22);
+      pointer-events: none;
+      transition: opacity 0.3s ease-in-out;
+    }
+    .related-card.card-h:hover .related-poster::before {
+      opacity: 0;
+    }
+    .related-card.card-h.card-e .related-poster::before {
+      background: rgba(230,48,60,0.22);
+    }
     .related-card.card-h .h-hint {
       position: absolute;
       inset: 0;
@@ -1089,6 +1146,15 @@
     }
     .related-card.card-h:hover .h-hint {
       opacity: 0;
+    }
+    /* ── Erótico: mismo camuflaje que Hentai pero en rojo para diferenciarlo ── */
+    .related-card.card-h.card-e:hover .related-poster {
+      border: 2px solid #e6303c;
+      box-shadow: 0 0 14px 3px rgba(230,48,60,0.6), 0 0 30px rgba(230,48,60,0.3);
+    }
+    .related-card.card-h.card-e .h-ribbon {
+      background: linear-gradient(135deg, #e6303c, #7a0d14);
+      box-shadow: 0 2px 10px rgba(230,48,60,0.7);
     }
 
     /* ── Marca de agua para tipo "Música" (tarjetas relacionadas) — mismo criterio que index.html ── */
@@ -1383,11 +1449,13 @@
       <div class="side-box-title">TIPO</div>
       <div class="side-filter-group">
         <div class="side-tags">
-          <a class="side-tag" href="index.html?filter=pelicula">PELÍCULAS</a>
-          <a class="side-tag" href="index.html?filter=serie">SERIES</a>
-          <a class="side-tag" href="index.html?filter=anime">ANIME</a>
-          <a class="side-tag" href="index.html?filter=dorama">DORAMAS</a>
+          <a class="side-tag" href="index.html?filter=pelicula">🎬 PELÍCULAS</a>
+          <a class="side-tag" href="index.html?filter=serie">📺 SERIES</a>
+          <a class="side-tag" href="index.html?filter=documental">📽 DOCUMENTAL</a>
+          <a class="side-tag" href="index.html?filter=anime">⛩ ANIME</a>
+          <a class="side-tag" href="index.html?filter=dorama">🌸 DORAMAS</a>
           <a class="side-tag" href="index.html?filter=hentai">🔞 ADULT/HENTAI</a>
+          <a class="side-tag" href="index.html?filter=erotico">🔥 ERÓTICO</a>
           <a class="side-tag" href="index.html?filter=musica">🎵 MÚSICA</a>
         </div>
       </div>
@@ -1610,8 +1678,8 @@ function getServerIconsHtml(text, url) {
 function parseEnlaces(raw) {
   if (!raw || !raw.trim()) return [];
   const lines = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-  const servers = [];
-  let currentServer = '';
+  const sections = [];
+  let currentSection = null;
   let pendingLabel = '';
 
   function extractUrl(line) {
@@ -1629,28 +1697,35 @@ function parseEnlaces(raw) {
     const url = extractUrl(line);
     if (url) {
       const inlineLabel = extractLabel(line, url);
+      if (!currentSection) {
+        // Aún no hubo línea de servidor reconocida: usamos la línea pendiente (si existe) como nombre
+        currentSection = { name: pendingLabel || 'Servidores', title: '', links: [] };
+        sections.push(currentSection);
+        pendingLabel = '';
+      }
       const label = inlineLabel || pendingLabel;
-      const groupName = currentServer || 'Servidores';
-      let group = servers.find(s => s.name === groupName);
-      if (!group) { group = { name: groupName, links: [] }; servers.push(group); }
-      group.links.push({ label, url });
+      currentSection.links.push({ label, url });
       pendingLabel = '';
     } else {
       if (line.length > 1 && !/^[\d\s.)\-]+$/.test(line)) {
-        // Solo pisa el servidor actual si la línea es un nombre de servidor
-        // reconocido (o si todavía no había ninguno). Así "part1.rar",
-        // "Temporada 1:", "1 acortador", etc. no borran el servidor real
-        // (ej. AkiraBox) y quedan como etiqueta del link siguiente.
-        if (!currentServer || isKnownServerLine(line)) {
-          currentServer = line;
+        if (isKnownServerLine(line)) {
+          // IMPORTANTE: cada línea de servidor SIEMPRE abre una sección nueva,
+          // aunque el texto sea idéntico a uno anterior (ej. misma fecha de
+          // vencimiento en dos capítulos distintos). Así nunca se fusionan
+          // enlaces de episodios/versiones diferentes en un mismo bloque.
+          currentSection = { name: line, title: pendingLabel, links: [] };
+          sections.push(currentSection);
           pendingLabel = '';
         } else {
+          // Línea de texto libre: puede ser el título del próximo bloque
+          // (si viene antes de un nombre de servidor) o la etiqueta del
+          // próximo enlace (si ya estamos dentro de una sección abierta).
           pendingLabel = line;
         }
       }
     }
   }
-  return servers;
+  return sections;
 }
 
 function renderEnlaces(raw) {
@@ -1667,6 +1742,7 @@ function renderEnlaces(raw) {
     return `
     <div class="enlaces-section">
       ${showHeader ? `<div class="enlaces-server-name">${getServerIconsHtml(headerContext)}${s.name}</div>` : ''}
+      ${s.title ? `<div class="enlaces-section-subtitle">${s.title}</div>` : ''}
       ${s.links.map((lk, i) => {
         const safeUrl = lk.url.replace(/'/g, "\\'");
         // Nombre visible del link: label > número si hay varios > URL corta
@@ -1715,10 +1791,12 @@ function renderRelated(movies, currentIdx) {
   grid.innerHTML = related.map(m => {
     const ri = movies.indexOf(m);
     const fallback = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='130' height='195'%3E%3Crect fill='%230e1117' width='130' height='195'/%3E%3C/svg%3E`;
-    const isH = /hentai|adult/.test((m.type || '').toLowerCase());
+    const typeNorm = (m.type || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const isH = /hentai|adult|erotico/.test(typeNorm);
+    const isE = /erotico/.test(typeNorm);
     const isM = isMusicContent(m);
     return `
-    <a class="related-card${isH ? ' card-h' : ''}${isM ? ' card-m' : ''}" href="detalle.html?id=${movies[ri].slug || ri}">
+    <a class="related-card${isH ? ' card-h' : ''}${isE ? ' card-e' : ''}${isM ? ' card-m' : ''}" href="detalle.html?id=${movies[ri].slug || ri}">
       <div class="related-poster">
         ${isH ? '<span class="h-ribbon">+18</span><span class="h-hint">CONTENIDO EXPLÍCITO</span>' : ''}
         <img src="${m.image || ''}" alt="${m.title}" onerror="this.src='${fallback}'"/>
@@ -1785,7 +1863,8 @@ async function init() {
   if (m.audio) tags.push(m.audio.split(/[\s\-–]/)[0].toUpperCase());
   // Tipo: Película / Serie / Anime… (camuflado si es contenido adulto)
   if (m.type) {
-    const isAdultType = /hentai|adult/.test(m.type.toLowerCase());
+    const typeNormTag = m.type.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const isAdultType = /hentai|adult|erotico/.test(typeNormTag);
     tags.push(isAdultType ? '+18' : m.type.toUpperCase());
   }
   // Resolución (quality): Full 1080p, 4K, 720p…
@@ -1810,8 +1889,11 @@ async function init() {
   const posterWrapEl = document.querySelector('.poster-wrap');
   const posterFrameEl = document.querySelector('.poster-frame') || posterWrapEl;
   if (posterWrapEl) {
-    const isH = /hentai|adult/.test((m.type || '').toLowerCase());
+    const typeNormPoster = (m.type || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const isH = /hentai|adult|erotico/.test(typeNormPoster);
+    const isE = /erotico/.test(typeNormPoster);
     posterWrapEl.classList.toggle('card-h', isH);
+    posterWrapEl.classList.toggle('card-e', isE);
     let ribbon = posterFrameEl.querySelector('.h-ribbon');
     let hint = posterFrameEl.querySelector('.h-hint');
     if (isH) {
@@ -1869,7 +1951,7 @@ async function init() {
     .split(/[\n,]/)
     .map(s => s.trim())
     .filter(s => s && /^https?:\/\//i.test(s) && imageExts.test(s));
-  const isHentaiContent = /hentai|adult/.test((m.type || '').toLowerCase());
+  const isHentaiContent = /hentai|adult|erotico/.test((m.type || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
   const btnRevealCaps = document.getElementById('btn-reveal-caps');
   nsfwScreenshots = screenshots.slice();
   if (screenshots.length === 0) {
@@ -2057,9 +2139,11 @@ init();
     const basePath = window.location.pathname.includes('/admin/') ? '../' : '';
 
     let html = results.map(({ m, i }) => {
-      const isH = /hentai|adult/.test((m.type || '').toLowerCase());
+      const typeNormSD = (m.type || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const isH = /hentai|adult|erotico/.test(typeNormSD);
+      const isE = /erotico/.test(typeNormSD);
       return `
-      <a class="search-dropdown-item${isH ? ' item-h' : ''}" href="${basePath}detalle.html?id=${m.slug || i}" data-idx="${i}" style="animation-delay:${Math.min(i*0.04,0.3)}s">
+      <a class="search-dropdown-item${isH ? ' item-h' : ''}${isE ? ' item-e' : ''}" href="${basePath}detalle.html?id=${m.slug || i}" data-idx="${i}" style="animation-delay:${Math.min(i*0.04,0.3)}s">
         <span class="search-dropdown-thumb-wrap">
           <img class="search-dropdown-thumb" src="${m.image||fallback}" alt="${m.title}" onerror="this.src='${fallback}'"/>
           ${isH ? '<span class="h-ribbon-sm">+18</span><span class="h-hint-sm">CONTENIDO<br>EXPLÍCITO</span>' : ''}
