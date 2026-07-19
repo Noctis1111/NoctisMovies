@@ -1439,6 +1439,13 @@ function autoRellenarTodo() {
   const anchoRes = parseInt(resParts[0]||'0');
   const altoRes  = parseInt(resParts[1]||'0');
   const esFullHDExacta = anchoRes === 1920 && altoRes === 1080;
+  // Si hay una Resolución explícita (ej. "1920×800"), esos números mandan sobre
+  // palabras como HDR10/4K/2K que puedan aparecer en el título o en "Calidad:".
+  // HDR10 es un tipo de rango dinámico, NO implica que la resolución sea 4K.
+  const resDice4K   = anchoRes >= 3840 || altoRes >= 2160;
+  const resDice1080 = anchoRes === 1920 || altoRes === 1080;
+  const resDice720  = anchoRes === 1280 || altoRes === 720;
+  const resDice480  = altoRes === 480 || anchoRes === 854 || anchoRes === 640;
   if (isMusicFormat) {
     // Música: Calidad y Audio (idioma) no aplican — se limpian (siguen siendo activables a mano)
     setActiveChip('chips-quality','');
@@ -1453,9 +1460,20 @@ function autoRellenarTodo() {
     if (/32[\s\-]?BITS?/.test(musicaUp)) formatosDetectados.push('Master 32-bit');
     setActiveChips('chips-audioformat', formatosDetectados);
   }
+  else if (resDice4K)
+    setActiveChip('chips-quality','4K');
+  else if (esFullHDExacta)
+    setActiveChip('chips-quality','Full HD');
+  else if (resDice1080)
+    setActiveChip('chips-quality','1080p');
+  else if (resDice720)
+    setActiveChip('chips-quality','720p');
+  else if (resDice480)
+    setActiveChip('chips-quality','480p');
+  // Sin Resolución numérica decisiva: se recurre al texto (Calidad/Título) como respaldo
   else if (calQUp.includes('3840')||calQUp.includes('2160')||calQUp.includes('4K')||calQUp.includes('2K')||calQUp.includes('HDR10')||calQUp.includes('DV HDR'))
     setActiveChip('chips-quality','4K');
-  else if (esFullHDExacta || (!p.resolucion2 && calQUp.includes('FULL HD')))
+  else if (!p.resolucion2 && calQUp.includes('FULL HD'))
     setActiveChip('chips-quality','Full HD');
   else if (calQUp.includes('1920')||calQUp.includes('1080')||calQUp.includes('FULL HD')||calQUp.includes('FULL'))
     setActiveChip('chips-quality','1080p');
