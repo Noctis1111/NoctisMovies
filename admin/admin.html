@@ -705,6 +705,9 @@
     .item-btn.copy-link { color: var(--gold); }
     .item-btn.copy-link:hover { background: rgba(201,168,76,0.16); border-color: var(--gold); color: var(--gold2); }
     .item-btn.copy-link.copied { background: rgba(34,197,94,0.18); border-color: var(--green); color: var(--green); }
+    .item-btn.copy-search { color: var(--blue); }
+    .item-btn.copy-search:hover { background: rgba(59,130,246,0.16); border-color: var(--blue); color: var(--blue); }
+    .item-btn.copy-search.copied { background: rgba(34,197,94,0.18); border-color: var(--green); color: var(--green); }
 
     /* STATS */
     .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 0.5rem; }
@@ -2149,6 +2152,9 @@ function renderList(resetPage) {
         </div>
       </div>
       <div class="movie-item-actions">
+        <button class="item-btn copy-search" id="copy-search-btn-${ri}" title="Copiar URL de búsqueda (index)" onclick="copySearchUrl(${ri})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </button>
         <button class="item-btn copy-link" id="copy-btn-${ri}" title="Copiar URL del detalle" onclick="copyDetailUrl(${ri})">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l1.42-1.41a5 5 0 0 0-7.07-7.07L10 6"/><path d="M14 11a5 5 0 0 0-7.07 0l-1.42 1.41a5 5 0 0 0 7.07 7.07L14 18"/></svg>
         </button>
@@ -2261,6 +2267,41 @@ function copyDetailUrl(idx) {
 
   function markCopied() {
     showToast('🔗 URL del detalle copiada', 'success');
+    if (btn) {
+      btn.classList.add('copied');
+      setTimeout(() => btn.classList.remove('copied'), 1200);
+    }
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(markCopied).catch(() => fallbackCopy(url, markCopied));
+  } else {
+    fallbackCopy(url, markCopied);
+  }
+}
+
+function baseTitleFor(title) {
+  const t = (title || '').trim();
+  // Cortamos justo antes del primer "(AÑO)" — ej: "Girl's Blood (2014) BDRip..." -> "Girl's Blood"
+  const match = t.match(/^(.*?)\s*\(\d{4}\)/);
+  if (match) return match[1].trim();
+  return t;
+}
+
+function searchUrlFor(m) {
+  // index.html vive en la raíz → subimos un nivel igual que con detalle.html
+  return new URL('../index.html?search=' + encodeURIComponent(baseTitleFor(m.title)), window.location.href).href;
+}
+
+function copySearchUrl(idx) {
+  const movies = getMovies();
+  const m = movies[idx];
+  if (!m) return;
+  const url = searchUrlFor(m);
+  const btn = document.getElementById('copy-search-btn-' + idx);
+
+  function markCopied() {
+    showToast('🔍 URL de búsqueda copiada', 'success');
     if (btn) {
       btn.classList.add('copied');
       setTimeout(() => btn.classList.remove('copied'), 1200);
