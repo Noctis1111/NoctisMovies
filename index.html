@@ -1230,6 +1230,16 @@ async function loadMovies() {
   buildYearSidebar();
   renderGrid();
   build2026(allMovies);
+
+  // Si llegamos con una búsqueda ya cargada en la URL (ej. desde detalle.html
+  // al presionar Enter en el buscador), replicamos el mismo scroll automático
+  // hacia los resultados que ocurre cuando se escribe directamente acá.
+  if (searchParam) {
+    const tabsEl = document.querySelector('.filter-tabs');
+    if (tabsEl) {
+      setTimeout(() => tabsEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+    }
+  }
 }
 
 function buildYearSidebar() {
