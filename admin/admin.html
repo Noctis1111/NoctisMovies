@@ -368,6 +368,23 @@
   display: flex !important; 
   align-items: center !important; 
   justify-content: space-between !important; 
+  gap: 0.6rem;
+}
+
+/* Bloque central de orden dentro del header del catálogo */
+.sort-row-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  flex: 1;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.sort-btn-sm {
+  padding: 0.32rem 0.6rem !important;
+  font-size: 0.7rem !important;
+  border-radius: 6px !important;
 }
 
 /* 3. TÍTULOS: Contraste total */
@@ -465,6 +482,24 @@
 #f-screenshot {
   min-height: 90px !important;
 }
+
+/* Botón "copiar anterior" a la altura del label, sin ocupar espacio extra */
+.btn-copy-prev {
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-copy-prev:hover { background: var(--gold); color: #000; }
+.btn-copy-prev:active { transform: scale(0.97); }
 
 /* 5. EFECTO DE ENFOQUE: Se mantiene el destello dorado */
 .form-group input:focus, 
@@ -972,7 +1007,10 @@
                 <input type="url" id="f-image" placeholder="https://..." oninput="previewImgUrl(this.value)" style="margin-bottom:0;"/>
               </div>
               <div class="form-group">
-                <label>URLs Capturas <span id="screenshot-count" style="color:var(--gold);font-weight:700;">(0)</span></label>
+                <label style="display:flex;align-items:center;justify-content:space-between;gap:0.4rem;flex-wrap:nowrap;">
+                  <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">URLs Capturas <span id="screenshot-count" style="color:var(--gold);font-weight:700;">(0)</span></span>
+                  <button type="button" class="btn-copy-prev" onclick="copyLastScreenshots()" title="Copiar las URLs de capturas guardadas la última vez">📋 Copiar</button>
+                </label>
                 <textarea id="f-screenshot" class="textarea-links" style="min-height:165px;font-size:0.9rem;" placeholder="https://cap1.jpg&#10;https://cap2.jpg" oninput="updateScreenshotCount()"></textarea>
               </div>
               <div class="form-group">
@@ -1050,8 +1088,14 @@
     <!-- COLUMNA DERECHA: LISTA -->
     <div>
       <div class="panel">
-        <div class="panel-header">
+        <div class="panel-header" id="catalog-panel-header">
           <div class="panel-title">Catálogo <span id="count-badge">0</span></div>
+          <div class="sort-row-inline" id="sort-row-inline">
+            <button class="sort-btn sort-btn-sm active" id="sort-btn-default" onclick="setSortMode('default')">Orden de subida</button>
+            <button class="sort-btn sort-btn-sm" id="sort-btn-views_desc" onclick="setSortMode('views_desc')">Más vistas</button>
+            <button class="sort-btn sort-btn-sm" id="sort-btn-views_asc" onclick="setSortMode('views_asc')">Menos vistas</button>
+            <button class="views-refresh-btn sort-btn-sm" id="views-refresh-btn" onclick="refreshViews(true)" title="Actualizar vistas">🔄 Vistas</button>
+          </div>
           <button class="export-btn" style="width:auto;padding:0.3rem 0.8rem;margin:0;font-size:0.75rem;" onclick="clearAll()">🗑 Limpiar todo</button>
         </div>
         <div style="padding:1rem 1.5rem 0;">
@@ -1079,13 +1123,6 @@
         </div>
         <div class="admin-search">
           <input type="text" id="admin-search" placeholder="Buscar en el catálogo..." oninput="renderList(true)"/>
-        </div>
-        <div class="sort-row">
-          <label>Ordenar</label>
-          <button class="sort-btn active" id="sort-btn-default" onclick="setSortMode('default')">Orden de subida</button>
-          <button class="sort-btn" id="sort-btn-views_desc" onclick="setSortMode('views_desc')">Más vistas</button>
-          <button class="sort-btn" id="sort-btn-views_asc" onclick="setSortMode('views_asc')">Menos vistas</button>
-          <button class="views-refresh-btn" id="views-refresh-btn" onclick="refreshViews(true)" title="Actualizar vistas">🔄 Vistas</button>
         </div>
         <div class="panel-body" style="padding-top:1rem;">
           <div class="movie-list" id="movie-list"></div>
@@ -1818,6 +1855,26 @@ function updateScreenshotCount() {
   if (el) el.textContent = '(' + count + ')';
 }
 
+/* --- Copiar URLs de capturas del último catálogo guardado --- */
+const LAST_SCREENSHOTS_KEY = 'noctis_last_screenshots';
+
+function saveLastScreenshots(value) {
+  if (!value || !value.trim()) return; // no pisar el recuerdo con un catálogo vacío
+  try { localStorage.setItem(LAST_SCREENSHOTS_KEY, value); } catch {}
+}
+
+function getLastScreenshots() {
+  try { return localStorage.getItem(LAST_SCREENSHOTS_KEY) || ''; } catch { return ''; }
+}
+
+function copyLastScreenshots() {
+  const last = getLastScreenshots();
+  if (!last) { showToast('Aún no hay URLs de capturas guardadas para copiar.', 'info'); return; }
+  document.getElementById('f-screenshot').value = last;
+  updateScreenshotCount();
+  showToast('✓ URLs de capturas copiadas del último catálogo guardado', 'success');
+}
+
 function clearForm() {
   ['f-title','f-datos-raw','f-desc','f-image','f-screenshot','f-trailer','f-links','f-descarga-raw','f-password'
   ].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
@@ -1881,6 +1938,8 @@ function submitForm() {
   }
   const ok = saveMovies(movies);
   if (!ok) return; // saveMovies mostró el error
+
+  saveLastScreenshots(data.screenshot);
 
   showToast(isEdit ? '✓ Actualizado' : '✓ Agregado — Total: ' + movies.length, 'success');
   clearForm();
@@ -2193,6 +2252,8 @@ function renderList(resetPage) {
 function goPage(p) {
   currentPage = p;
   renderList(false);
+  const header = document.getElementById('catalog-panel-header');
+  if (header) header.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function editMovie(idx) {
