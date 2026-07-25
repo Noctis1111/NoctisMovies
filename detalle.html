@@ -537,7 +537,7 @@
       pointer-events: none;
       z-index: 5;
       /* Degradado de 4 puntos mucho más suave: la portada principal debe verse casi completa */
-      background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.12) 33%, rgba(0,0,0,0.22) 66%, rgba(0,0,0,0.35) 100%);
+      background: linear-gradient(180deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.05) 33%, rgba(0,0,0,0.1) 66%, rgba(0,0,0,0.18) 100%);
       border-radius: 12px;
       transition: background 0.3s ease-in-out, transform 0.4s ease-in-out;
       transform: scale(1);
@@ -545,7 +545,7 @@
     .poster-wrap .m-badge img {
       width: 65%;
       height: auto;
-      opacity: 0.2;
+      opacity: 0.1;
       filter: drop-shadow(0 2px 10px rgba(0,0,0,0.7));
       transition: opacity 0.3s ease-in-out;
     }
@@ -689,6 +689,17 @@
     /* CAPTURAS + TRAILER row */
     .media-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 0 1.5rem 1.5rem; }
     @media (max-width: 600px) { .media-row { grid-template-columns: 1fr; } }
+
+    /* MODO MÚSICA: sin trailer, hasta 4 portadas por fila, separadas y centradas */
+    .media-row.music { grid-template-columns: 1fr; }
+    .capturas-grid { position: relative; width: 100%; overflow: hidden; }
+    .cap-pair { display: none; flex-wrap: wrap; justify-content: center; gap: 1rem; padding: 1rem; }
+    .cap-pair.active { display: flex; }
+    .capturas-grid .cap-cell { position: relative; width: calc(25% - 12px); max-width: 260px; aspect-ratio: 1/1; overflow: hidden; border-radius: 8px; background: var(--surface3); flex: 0 0 auto; }
+    .capturas-grid .cap-cell img { width: 100%; height: 100%; object-fit: cover; display: block; cursor: zoom-in; }
+    .capturas-grid.nsfw-hidden .cap-cell img { filter: blur(28px) saturate(0.4) brightness(0.6); transform: scale(1.15); }
+    .capturas-grid.nsfw-hidden .cap-cell { cursor: pointer; }
+    @media (max-width: 420px) { .cap-pair { gap: 0.6rem; padding: 0.75rem; } .capturas-grid .cap-cell { width: calc(25% - 7px); } }
     /* CAJA DE CAPTURAS (Media Box) - Estilo Marco Cinemático */
 /* CAJA DE CAPTURAS - Nivel Ultra Premium */
 .media-box { 
@@ -1386,17 +1397,17 @@
       </div>
 
       <!-- CAPTURAS + TRAILER -->
-      <div class="media-row">
+      <div class="media-row" id="media-row">
         <div class="media-box">
           <div class="media-box-title-row">
-            <div class="media-box-title">CAPTURAS</div>
+            <div class="media-box-title" id="capturas-title">CAPTURAS</div>
             <button class="btn-reveal-nsfw" id="btn-reveal-caps" onclick="toggleCapturasNSFW()">🔞 <span id="btn-reveal-caps-txt">Ver capturas</span></button>
           </div>
           <div id="capturas-container">
             <div class="capturas-placeholder">Sin capturas disponibles</div>
           </div>
         </div>
-        <div class="media-box">
+        <div class="media-box" id="trailer-box">
           <div class="media-box-title">TRAILER</div>
           <div class="trailer-wrap" id="trailer-container">
             <div class="trailer-placeholder">
@@ -1976,19 +1987,86 @@ async function init() {
 
   // Capturas: soporta múltiples URLs separadas por salto de línea
   const capContainer = document.getElementById('capturas-container');
+  const mediaRow = document.getElementById('media-row');
+  const trailerBox = document.getElementById('trailer-box');
+  const isMusic = isMusicContent(m);
+  if (mediaRow) mediaRow.classList.toggle('music', isMusic);
+  if (trailerBox) trailerBox.style.display = isMusic ? 'none' : '';
   const rawScreenshots = (m.screenshot || '').trim();
   // Solo URLs válidas de imagen
   const imageExts = /\.(jpg|jpeg|png|gif|webp|bmp|avif)(\?.*)?$/i;
   const screenshots = rawScreenshots
     .split(/[\n,]/)
     .map(s => s.trim())
-    .filter(s => s && /^https?:\/\//i.test(s) && imageExts.test(s));
+    .filter(s => s && /^https?:\/\//i.test(s));
   const isHentaiContent = /hentai|adult|erotico/.test((m.type || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
   const btnRevealCaps = document.getElementById('btn-reveal-caps');
+  const capturasTitle = document.getElementById('capturas-title');
+  if (capturasTitle) capturasTitle.textContent = isMusic ? 'ALBUMS' : 'CAPTURAS';
   nsfwScreenshots = screenshots.slice();
   if (screenshots.length === 0) {
-    capContainer.innerHTML = `<div class="capturas-placeholder">Sin capturas disponibles</div>`;
+    capContainer.innerHTML = `<div class="capturas-placeholder">Sin ${isMusic ? 'álbumes' : 'capturas'} disponibles</div>`;
     if (btnRevealCaps) btnRevealCaps.style.display = 'none';
+  } else if (isMusic) {
+    const pairs = [];
+    for (let i = 0; i < screenshots.length; i += 4) pairs.push(screenshots.slice(i, i + 4));
+    const pairsHtml = pairs.map((pair, pi) => {
+      const cells = pair.map((url, j) => {
+        const idx = pi * 4 + j;
+        return `<div class="cap-cell"><img src="${url}" alt="Álbum ${idx+1}" referrerpolicy="no-referrer" loading="lazy" data-src="${url}" onerror="handleCapturaError(this)" onclick="openNsfwLightbox(${idx})"/></div>`;
+      }).join('');
+      return `<div class="cap-pair${pi===0?' active':''}">${cells}</div>`;
+    }).join('');
+    const navBtns = pairs.length > 1 ? `
+      <button class="slider-btn prev" onclick="sliderPrev()">&#8249;</button>
+      <button class="slider-btn next" onclick="sliderNext()">&#8250;</button>` : '';
+    const dotsHtml = pairs.length > 1 ? `<div class="slider-dots">${
+      pairs.map((_, i) => `<span class="slider-dot ${i===0?'active':''}" onclick="sliderGo(${i})"></span>`).join('')
+    }</div>` : '';
+    capContainer.innerHTML = `<div class="capturas-grid${isHentaiContent ? ' nsfw-hidden' : ''}" id="capturas-slider">${pairsHtml}${navBtns}${dotsHtml}</div>`;
+    let sliderIdx = 0;
+    const sliderPairs = capContainer.querySelectorAll('.cap-pair');
+    const sliderDots = capContainer.querySelectorAll('.slider-dot');
+    function sliderShow(n) {
+      sliderPairs.forEach(p => p.classList.remove('active'));
+      sliderDots.forEach(d => d.classList.remove('active'));
+      sliderIdx = ((n % sliderPairs.length) + sliderPairs.length) % sliderPairs.length;
+      sliderPairs[sliderIdx].classList.add('active');
+      if (sliderDots[sliderIdx]) sliderDots[sliderIdx].classList.add('active');
+    }
+    window.sliderNext = () => sliderShow(sliderIdx + 1);
+    window.sliderPrev = () => sliderShow(sliderIdx - 1);
+    window.sliderGo = (n) => sliderShow(n);
+    if (pairs.length > 1) setInterval(() => sliderShow(sliderIdx + 1), 2100);
+    if (btnRevealCaps) {
+      btnRevealCaps.style.display = isHentaiContent ? 'inline-flex' : 'none';
+      btnRevealCaps.classList.remove('active');
+      const btnTxt = document.getElementById('btn-reveal-caps-txt');
+      if (btnTxt) btnTxt.textContent = 'Ver capturas';
+    }
+    if (isHentaiContent) {
+      const gridEl = document.getElementById('capturas-slider');
+      if (gridEl) {
+        gridEl.addEventListener('dblclick', (e) => {
+          if (gridEl.classList.contains('nsfw-hidden')) {
+            e.preventDefault();
+            toggleCapturasNSFW();
+          }
+        });
+        let lastTapTs = 0;
+        gridEl.addEventListener('touchend', (e) => {
+          if (!gridEl.classList.contains('nsfw-hidden')) return;
+          const now = Date.now();
+          if (now - lastTapTs < 350) {
+            e.preventDefault();
+            toggleCapturasNSFW();
+            lastTapTs = 0;
+          } else {
+            lastTapTs = now;
+          }
+        });
+      }
+    }
   } else if (screenshots.length >= 1) {
     const imgs = screenshots.map((url, i) =>
       `<img src="${url}" alt="Captura ${i+1}" class="${i===0?'active':''}" referrerpolicy="no-referrer" loading="lazy" data-src="${url}" onerror="handleCapturaError(this)" onclick="openNsfwLightbox(${i})"/>`
