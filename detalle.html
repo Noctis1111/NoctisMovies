@@ -402,6 +402,7 @@
   border: 1px solid rgba(255, 255, 255, 0.04) !important; 
   border-radius: 16px; 
   overflow: hidden; 
+  position: relative;
   
   /* 3. SOMBRAS FÍSICAMENTE PRECISAS Y REFLEJOS LÍQUIDOS:
      En lugar de una sola mancha negra, usamos varias sombras que se abren gradualmente. */
@@ -413,6 +414,45 @@
     0 24px 32px rgba(0, 0, 0, 0.6),            /* Sombra de profundidad */
     0 0 80px rgba(229, 188, 75, 0.05) !important; /* El sutil halo dorado cinematográfico */
 }
+
+/* =========================================
+   EFECTO "GOTAS DE AGUA" (SOLO PARA MÚSICA)
+   Ondas concéntricas finas que nacen en puntos
+   aleatorios del panel, se expanden y se van
+   afinando/desvaneciendo — timing y cantidad
+   siempre variables, nunca un patrón fijo.
+   Se activa/desactiva vía JS con .active en
+   #ripple-container, dentro de #detail-card.
+========================================= */
+#ripple-container {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ripple-ring {
+  position: absolute;
+  border-radius: 50%;
+  border-style: solid;
+  border-color: rgba(201,168,76,0.55);
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  animation-name: ripple-expand;
+  animation-timing-function: cubic-bezier(.25,.7,.4,1);
+  animation-fill-mode: forwards;
+}
+@keyframes ripple-expand {
+  0%   { width: 0;             height: 0;             border-width: 3px;   opacity: 0.55; }
+  100% { width: var(--rp-size); height: var(--rp-size); border-width: 0.4px; opacity: 0; }
+}
+/* El contenido real del panel debe quedar arriba de las ondas */
+.detail-title-bar, .detail-top, .media-row, #detail-card > *:not(#ripple-container) {
+  position: relative;
+  z-index: 1;
+}
+
 
 
 
@@ -1367,6 +1407,7 @@
     </div>
 
     <div class="detail-card" id="detail-card">
+      <div id="ripple-container"></div>
       <!-- TÍTULO -->
       <div class="detail-title-bar">
         <h1 id="d-title">Cargando...</h1>
@@ -1600,6 +1641,44 @@ const MUSIC_LOGO_B64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAGWCA
 function isMusicContent(m) {
   const t = (m.type || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   return t.includes('musica') || t.includes('music');
+}
+
+// ── Efecto "gotas de agua" (ondas concéntricas) para fichas de tipo Música ──
+let rippleTimer = null;
+function spawnRipple() {
+  const container = document.getElementById('ripple-container');
+  if (!container) return;
+  const el = document.createElement('div');
+  el.className = 'ripple-ring';
+  const w = container.clientWidth  || 800;
+  const h = container.clientHeight || 400;
+  const size = 140 + Math.random() * 420;       // diámetro final: 140–560px
+  const duration = (3.5 + Math.random() * 4.5).toFixed(2); // 3.5s–8s (quedan más tiempo en pantalla)
+  el.style.left = (Math.random() * w) + 'px';
+  el.style.top  = (Math.random() * h) + 'px';
+  el.style.setProperty('--rp-size', size + 'px');
+  el.style.animationDuration = duration + 's';
+  container.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
+function startRippleEffect() {
+  if (rippleTimer) return; // ya está corriendo
+  const loop = () => {
+    spawnRipple();
+    // Casi siempre nacen varias ondas casi juntas, para que el panel grande nunca se vea vacío
+    if (Math.random() < 0.85) setTimeout(spawnRipple, 80 + Math.random() * 180);
+    if (Math.random() < 0.55) setTimeout(spawnRipple, 200 + Math.random() * 250);
+    if (Math.random() < 0.3)  setTimeout(spawnRipple, 400 + Math.random() * 300);
+    const nextIn = 150 + Math.random() * 400; // ritmo variable, mucho más seguido
+    rippleTimer = setTimeout(loop, nextIn);
+  };
+  loop();
+}
+function stopRippleEffect() {
+  clearTimeout(rippleTimer);
+  rippleTimer = null;
+  const container = document.getElementById('ripple-container');
+  if (container) container.innerHTML = '';
 }
 
 // ===== CONTADOR DE VISTAS (CounterAPI — gratis, sin token) =====
@@ -1992,6 +2071,7 @@ async function init() {
   const trailerBox = document.getElementById('trailer-box');
   const isMusic = isMusicContent(m);
   if (mediaRow) mediaRow.classList.toggle('music', isMusic);
+  if (isMusic) startRippleEffect(); else stopRippleEffect();
   if (trailerBox) trailerBox.style.display = isMusic ? 'none' : '';
   const rawScreenshots = (m.screenshot || '').trim();
   // Solo URLs válidas de imagen
