@@ -973,11 +973,10 @@
                 <button type="button" class="chip" data-value="X265" style="border-color:#6e6e6e;color:#6e6e6e;">X265</button>
                 <button type="button" class="chip" data-value="WEB-DL" style="border-color:#0fb528;color:#0fb528;">WEB-DL</button>
                 <button type="button" class="chip" data-value="WEB-RIP" style="border-color:#ee4394;color:#ee4394;">WEB-RIP</button>
-                <button type="button" class="chip" data-value="PLACEBO" style="border-color:#6ac2eb;color:#6ac2eb;">PLACEBO</button>
+                <button type="button" class="chip" data-value="BLU-RAY" style="border-color:#6ac2eb;color:#6ac2eb;">BLU-RAY</button>
                 <button type="button" class="chip" data-value="HDRIP" style="border-color:#f8b800;color:#f8b800;">HDRip</button>
                 <button type="button" class="chip" data-value="HDTS" style="border-color:#3330ac;color:#3330ac;">HDTS</button>
                 <button type="button" class="chip" data-value="DCP-RIP" style="border-color:#b05a00;color:#b05a00;">DCP-RIP</button>
-                <button type="button" class="chip" data-value="BLU-RAY" style="border-color:#16a085;color:#16a085;">BLU-RAY</button>
               </div>
               <input type="hidden" id="f-source" value=""/>
               </div>
@@ -1536,7 +1535,7 @@ function autoRellenarTodo() {
   }
 
 
-  // FUENTE — Prioridad: X265 > REMUX > WEB-DL > WEB-RIP > PLACEBO > BDRIP > BRRIP > HDTS > HDRIP > DVDRIP > 60FPS
+  // FUENTE — Prioridad: X265 > REMUX > WEB-DL > WEB-RIP > BLU-RAY > BDRIP > BRRIP > HDTS > HDRIP > DVDRIP > 60FPS
   // Solo se detecta por el texto explícito del título/calidad (NO por el codec, ya que casi todo viene en H265 hoy en día)
   const combined = calUp + ' ' + tituloUp; // buscar en título y calidad, sin el codec
   if (combined.includes('X265') || combined.includes('X 265') || combined.includes('HEVC'))
@@ -1547,8 +1546,10 @@ function autoRellenarTodo() {
     setActiveChip('chips-source','WEB-DL');
   else if (combined.includes('WEBRIP')||combined.includes('WEB-RIP'))
     setActiveChip('chips-source','WEB-RIP');
+  else if (combined.includes('BLURAY')||combined.includes('BLU-RAY')||combined.includes('BLU RAY'))
+    setActiveChip('chips-source','BLU-RAY');
   else if (combined.includes('PLACEBO'))
-    setActiveChip('chips-source','PLACEBO');
+    setActiveChip('chips-source','BLU-RAY');
   else if (combined.includes('BDRIP'))
     setActiveChip('chips-source','BDRIP');
   else if (combined.includes('BRRIP'))
@@ -1787,7 +1788,7 @@ function autoRellenarDescarga() {
   }
 
   // ── Auto-seleccionar FUENTE / ENCODE ──
-  // Prioridad: X265 > REMUX > WEB-DL > WEB-RIP > PLACEBO > BDRIP > BRRIP > HDTS > HDRIP
+  // Prioridad: X265 > REMUX > WEB-DL > WEB-RIP > BLU-RAY > BDRIP > BRRIP > HDTS > HDRIP
   // Solo por texto explícito en calidad (NO por el codec, casi todo es H265 hoy en día)
   const calUp2  = (dp.calidad2  || '').toUpperCase();
   const combined2 = calUp2;
@@ -1799,8 +1800,10 @@ function autoRellenarDescarga() {
     setActiveChip('chips-source', 'WEB-DL');
   else if (combined2.includes('WEBRIP') || combined2.includes('WEB-RIP'))
     setActiveChip('chips-source', 'WEB-RIP');
+  else if (combined2.includes('BLURAY')||combined2.includes('BLU-RAY')||combined2.includes('BLU RAY'))
+    setActiveChip('chips-source', 'BLU-RAY');
   else if (combined2.includes('PLACEBO'))
-    setActiveChip('chips-source', 'PLACEBO');
+    setActiveChip('chips-source', 'BLU-RAY');
   else if (combined2.includes('BDRIP'))
     setActiveChip('chips-source', 'BDRIP');
   else if (combined2.includes('BRRIP'))
@@ -2152,11 +2155,10 @@ const SOURCE_COLORS = {
   'X265': '#6e6e6e',
   'WEB-DL': '#0fb528',
   'WEB-RIP': '#ee4394',
-  'PLACEBO': '#6ac2eb',
+  'BLU-RAY': '#6ac2eb',
   'HDRIP': '#f8b800',
   'HDTS': '#3330ac',
-  'DCP-RIP': '#b05a00',
-  'BLU-RAY': '#16a085'
+  'DCP-RIP': '#b05a00'
 };
 
 function renderList(resetPage) {
