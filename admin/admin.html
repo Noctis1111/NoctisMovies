@@ -488,11 +488,11 @@
   background: transparent;
   border: 1px solid var(--gold);
   color: var(--gold);
-  font-size: 0.58rem;
+  font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.2px;
-  padding: 2px 6px;
-  border-radius: 5px;
+  padding: 6px 17px;
+  border-radius: 6px;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
@@ -1225,7 +1225,7 @@ let editingIndex = -1;
 function parseBloqueCompleto(raw) {
   const r = {
     titulo:'', originalTitle:'', year:'', country:'', duration:'', genre:'', sinopsis:'',
-    infoDescarga:'', enlaces:'',
+    infoDescarga:'', enlaces:'', screenshots:'',
     audio2:'', calidad2:'', resolucion2:'', formato2:'MKV', size2:'', codec2:'H264', subtitles2:''
   };
   if (!raw || !raw.trim()) return r;
@@ -1242,6 +1242,7 @@ function parseBloqueCompleto(raw) {
   let idxDescarga = -1;
   let idxEnlaces  = -1;
   let camposOk    = false;
+  const screenshotsArr = [];
 
   for (let i = 0; i < lineas.length; i++) {
     const l = lineas[i];
@@ -1258,6 +1259,13 @@ function parseBloqueCompleto(raw) {
       if (idxDescarga < 0) idxDescarga = i; continue;
     }
     if (/^https?:\/\//i.test(l)) {
+      // URL que aparece ANTES de "MAS INFO" / los campos de descarga, ya con
+      // datos (Título Original/Año/...) iniciados → es una captura de
+      // pantalla (screenshot), no un enlace de descarga.
+      if (idxDescarga < 0 && camposOk) {
+        screenshotsArr.push(l);
+        continue;
+      }
       if (idxEnlaces < 0 && (camposOk || idxDescarga >= 0)) {
         // buscar línea de servidor antes (línea no-técnica inmediatamente anterior)
         let srv = i;
@@ -1282,6 +1290,7 @@ function parseBloqueCompleto(raw) {
       if (next && /^https?:\/\//i.test(next)) { idxEnlaces = i; }
     }
   }
+  r.screenshots = screenshotsArr.join('\n');
 
   // Límites
   const finDatos    = idxDescarga >= 0 ? idxDescarga : (idxEnlaces >= 0 ? idxEnlaces : lineas.length);
@@ -1314,6 +1323,8 @@ function parseBloqueCompleto(raw) {
       if (!titCapt) { r.titulo = l; titCapt = true; }
       continue;
     }
+    // URL de captura ya extraída arriba como screenshot: no debe ir a la sinopsis
+    if (/^https?:\/\//i.test(l)) continue;
     sinLines.push(l);
   }
   r.sinopsis = sinLines.join(' ').trim();
@@ -1443,6 +1454,11 @@ function autoRellenarTodo() {
   if (p.infoDescarga) document.getElementById('f-descarga-raw').value = p.infoDescarga;
   // Enlaces
   if (p.enlaces) document.getElementById('f-links').value = p.enlaces;
+  // URLs Capturas (detectadas entre la sinopsis y "MAS INFO")
+  if (p.screenshots) {
+    document.getElementById('f-screenshot').value = p.screenshots;
+    updateScreenshotCount();
+  }
 
   // Año filtro (primer año de 4 dígitos)
   if (p.year) {
