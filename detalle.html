@@ -1375,6 +1375,9 @@
     .title-tag { padding: 3px 10px; border-radius: 20px; border: 1px solid rgba(201,168,76,0.3); color: rgba(201,168,76,0.85); font-family: 'Barlow Condensed', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; line-height: 1.6; }
     .title-tag.tag-hentai { font-size: 0.95rem; padding: 5px 14px; border: 1px solid rgba(255,74,117,0.5); color: #ff4a75; background: rgba(255,74,117,0.08); }
     .title-tag.tag-type { font-family: 'Bebas Neue', sans-serif; font-size: 0.85rem; letter-spacing: 1.5px; padding: 4px 12px; border-radius: 6px; background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.45); color: var(--gold); }
+    /* Fecha de subida: misma fila que las demas etiquetas, pero pegada al
+       extremo derecho (margin-left:auto la empuja al otro lado de la fila) */
+    .title-tag.tag-date { margin-left: auto; border-style: dashed; color: #b8bfcc; font-weight: 700; font-size: 0.85rem; padding: 4px 12px; }
 
     /* NOT FOUND */
     .not-found { text-align: center; padding: 6rem 2rem; }
@@ -1891,9 +1894,27 @@ function renderDescargaRawHtml(raw) {
   const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
   const isHeading = l => /^m[aá]s\s*info$/i.test(l);
   const knownLabels = /^(audio|calidad|resoluci[oó]n|formato|tama[ñn]o|codec|subt[ií]tulos|duraci[oó]n)\s*:/i;
-  const specStart = lines.findIndex(l => knownLabels.test(l));
-  const contenidoLines = (specStart === -1 ? lines : lines.slice(0, specStart)).filter(l => !isHeading(l));
-  const specLines = (specStart === -1 ? [] : lines.slice(specStart)).filter(l => !isHeading(l));
+
+  // Si el bloque trae DOS encabezados "MAS INFO" (contenido adicional +
+  // specs técnicas), el segundo SIEMPRE marca el inicio de los datos
+  // técnicos reales, sin importar si "Tamaño:"/"Codec:" ya aparecieron
+  // antes como parte del contenido adicional (ej. tamaño por película
+  // de una colección). Con un solo encabezado, se usa el comportamiento
+  // de siempre (primera etiqueta técnica conocida).
+  const headingIdx = [];
+  lines.forEach((l, i) => { if (isHeading(l)) headingIdx.push(i); });
+
+  let contenidoLines, specLines;
+  if (headingIdx.length >= 2) {
+    const first = headingIdx[0];
+    const second = headingIdx[1];
+    contenidoLines = lines.slice(first + 1, second).filter(l => !isHeading(l));
+    specLines = lines.slice(second + 1).filter(l => !isHeading(l));
+  } else {
+    const specStart = lines.findIndex(l => knownLabels.test(l));
+    contenidoLines = (specStart === -1 ? lines : lines.slice(0, specStart)).filter(l => !isHeading(l));
+    specLines = (specStart === -1 ? [] : lines.slice(specStart)).filter(l => !isHeading(l));
+  }
 
   const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const sizeRe = /(\d+(?:[.,]\d+)?\s?(?:GB|MB|KB|TB))(?!.*\d+(?:[.,]\d+)?\s?(?:GB|MB|KB|TB))/i;
@@ -2277,6 +2298,17 @@ async function init() {
   }
   document.getElementById('d-title').textContent = m.title;
 
+  // Formatea "YYYY-MM" (guardado por admin.html) a algo legible, ej "Agosto 2026"
+  function formatUploadDate(ud) {
+    if (!ud) return '';
+    const parts = String(ud).split('-');
+    if (parts.length < 2) return '';
+    const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const y = parts[0], mNum = parseInt(parts[1], 10);
+    if (!y || !mNum || mNum < 1 || mNum > 12) return '';
+    return meses[mNum - 1] + ' ' + y;
+  }
+
   // Tags del título — solo campos del filtrado admin
   const tagsEl = document.getElementById('title-tags');
   // Tipo: Película / Serie / Anime… (camuflado si es contenido adulto) — va justo después del año
@@ -2298,7 +2330,10 @@ async function init() {
   if (m.genre) m.genre.split(',').slice(0,3).forEach(g => { const t = g.trim(); if(t) tags.push(t.toUpperCase()); });
   // Año destacado al inicio, luego Tipo/+18, luego el resto
   const yearHtml = m.year ? `<span class="title-year">${m.year}</span>` : '';
-  tagsEl.innerHTML = yearHtml + typeHtml + tags.map(t => `<span class="title-tag">${t}</span>`).join('');
+  // Fecha de subida (si el titulo la tiene) — al fondo, extremo derecho de la fila
+  const uploadLabel = formatUploadDate(m.uploadDate);
+  const dateHtml = uploadLabel ? `<span class="title-tag tag-date">${uploadLabel}</span>` : '';
+  tagsEl.innerHTML = yearHtml + typeHtml + tags.map(t => `<span class="title-tag">${t}</span>`).join('') + dateHtml;
 
   // Poster
   const posterEl = document.getElementById('d-poster');
