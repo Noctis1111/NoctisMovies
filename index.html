@@ -763,6 +763,9 @@ header::after {
     .card-overlay { display: none; }
     .card-title { margin-top: 0.5rem; font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 500; letter-spacing: 0.5px; color: #fff; line-height: 1.35; word-break: break-word; transition: text-shadow 0.25s, transform 0.25s; display: inline-block; }
     .movie-card:hover .card-title { text-shadow: 0 0 8px rgba(255,255,255,0.9), 0 0 18px rgba(255,255,255,0.55), 0 0 32px rgba(201,168,76,0.4); transform: scale(1.03); }
+    /* Fecha de subida: misma altura/linea que el titulo, pegada al lado
+       derecho de la tarjeta (no continua el flujo del titulo, va aparte) */
+    .card-date { display: block; text-align: right; margin-top: 0.2rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.79rem; font-weight: 700; letter-spacing: 0.5px; color: #9aa2b1; }
 
     /* ── Camuflaje activo: efecto Adult/Hentai solo en hover ── */
     /* El blur necesita recorte propio (si no, "sangra" fuera del marco); estas tarjetas no usan el efecto pop-out */
@@ -1346,6 +1349,7 @@ function renderGrid() {
     const isH = isAdultContent(m);
     const isE = isEroticContent(m);
     const isM = isMusicContent(m);
+    const dateLabel = formatUploadDate(m.uploadDate);
     return `
     <a class="movie-card${isH ? ' card-h' : ''}${isE ? ' card-e' : ''}${isM ? ' card-m' : ''}" href="detalle.html?id=${m.slug || realIdx}" style="animation-delay:${(i % 20) * 40}ms">
       <div class="card-poster">
@@ -1354,11 +1358,23 @@ function renderGrid() {
         ${isM ? `<span class="m-badge"><img src="${MUSIC_LOGO_B64}" alt="Música"/></span>` : ''}
       </div>
       <div class="card-title">${m.title}</div>
+      ${dateLabel ? `<div class="card-date">${dateLabel}</div>` : ''}
     </a>`;
   }).join('');
 
   // Renderizar paginación
   renderPagination(totalPages, filtered.length);
+}
+
+// Formatea "YYYY-MM" (guardado por admin.html) a algo legible, ej "Agosto 2026"
+function formatUploadDate(ud) {
+  if (!ud) return '';
+  const parts = String(ud).split('-');
+  if (parts.length < 2) return '';
+  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const y = parts[0], mNum = parseInt(parts[1], 10);
+  if (!y || !mNum || mNum < 1 || mNum > 12) return '';
+  return meses[mNum - 1] + ' ' + y;
 }
 
 function isAdultContent(m) {
@@ -1700,7 +1716,7 @@ loadMovies();
 
   // AJUSTE MANUAL: cuantos pixeles mover el boton hacia la derecha.
   // Sube este numero para moverlo mas a la derecha (mas cerca del borde).
-  var extraRight = -15;
+  var extraRight = 20;
 
   function update() {
     var scrollY = window.scrollY || window.pageYOffset || 0;
