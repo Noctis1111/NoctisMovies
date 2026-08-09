@@ -895,6 +895,13 @@
     .dc-track-num { color: var(--gold); font-weight: 600; min-width: 1.8em; text-align: right; flex: 0 0 auto; }
     .dc-track-title { color: var(--white); flex: 1 1 auto; text-align: left; }
     .dc-track-dur { color: var(--muted); flex: 0 0 auto; font-variant-numeric: tabular-nums; }
+    /* Encabezado de cada CD dentro de una coleccion (ej. "CD 06 — 511.28 MiB"):
+       se separa un poco del CD anterior y resalta mas que su linea de detalle */
+    .dc-cdhead { font-size: 0.95rem; font-weight: 700; color: var(--white); text-align: center; margin: 0.7rem 0 0; }
+    .dc-cdhead:first-of-type { margin-top: 0.5rem; }
+    /* Linea de detalle del CD (ej. "15 pistas + Artwork/Scans"): mas chica,
+       mas tenue y sin viñeta, para que se lea como un sub-dato del CD de arriba */
+    .dc-cdmeta { font-size: 0.8rem; color: var(--muted); opacity: 0.75; text-align: center; margin-top: 0.05rem; }
 
     /* Botones de descarga - Estilo Gold Premium */
 /* --- NOCTIS MOVIES - UI PREMIUM COMPLETO --- */
@@ -1938,18 +1945,28 @@ function renderDescargaRawHtml(raw) {
   }
 
   const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const sizeRe = /(\d+(?:[.,]\d+)?\s?(?:GB|MB|KB|TB))(?!.*\d+(?:[.,]\d+)?\s?(?:GB|MB|KB|TB))/i;
+  const sizeRe = /(\d[\d.,]*\s?(?:GiB|MiB|KiB|TiB|GB|MB|KB|TB))(?!.*\d[\d.,]*\s?(?:GiB|MiB|KiB|TiB|GB|MB|KB|TB))/i;
   const trackRe = /^(\d{1,3})\.\s*(.+?)\s*\(\s*(\d{1,3}:\s*\d{1,2})\s*\)\s*$/;
   const bulletRe = /^[•◽▪●\-]\s*/;
+  // Encabezado de un CD dentro de una coleccion: "CD 06 — 511.28 MiB", "CD BALLADS — 542.63 MiB"
+  const cdHeadRe = /^CD\s+\S.*$/i;
 
   let contenidoHtml = '';
   if (contenidoLines.length) {
-    contenidoHtml = '<div class="descarga-contenido"><div class="mas-info-head head-dim">MAS INFO</div>' + contenidoLines.map(line => {
-      if (/^contenido$/i.test(line)) return `<div class="dc-subhead">${esc(line)}</div>`;
+    const parts = [];
+    let afterCdHead = false;
+    contenidoLines.forEach(line => {
+      if (/^contenido$/i.test(line)) {
+        parts.push(`<div class="dc-subhead">${esc(line)}</div>`);
+        afterCdHead = false;
+        return;
+      }
       const trackMatch = line.match(trackRe);
       if (trackMatch) {
         const [, num, title, dur] = trackMatch;
-        return `<div class="dc-track"><span class="dc-track-num">${esc(num)}.</span><span class="dc-track-title">${esc(title)}</span><span class="dc-track-dur">${esc(dur.replace(/\s+/g, ''))}</span></div>`;
+        parts.push(`<div class="dc-track"><span class="dc-track-num">${esc(num)}.</span><span class="dc-track-title">${esc(title)}</span><span class="dc-track-dur">${esc(dur.replace(/\s+/g, ''))}</span></div>`);
+        afterCdHead = false;
+        return;
       }
       const hasBullet = bulletRe.test(line);
       const text = line.replace(bulletRe, '');
@@ -1959,8 +1976,21 @@ function renderDescargaRawHtml(raw) {
         const idx = text.lastIndexOf(sizeMatch[1]);
         html = `${esc(text.slice(0, idx))}<strong class="dc-size">${esc(sizeMatch[1])}</strong>${esc(text.slice(idx + sizeMatch[1].length))}`;
       }
-      return `<div class="dc-item${hasBullet ? ' dc-bulleted' : ''}">${html}</div>`;
-    }).join('') + '</div>';
+      // "CD 06 — 511.28 MiB": encabezado propio de CD, sin viñeta, resaltado
+      if (!hasBullet && cdHeadRe.test(text)) {
+        parts.push(`<div class="dc-cdhead">${html}</div>`);
+        afterCdHead = true;
+        return;
+      }
+      // Linea que sigue justo debajo de un encabezado de CD (ej. "15 pistas + Artwork/Scans")
+      if (!hasBullet && afterCdHead) {
+        parts.push(`<div class="dc-cdmeta">${html}</div>`);
+        return;
+      }
+      afterCdHead = false;
+      parts.push(`<div class="dc-item${hasBullet ? ' dc-bulleted' : ''}">${html}</div>`);
+    });
+    contenidoHtml = '<div class="descarga-contenido"><div class="mas-info-head head-dim">MAS INFO</div>' + parts.join('') + '</div>';
   }
 
   let specHtml = '';
