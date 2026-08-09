@@ -1215,12 +1215,13 @@ function saveMovies(arr) {
 
 let editingIndex = -1;
 
-// Fecha de subida automática (mes/año), tomada del reloj del equipo.
-// Formato: "YYYY-MM" — fácil de ordenar/filtrar y de formatear en index/detalle.
+// Fecha de subida automática (día/mes/año), tomada del reloj del equipo.
+// Formato: "YYYY-MM-DD" — fácil de ordenar/filtrar y de formatear en index/detalle.
 function currentUploadDate() {
   const d = new Date();
   const mm = String(d.getMonth() + 1).padStart(2, '0');
-  return d.getFullYear() + '-' + mm;
+  const dd = String(d.getDate()).padStart(2, '0');
+  return d.getFullYear() + '-' + mm + '-' + dd;
 }
 
 /* ======================== PARSE BLOQUE COMPLETO ======================== */
