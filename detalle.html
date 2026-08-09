@@ -1294,6 +1294,27 @@
     .related-card:hover .related-info-title { text-shadow: 0 0 8px rgba(255,255,255,0.9), 0 0 18px rgba(255,255,255,0.55), 0 0 32px rgba(201,168,76,0.4); transform: scale(1.03); }
     .related-info-meta { display: none; }
     .related-year { display: none; }
+    /* Fecha de subida: ARRIBA de la portada, igual que en index.html */
+    .related-date { display: block; text-align: right; margin-bottom: 0.05rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.4px; color: #9aa2b1; }
+    /* Marco abierto (arriba + lados, sin cerrar abajo) que agrupa
+       visualmente la fecha con SU portada, igual que en index.html */
+    .related-frame {
+      position: relative;
+      padding: 3px 6px 0;
+    }
+    .related-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border: 1px solid rgba(201,168,76,0.75);
+      border-bottom: none;
+      border-radius: 10px 10px 0 0;
+      -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 15%, transparent 60%);
+              mask-image: linear-gradient(to bottom, #000 0%, #000 15%, transparent 60%);
+    }
+    .related-frame.no-date { padding: 0; }
+    .related-frame.no-date::before { display: none; }
 
     /* BANNER VIP */
     .banner-vip {
@@ -1957,6 +1978,20 @@ function renderDescargaRawHtml(raw) {
   return contenidoHtml + specHtml || '<div class="descarga-fila">Sin información disponible.</div>';
 }
 
+// Formatea "YYYY-MM-DD" (guardado por admin.html) a algo legible, ej "08 Agosto 2026".
+// Compatible con registros viejos guardados solo como "YYYY-MM" (sin día).
+// Global (no anidada) para poder usarse tanto en el detalle principal como en "MÁS TÍTULOS".
+function formatUploadDate(ud) {
+  if (!ud) return '';
+  const parts = String(ud).split('-');
+  if (parts.length < 2) return '';
+  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const y = parts[0], mNum = parseInt(parts[1], 10);
+  if (!y || !mNum || mNum < 1 || mNum > 12) return '';
+  const dd = parts[2] ? String(parseInt(parts[2], 10)).padStart(2, '0') : '';
+  return (dd ? dd + ' ' : '') + meses[mNum - 1] + ' ' + y;
+}
+
 function isMusicContent(m) {
   const t = (m.type || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   return t.includes('musica') || t.includes('music');
@@ -2237,12 +2272,16 @@ function renderRelated(movies, currentIdx) {
     const isH = /hentai|adult|erotico/.test(typeNorm);
     const isE = /erotico/.test(typeNorm);
     const isM = isMusicContent(m);
+    const dateLabel = formatUploadDate(m.uploadDate);
     return `
     <a class="related-card${isH ? ' card-h' : ''}${isE ? ' card-e' : ''}${isM ? ' card-m' : ''}" href="detalle.html?id=${movies[ri].slug || ri}">
-      <div class="related-poster">
-        ${isH ? '<span class="h-ribbon">+18</span><span class="h-hint">CONTENIDO EXPLÍCITO</span>' : ''}
-        <img src="${m.image || ''}" alt="${m.title}" onerror="this.src='${fallback}'"/>
+      <div class="related-frame${dateLabel ? '' : ' no-date'}">
+        ${dateLabel ? `<div class="related-date">${dateLabel}</div>` : ''}
+        <div class="related-poster">
+          ${isH ? '<span class="h-ribbon">+18</span><span class="h-hint">CONTENIDO EXPLÍCITO</span>' : ''}
+          <img src="${m.image || ''}" alt="${m.title}" onerror="this.src='${fallback}'"/>
         ${isM ? `<span class="m-badge"><img src="${MUSIC_LOGO_B64}" alt="Música"/></span>` : ''}
+      </div>
       </div>
       <div class="related-info">
         <div class="related-info-title">${m.title}</div>
@@ -2297,17 +2336,6 @@ async function init() {
     });
   }
   document.getElementById('d-title').textContent = m.title;
-
-  // Formatea "YYYY-MM" (guardado por admin.html) a algo legible, ej "Agosto 2026"
-  function formatUploadDate(ud) {
-    if (!ud) return '';
-    const parts = String(ud).split('-');
-    if (parts.length < 2) return '';
-    const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-    const y = parts[0], mNum = parseInt(parts[1], 10);
-    if (!y || !mNum || mNum < 1 || mNum > 12) return '';
-    return meses[mNum - 1] + ' ' + y;
-  }
 
   // Tags del título — solo campos del filtrado admin
   const tagsEl = document.getElementById('title-tags');
