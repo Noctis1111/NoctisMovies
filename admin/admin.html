@@ -911,6 +911,7 @@
               <input type="hidden" id="f-country"/>
               <input type="hidden" id="f-duration"/>
               <input type="hidden" id="f-genre"/>
+              <input type="hidden" id="f-artist"/>
 
               <div class="form-section">🎛 Filtrado</div>
 
@@ -1233,14 +1234,14 @@ function currentUploadDate() {
 */
 function parseBloqueCompleto(raw) {
   const r = {
-    titulo:'', originalTitle:'', year:'', country:'', duration:'', genre:'', sinopsis:'',
+    titulo:'', originalTitle:'', year:'', country:'', duration:'', genre:'', artista:'', sinopsis:'',
     infoDescarga:'', enlaces:'', screenshots:'',
     audio2:'', calidad2:'', resolucion2:'', formato2:'MKV', size2:'', codec2:'H264', subtitles2:''
   };
   if (!raw || !raw.trim()) return r;
   const lineas = raw.split('\n').map(l => l.trim());
 
-  const camposDatos    = ['título original','titulo original','año','ano','país','pais','country','pais(es)','país(es)','duración','duracion','género','genero','genre'];
+  const camposDatos    = ['título original','titulo original','año','ano','país','pais','country','pais(es)','país(es)','duración','duracion','género','genero','genre','artista','artist'];
   const camposDescarga = ['audio','calidad','resolución','resolucion','formato','tamaño','tamano','codec','códec','subtítulos','subtitulos','subtítulo','subtitulo'];
   const reMasInfo   = /^mas\s*info\s*$/i;
   const reTemporada = /^temporada\s*\d+\s*[\|│]\s*[\d.,]+\s*(gb|mb)/i;
@@ -1325,6 +1326,7 @@ function parseBloqueCompleto(raw) {
       else if (key.includes('país') || key.includes('pais') || key === 'country') r.country = val;
       else if (key.includes('duración') || key.includes('duracion')) r.duration = val;
       else if (key.includes('género') || key.includes('genero') || key === 'genre') r.genre = val;
+      else if (key.includes('artista') || key === 'artist') r.artista = val;
       continue;
     }
     if (!camposIniciados) {
@@ -1854,6 +1856,7 @@ function getFormData() {
     year:          parsed.year,
     type:          document.getElementById('f-type').value,
     country:       parsed.country,
+    artista:       parsed.artista,
     duration:      parsed.duration,
     genre:         parsed.genre,
     quality:       document.getElementById('f-quality').value,
@@ -2297,6 +2300,7 @@ function editMovie(idx) {
   // Rebuild datos-raw (datos + sinopsis juntos)
   const datosLines = [];
   if (m.originalTitle) datosLines.push('Título Original: ' + m.originalTitle);
+  if (m.artista) datosLines.push('Artista: ' + m.artista);
   if (m.year) datosLines.push('Año: ' + m.year);
   if (m.country) datosLines.push('País(es): ' + m.country);
   if (m.duration) datosLines.push('Duración: ' + m.duration);
