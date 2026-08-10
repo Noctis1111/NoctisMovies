@@ -1482,7 +1482,7 @@
             <div class="section-box-title">DATOS</div>
             <div class="dato-row"><span class="dato-label">Título:</span><span class="dato-value" id="d-original-title">—</span></div>
             <div class="dato-row"><span class="dato-label">Año:</span><span class="dato-value" id="d-year">—</span></div>
-            <div class="dato-row"><span class="dato-label">País(es):</span><span class="dato-value" id="d-country">—</span></div>
+            <div class="dato-row"><span class="dato-label" id="d-country-label">País(es):</span><span class="dato-value" id="d-country">—</span></div>
             <div class="dato-row"><span class="dato-label">Duración:</span><span class="dato-value" id="d-duration">—</span></div>
             <div class="dato-row"><span class="dato-label">Género:</span><span class="dato-value" id="d-genre">—</span></div>
           </div>
@@ -2451,7 +2451,13 @@ async function init() {
   // Datos
   document.getElementById('d-original-title').textContent = m.originalTitle || m.title;
   document.getElementById('d-year').textContent = m.year || '—';
-  document.getElementById('d-country').textContent = m.country || '—';
+  if (m.artista) {
+    document.getElementById('d-country-label').textContent = 'Artista:';
+    document.getElementById('d-country').textContent = m.artista;
+  } else {
+    document.getElementById('d-country-label').textContent = 'País(es):';
+    document.getElementById('d-country').textContent = m.country || '—';
+  }
   document.getElementById('d-duration').textContent = m.duration || '—';
   document.getElementById('d-genre').textContent = m.genre || '—';
 
