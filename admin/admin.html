@@ -1424,11 +1424,20 @@ function currentUploadDate() {
 function parseBloqueCompleto(raw) {
   const r = {
     titulo:'', originalTitle:'', year:'', country:'', duration:'', genre:'', artista:'', sinopsis:'',
-    infoDescarga:'', enlaces:'', screenshots:'',
+    infoDescarga:'', enlaces:'', screenshots:'', trailer:'',
     audio2:'', calidad2:'', resolucion2:'', formato2:'MKV', size2:'', codec2:'H264', subtitles2:''
   };
   if (!raw || !raw.trim()) return r;
-  const lineas = raw.split('\n').map(l => l.trim());
+
+  // ── Trailer de YouTube: puede venir en CUALQUIER lugar del bloque pegado
+  // (antes del título, entre las capturas, al final, etc.) — se saca primero
+  // para que no se cuele como captura o como enlace de descarga.
+  const reYoutube = /^https?:\/\/(?:www\.)?(?:youtu\.be\/|(?:m\.)?youtube\.com\/(?:watch\?v=|embed\/|shorts\/))\S+$/i;
+  const lineas = [];
+  for (const l0 of raw.split('\n').map(l => l.trim())) {
+    if (!r.trailer && reYoutube.test(l0)) { r.trailer = l0; continue; }
+    lineas.push(l0);
+  }
 
   const camposDatos    = ['título original','titulo original','año','ano','país','pais','country','pais(es)','país(es)','duración','duracion','género','genero','genre','artista','artist'];
   const camposDescarga = ['audio','calidad','resolución','resolucion','formato','tamaño','tamano','codec','códec','subtítulos','subtitulos','subtítulo','subtitulo'];
@@ -1659,6 +1668,8 @@ function autoRellenarTodo() {
     document.getElementById('f-screenshot').value = p.screenshots;
     updateScreenshotCount();
   }
+  // Trailer YouTube (detectado en cualquier posición del bloque pegado)
+  if (p.trailer) document.getElementById('f-trailer').value = p.trailer;
 
   // Año filtro (primer año de 4 dígitos)
   if (p.year) {
