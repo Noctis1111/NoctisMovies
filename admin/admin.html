@@ -360,7 +360,7 @@
 
 /* 2. CABECERA DEL PANEL: Bloque sólido tipo "pestaña" metálica */
 .panel-header { 
-  padding: 0.85rem 1.25rem !important; 
+  padding: 0.55rem 1.25rem !important; 
   background: #131826 !important; /* Más claro y robusto para dar un corte visual inmediato */
   
   /* Línea dorada más viva y nítida */
@@ -405,7 +405,7 @@
 
 /* 4. CUERPO DEL PANEL: Fondo oscuro limpio para albergar tus inputs */
 .panel-body { 
-  padding: 1.1rem 1.25rem !important; 
+  padding: 0.65rem 1.25rem !important; 
   background: rgba(0, 0, 0, 0.12) !important; /* Le da una ligera profundidad al interior */
 }
 
@@ -420,7 +420,7 @@
 
 /* 1. ESPACIADO DEL FORMULARIO: Vuelve a tu 0.6rem original */
 .form-group { 
-  margin-bottom: 0.6rem !important; 
+  margin-bottom: 0.45rem !important; 
 }
 
 /* 2. ETIQUETAS (LABELS): Vuelve a tu tamaño 0.72rem y margen 0.35rem */
@@ -475,7 +475,7 @@
 
 /* Cajas de Info descarga / Enlaces públicos */
 #f-descarga-raw, #f-links {
-  min-height: 175px !important;
+  min-height: 165px !important;
 }
 
 /* URLs Capturas (screenshots) */
@@ -649,7 +649,7 @@
               0 0 25px rgba(16, 185, 129, 0.4) !important; 
 }
     /* SECTION DIVIDER */
-    .form-section { font-family: 'Bebas Neue', sans-serif; font-size: 0.95rem; letter-spacing: 2px; color: var(--gold); margin: 0.75rem 0 0.5rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); }
+    .form-section { font-family: 'Bebas Neue', sans-serif; font-size: 0.95rem; letter-spacing: 2px; color: var(--gold); margin: 0.4rem 0 0.35rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); }
     .chip-group { display: flex; flex-wrap: wrap; gap: 0.35rem; }
     .chip-group-vertical { flex-direction: column; gap: 0.4rem; }
     .chip { background: #0a0c12; border: 1px solid var(--border); color: var(--muted); padding: 0.4rem 0.85rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.18s; letter-spacing: 0.5px; }
@@ -675,6 +675,22 @@
     .chip.chip-master32.chip-active .chip-aft-sub { color: #4a3f1a; }
     /* Fuente/Encode → misma altura más generosa que Formato de Audio */
     #chips-source.chip-group .chip { padding: 0.62rem 0.9rem; white-space: nowrap; }
+    /* Calidad / Audio / HDR → una sola fila (van en columnas de 1/3, por eso los chips son más chicos que en Fuente/Encode) */
+    #chips-quality.chip-group, #chips-audio.chip-group, #chips-hdr.chip-group {
+      flex-wrap: nowrap;
+      gap: 0.22rem;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 3px;
+      scrollbar-width: thin;
+    }
+    #chips-quality.chip-group .chip, #chips-audio.chip-group .chip, #chips-hdr.chip-group .chip {
+      padding: 0.34rem 0.42rem;
+      font-size: 0.66rem;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
     /* Chips de Tipo → cada uno con su color definido por --chip-c */
     .chip-type { text-align: left; border-radius: 8px; padding: 0.5rem 0.75rem; }
     .chip-type:hover { border-color: var(--chip-c); color: var(--chip-c); background: rgba(255,255,255,0.04); }
@@ -718,6 +734,9 @@
     .movie-item { display: flex; align-items: center; gap: 1rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem 1rem; transition: border-color 0.2s; }
     .movie-item:hover { border-color: rgba(201,168,76,0.2); }
     .movie-item-poster { width: 90px; height: 52px; object-fit: cover; border-radius: 6px; flex-shrink: 0; background: var(--surface3); aspect-ratio: 1280/740; }
+    .movie-item-poster-wrap { position: relative; width: 90px; height: 52px; flex-shrink: 0; }
+    .movie-item-poster-wrap .movie-item-poster { width: 100%; height: 100%; }
+    .movie-item-badge-overlay { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 6px; pointer-events: none; }
     .movie-item-info { flex: 1; min-width: 0; }
     .movie-item-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.12rem; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
     .movie-item-meta { font-size: 0.9rem; color: var(--muted); display: flex; gap: 0.5rem; margin-top: 0.2rem; flex-wrap: wrap; }
@@ -806,6 +825,7 @@
       .admin-main { padding: 0.5rem; }
       .stat-num { font-size: 1.4rem; }
       .movie-item-poster { width: 38px; height: 54px; }
+      .movie-item-poster-wrap { width: 38px; height: 54px; }
       .item-btn { width: 32px; height: 32px; }
       .item-btn svg { width: 15px; height: 15px; }
     }
@@ -817,6 +837,13 @@
     .page-btn.active { background: var(--gold); border-color: var(--gold); color: #000; }
     .page-btn:disabled { opacity: 0.25; cursor: default; }
     .page-info { font-size: 0.82rem; color: var(--muted); letter-spacing: 0.5px; white-space: nowrap; }
+    /* Cuando hay cinta de fuente activa, la foto se recorta al hueco real
+       del marco (valores calibrados a mano con la herramienta de prueba) */
+    #img-preview.has-frame {
+      top: 9.9% !important; left: 6.8% !important;
+      width: calc(100% - 6.8% - 1.3%) !important; height: calc(100% - 9.9% - 1.4%) !important;
+      right: auto !important; bottom: auto !important;
+    }
   </style>
 </head>
 <body>
@@ -866,7 +893,7 @@
         <div class="panel-body">
 
           <!-- ══ 2 COLUMNAS: Info básica+Filtrado | Imágenes ══ -->
-          <div style="display:grid;grid-template-columns:1fr 230px;gap:1rem;align-items:start;margin-bottom:0.75rem;">
+          <div style="display:grid;grid-template-columns:1fr 230px;gap:1rem;align-items:start;margin-bottom:0.4rem;">
 
             <!-- COLUMNA IZQUIERDA: Título / Datos+Sinopsis / Tipo / Año + FILTRADO -->
             <div>
@@ -879,7 +906,7 @@
               </div>
 
               <!-- Datos+Sinopsis | Tipo | Año -->
-              <div style="display:grid;grid-template-columns:1fr auto auto;gap:0.75rem;margin-bottom:0.75rem;align-items:stretch;">
+              <div style="display:grid;grid-template-columns:1fr auto auto;gap:0.75rem;margin-bottom:0.4rem;align-items:stretch;">
                 <div class="form-group" style="margin-bottom:0;display:flex;flex-direction:column;">
                   <label>📋 Pega todo el bloque aquí <span style="color:var(--gold);font-size:0.68rem;font-weight:600;letter-spacing:0;">← TODO junto</span></label>
                   <textarea id="f-datos-raw" class="textarea-links" style="flex:1;min-height:105px;font-size:0.92rem;border-color:rgba(201,168,76,0.3);resize:none;" placeholder="Pega aquí todo el bloque completo:&#10;• Título&#10;• URL&#10;• Título Original / Año / País / Duración / Género&#10;• Sinopsis&#10;• MAS INFO + tamaños temporadas&#10;• Audio / Calidad / Resolución...&#10;• Enlaces&#10;&#10;¡Se separa todo automáticamente!" oninput="autoRellenarTodo()" onpaste="setTimeout(autoRellenarTodo,80)"></textarea>
@@ -915,7 +942,7 @@
 
               <div class="form-section">🎛 Filtrado</div>
 
-              <div class="form-row">
+              <div class="form-row" style="grid-template-columns:1fr 1fr 1fr !important;">
               <div class="form-group">
               <label>Calidad</label>
               <div class="chip-group" id="chips-quality">
@@ -939,6 +966,18 @@
                 <button type="button" class="chip" data-value="Chino">Chino</button>
               </div>
               <input type="hidden" id="f-audio" value="Latino"/>
+              </div>
+
+              <div class="form-group">
+              <label>HDR</label>
+              <div class="chip-group" id="chips-hdr">
+                <button type="button" class="chip" data-value="sdr">SDR</button>
+                <button type="button" class="chip" data-value="hdr10">HDR10</button>
+                <button type="button" class="chip" data-value="hdr10-plus">HDR10+</button>
+                <button type="button" class="chip" data-value="hdr10-dv">HDR10 DV</button>
+                <button type="button" class="chip" data-value="hdr10-plus-dv">HDR10+ DV</button>
+              </div>
+              <input type="hidden" id="f-hdr" value=""/>
               </div>
               </div>
 
@@ -982,6 +1021,28 @@
               <input type="hidden" id="f-source" value=""/>
               </div>
 
+              <div class="form-group">
+              <label>📺 Streaming</label>
+              <div class="chip-group" id="chips-streaming" style="flex-wrap:wrap;gap:0.35rem;">
+                <button type="button" class="chip" data-value="crunchyroll" style="border-color:#f47521;color:#f47521;">Crunchyroll</button>
+                <button type="button" class="chip" data-value="disney-plus" style="border-color:#113ccf;color:#113ccf;">Disney+</button>
+                <button type="button" class="chip" data-value="flow" style="border-color:#d0021b;color:#d0021b;">Flow</button>
+                <button type="button" class="chip" data-value="hbo-max-old" style="border-color:#9b0ec4;color:#9b0ec4;">HBO Max (antiguo)</button>
+                <button type="button" class="chip" data-value="hbo-max-new" style="border-color:#1e3a8a;color:#1e3a8a;">HBO Max (nuevo)</button>
+                <button type="button" class="chip" data-value="itunes" style="border-color:#fb5bc5;color:#fb5bc5;">iTunes</button>
+                <button type="button" class="chip" data-value="max" style="border-color:#7c3aed;color:#7c3aed;">Max</button>
+                <button type="button" class="chip" data-value="mubi" style="border-color:#009688;color:#009688;">MUBI</button>
+                <button type="button" class="chip" data-value="netflix" style="border-color:#e50914;color:#e50914;">Netflix</button>
+                <button type="button" class="chip" data-value="paramount-plus" style="border-color:#0064ff;color:#0064ff;">Paramount+</button>
+                <button type="button" class="chip" data-value="peacock" style="border-color:#6c2eb9;color:#6c2eb9;">Peacock</button>
+                <button type="button" class="chip" data-value="prime-video" style="border-color:#00a8e1;color:#00a8e1;">Prime Video</button>
+                <button type="button" class="chip" data-value="star-plus" style="border-color:#ffb400;color:#ffb400;">Star+</button>
+                <button type="button" class="chip" data-value="apple-tv-plus" style="border-color:#a8a8a8;color:#a8a8a8;">Apple TV+</button>
+                <button type="button" class="chip" data-value="vix" style="border-color:#00e6b8;color:#00e6b8;">ViX</button>
+              </div>
+              <input type="hidden" id="f-streaming" value=""/>
+              </div>
+
             </div>
 
             <!-- COLUMNA DERECHA: IMÁGENES Y MEDIOS -->
@@ -997,15 +1058,26 @@
                     <div style="font-size:0.64rem;color:var(--muted);margin-top:0.1rem;">WEBP · JPG · PNG</div>
                   </div>
                 </div>
-                <div id="poster-preview-wrap" style="display:none;position:relative;width:100%;aspect-ratio:1280/740;">
-                  <img id="img-preview" src="" alt="Preview" style="width:100%;height:100%;object-fit:cover;border-radius:10px;border:1px solid var(--border);display:block;"/>
-                  <button onclick="clearPoster()" title="Quitar imagen" style="position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.7);border:1px solid var(--border);color:#fff;font-size:0.7rem;cursor:pointer;line-height:1;">✕</button>
+                <div id="poster-preview-wrap" style="display:none;position:relative;width:100%;aspect-ratio:1280/740;overflow:hidden;border-radius:10px;border:1px solid var(--border);">
+                  <img id="img-preview" src="" alt="Preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block;z-index:1;"/>
+                  <img id="peli-idioma" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:2;"/>
+                  <img id="peli-fuente" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:3;"/>
+                  <img id="peli-calidad" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:4;"/>
+                  <img id="peli-hdr" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:5;"/>
+                  <img id="peli-streaming" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:6;"/>
+                  <button onclick="clearPoster()" title="Quitar imagen" style="position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.7);border:1px solid var(--border);color:#fff;font-size:0.7rem;cursor:pointer;line-height:1;z-index:9;">✕</button>
                 </div>
                 <input type="file" id="f-image-file" accept="image/webp,image/jpeg,image/png" style="display:none" onchange="handleImageFile(this.files[0])"/>
               </div>
               <div class="form-group">
                 <label>URL de la portada</label>
                 <input type="url" id="f-image" placeholder="https://..." oninput="previewImgUrl(this.value)" style="margin-bottom:0;"/>
+              </div>
+              <div class="form-group">
+                <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-weight:400;">
+                  <input type="checkbox" id="f-legacy-cover" onchange="updatePeliBadgePreview()" style="width:auto;margin:0;"/>
+                  <span>Portada ya lista (diseñada en Illustrator, sin cintas automáticas)</span>
+                </label>
               </div>
               <div class="form-group">
                 <label style="display:flex;align-items:center;justify-content:space-between;gap:0.4rem;flex-wrap:nowrap;">
@@ -1034,11 +1106,11 @@
           <div class="enlaces-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;margin-bottom:0.6rem;align-items:start;">
             <div class="form-group" style="margin-bottom:0;">
               <label>Info descarga <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(auto-rellenado o pega aquí)</span></label>
-              <textarea id="f-descarga-raw" class="textarea-links" style="min-height:150px;font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;Audio: Español Latino&#10;Calidad: WEBDL&#10;Resolución: 1920×1080&#10;Formato: MKV&#10;Tamaño: 4.5 GB&#10;Codec: H264&#10;Subtítulos: ..." oninput="autoRellenarDescarga()" onpaste="setTimeout(autoRellenarDescarga,50)"></textarea>
+              <textarea id="f-descarga-raw" class="textarea-links" style="min-height:110px;font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;Audio: Español Latino&#10;Calidad: WEBDL&#10;Resolución: 1920×1080&#10;Formato: MKV&#10;Tamaño: 4.5 GB&#10;Codec: H264&#10;Subtítulos: ..." oninput="autoRellenarDescarga()" onpaste="setTimeout(autoRellenarDescarga,50)"></textarea>
             </div>
             <div class="form-group" style="margin-bottom:0;">
               <label>Enlaces públicos <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(auto-rellenado o pega aquí)</span></label>
-              <textarea class="textarea-links" id="f-links" style="min-height:150px;font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;Servidor 1&#10;https://enlace1.com&#10;&#10;Servidor 2&#10;https://enlace2.com"></textarea>
+              <textarea class="textarea-links" id="f-links" style="min-height:110px;font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;Servidor 1&#10;https://enlace1.com&#10;&#10;Servidor 2&#10;https://enlace2.com"></textarea>
             </div>
             <div class="form-group" style="margin-bottom:0;">
               <label>🔄 Sincronización GitHub <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(config única)</span></label>
@@ -1047,8 +1119,8 @@
                 <input type="text" id="gh-repo" placeholder="Repositorio (ej: NoctisMovies)" style="width:100%;padding:0.5rem;background:#0a0c12;border:1px solid var(--border);border-radius:6px;color:#fff;font-size:0.85rem;"/>
                 <input type="password" id="gh-token" placeholder="Token (ghp_...)" style="width:100%;padding:0.5rem;background:#0a0c12;border:1px solid var(--border);border-radius:6px;color:#fff;font-size:0.85rem;"/>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;margin-top:0.1rem;">
-                  <button class="export-btn" onclick="saveGhConfig()" style="margin:0;padding:0.5rem;font-size:0.75rem;">💾 Guardar</button>
-                  <button class="export-btn primary-export" onclick="publishToGithub()" style="margin:0;padding:0.5rem;font-size:0.75rem;background:var(--green);border-color:var(--green);color:#000;">🚀 Publicar</button>
+                  <button class="export-btn" onclick="saveGhConfig()" style="margin:0;padding:0.4rem;font-size:0.75rem;">💾 Guardar</button>
+                  <button class="export-btn primary-export" onclick="publishToGithub()" style="margin:0;padding:0.4rem;font-size:0.75rem;background:var(--green);border-color:var(--green);color:#000;">🚀 Publicar</button>
                 </div>
                 <p id="gh-status" style="font-size:0.7rem;color:var(--muted);margin:0.2rem 0 0;"></p>
               </div>
@@ -1212,6 +1284,123 @@ function saveMovies(arr) {
     }
     return false;
   }
+}
+
+// ── Sistema de cintas para Películas/Series (fuente + idioma + calidad + HDR + streaming) ──
+// Cada categoria: key interno -> nombre EXACTO del archivo (sin .png) dentro de badges/<categoria>/
+const PELI_FILE_FOR = {
+  fuente: {
+    '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','brrip':'brrip','dcp-rip':'dcp-rip',
+    'hdrip':'hdrip','hdts':'hdts','remux':'remux','web-dl':'web-dl','web-rip':'web-rip','x265':'x265',
+  },
+  idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino' },
+  calidad: { '480p':'420p','720p':'720p','1080p':'1080p','full-hd':'full hd','4k':'4k' },
+  hdr: { 'sdr':'SDR','hdr10':'HDR 10','hdr10-plus':'HDR 10+','hdr10-dv':'HDR 10 DV','hdr10-plus-dv':'HDR 10+ DV' },
+  streaming: {
+    'crunchyroll':'crunchyroll','disney-plus':'disney+','flow':'flow','hbo-max-old':'hbo max antiguo',
+    'hbo-max-new':'hbo max nuevo','itunes':'itunes','max':'max','mubi':'mubi','netflix':'netflix',
+    'paramount-plus':'paramount+','peacock':'peacock','prime-video':'primevideo','star-plus':'star+',
+    'apple-tv-plus':'tv+','vix':'vix',
+  },
+};
+// admin.html vive en /admin/, las badges en la raiz del repo -> subir un nivel
+function peliBadgePath(cat, key) {
+  const file = PELI_FILE_FOR[cat] && PELI_FILE_FOR[cat][key];
+  if (!file) return '';
+  return `../badges/${cat}/${encodeURIComponent(file)}.png`;
+}
+
+function peliFuenteKey() {
+  const v = (document.getElementById('f-source')?.value || '').toLowerCase();
+  return v && PELI_FILE_FOR.fuente[v] ? v : null;
+}
+function peliCalidadKey() {
+  const v = document.getElementById('f-quality')?.value || '';
+  const map = { '4K':'4k', 'Full HD':'full-hd', '1080p':'1080p', '720p':'720p', '480p':'480p' };
+  return map[v] || null; // CAM no tiene cinta
+}
+function peliIdiomaKey() {
+  const v = document.getElementById('f-audio')?.value || '';
+  const map = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino' };
+  return map[v] || null;
+}
+// HDR y streaming no tienen chip propio: se detectan del texto ya escrito (titulo + datos + descarga)
+function peliDetectText() {
+  return (
+    (document.getElementById('f-title')?.value || '') + ' ' +
+    (document.getElementById('f-datos-raw')?.value || '') + ' ' +
+    (document.getElementById('f-descarga-raw')?.value || '')
+  ).toUpperCase();
+}
+function peliHdrKey() {
+  const t = peliDetectText();
+  const hasPlus = /HDR\s*10\s*\+/.test(t);
+  const hasDV = /\bDV\b|DOLBY\s*VISION/.test(t);
+  const hasHdr10 = /HDR\s*10/.test(t);
+  if (hasPlus && hasDV) return 'hdr10-plus-dv';
+  if (hasPlus) return 'hdr10-plus';
+  if (hasHdr10 && hasDV) return 'hdr10-dv';
+  if (hasHdr10) return 'hdr10';
+  if (/\bSDR\b/.test(t)) return 'sdr';
+  return null;
+}
+function peliStreamingKey() {
+  const t = peliDetectText();
+  if (/ITUNES/.test(t)) return 'itunes';
+  if (/APPLE\s*TV\s*\+/.test(t)) return 'apple-tv-plus';
+  if (/NETFLIX/.test(t)) return 'netflix';
+  if (/PRIME\s*VIDEO/.test(t)) return 'prime-video';
+  if (/DISNEY\s*\+/.test(t)) return 'disney-plus';
+  if (/HBO\s*MAX/.test(t)) return 'hbo-max-new';
+  if (/\bMAX\b/.test(t)) return 'max';
+  if (/\bMUBI\b/.test(t)) return 'mubi';
+  if (/PARAMOUNT\s*\+/.test(t)) return 'paramount-plus';
+  if (/PEACOCK/.test(t)) return 'peacock';
+  if (/STAR\s*\+/.test(t)) return 'star-plus';
+  if (/CRUNCHYROLL/.test(t)) return 'crunchyroll';
+  if (/\bFLOW\b/.test(t)) return 'flow';
+  if (/\bVIX\b/.test(t)) return 'vix';
+  return null;
+}
+
+function getPeliBadgeKeysFromMovie(m) {
+  if ((m.type || '').includes('Música')) return null; // esto es solo para peliculas/series
+  const map = { '4K':'4k', 'Full HD':'full-hd', '1080p':'1080p', '720p':'720p', '480p':'480p' };
+  const audioMap = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino' };
+  const text = ((m.title||'') + ' ' + (m.descargaRaw||'')).toUpperCase();
+  const hasPlus = /HDR\s*10\s*\+/.test(text);
+  const hasDV = /\bDV\b|DOLBY\s*VISION/.test(text);
+  const hasHdr10 = /HDR\s*10/.test(text);
+  let hdr = null;
+  if (hasPlus && hasDV) hdr = 'hdr10-plus-dv';
+  else if (hasPlus) hdr = 'hdr10-plus';
+  else if (hasHdr10 && hasDV) hdr = 'hdr10-dv';
+  else if (hasHdr10) hdr = 'hdr10';
+  else if (/\bSDR\b/.test(text)) hdr = 'sdr';
+  let streaming = null;
+  // El valor guardado manualmente (chip elegido en el form) siempre tiene prioridad
+  // sobre lo detectado por texto; el autodetector queda solo como respaldo.
+  if (/ITUNES/.test(text)) streaming = 'itunes';
+  else if (/APPLE\s*TV\s*\+/.test(text)) streaming = 'apple-tv-plus';
+  else if (/NETFLIX/.test(text)) streaming = 'netflix';
+  else if (/PRIME\s*VIDEO/.test(text)) streaming = 'prime-video';
+  else if (/DISNEY\s*\+/.test(text)) streaming = 'disney-plus';
+  else if (/HBO\s*MAX/.test(text)) streaming = 'hbo-max-new';
+  else if (/\bMAX\b/.test(text)) streaming = 'max';
+  else if (/\bMUBI\b/.test(text)) streaming = 'mubi';
+  else if (/PARAMOUNT\s*\+/.test(text)) streaming = 'paramount-plus';
+  else if (/PEACOCK/.test(text)) streaming = 'peacock';
+  else if (/STAR\s*\+/.test(text)) streaming = 'star-plus';
+  else if (/CRUNCHYROLL/.test(text)) streaming = 'crunchyroll';
+  else if (/\bFLOW\b/.test(text)) streaming = 'flow';
+  else if (/\bVIX\b/.test(text)) streaming = 'vix';
+  return {
+    fuente: (m.source||'').toLowerCase() && PELI_FILE_FOR.fuente[(m.source||'').toLowerCase()] ? (m.source||'').toLowerCase() : null,
+    idioma: audioMap[m.audio] || null,
+    calidad: map[m.quality] || null,
+    hdr: (m.hdr || hdr),
+    streaming: (m.streaming || streaming),
+  };
 }
 
 let editingIndex = -1;
@@ -1592,6 +1781,25 @@ function autoRellenarTodo() {
   else if (combined.includes('60FPS'))
     setActiveChip('chips-source','60FPS');
 
+  // HDR / DOLBY VISION — Prioridad: HDR10+ DV > HDR10 DV > HDR10+ > HDR10 > SDR
+  // "DV" = Dolby Vision. Se busca en el mismo texto (Calidad + Título) que usa Fuente.
+  const hdrHasDV        = /\bDV\b/.test(combined);
+  const hdrHasHDR10Plus = /HDR\s*10\s*\+/.test(combined);
+  const hdrHasHDR10     = /HDR\s*10\b/.test(combined);
+  const hdrHasSDR       = /\bSDR\b/.test(combined);
+  if (isMusicFormat)
+    setActiveChip('chips-hdr','');
+  else if (hdrHasHDR10Plus && hdrHasDV)
+    setActiveChip('chips-hdr','hdr10-plus-dv');
+  else if (hdrHasHDR10 && hdrHasDV)
+    setActiveChip('chips-hdr','hdr10-dv');
+  else if (hdrHasHDR10Plus)
+    setActiveChip('chips-hdr','hdr10-plus');
+  else if (hdrHasHDR10)
+    setActiveChip('chips-hdr','hdr10');
+  else if (hdrHasSDR)
+    setActiveChip('chips-hdr','sdr');
+
   // TIPO — Música > Anime > Dorama (coreano/japonés serie) > Serie > Película
   const countryLow = (p.country || '').toLowerCase();
   const isTemporada = tituloUp.includes('TEMPORADA')||tituloUp.includes('SERIE')||tituloUp.includes('SEASON')||tituloUp.includes('COMPLETA');
@@ -1611,6 +1819,8 @@ function autoRellenarTodo() {
     setActiveTypeChips('Serie');
   else if (durMin>=60)
     setActiveTypeChips('Película');
+
+  updatePeliBadgePreview();
 }
 
 // Alias para compatibilidad con onpaste/oninput del campo datos
@@ -1655,11 +1865,15 @@ function initChips() {
             setActiveChip('chips-quality', '');
             setActiveChip('chips-audio', '');
           }
+          updatePeliBadgePreview();
           return;
         }
 
         const wasActive = chip.classList.contains('chip-active');
         const isSource = hiddenInputId === 'f-source';
+        const isStreaming = hiddenInputId === 'f-streaming';
+        // Fuente, HDR y Streaming permiten des-seleccionar (clickear el chip activo lo apaga)
+        const isDeselectable = isSource || hiddenInputId === 'f-hdr' || isStreaming;
 
         // Desactivar todos en el grupo
         group.querySelectorAll('.chip').forEach(c => {
@@ -1671,16 +1885,17 @@ function initChips() {
           }
         });
 
-        // Fuente: permite des-seleccionar
-        if (wasActive && isSource) {
+        // Fuente / HDR / Streaming: permiten des-seleccionar
+        if (wasActive && isDeselectable) {
           hiddenInput.value = '';
+          updatePeliBadgePreview();
           return;
         }
 
         chip.classList.add('chip-active');
 
-        // Chips de Fuente o chip-colored: fondo con su propio color
-        if ((isSource || chip.classList.contains('chip-colored')) && chip.style.color) {
+        // Chips de Fuente, Streaming o chip-colored: fondo con su propio color
+        if ((isSource || isStreaming || chip.classList.contains('chip-colored')) && chip.style.color) {
           const ownColor = chip.style.color;
           chip.dataset.ownColor = ownColor;
           chip.style.background = ownColor;
@@ -1688,6 +1903,7 @@ function initChips() {
         }
 
         hiddenInput.value = chip.dataset.value;
+        updatePeliBadgePreview();
       });
     });
   });
@@ -1707,8 +1923,8 @@ function setActiveChip(groupId, value) {
       c.style.background = '#0a0c12';
       c.style.color = c.dataset.ownColor;
     }
-    // Si coincide y es chip de fuente o chip-colored, aplicar fondo de color
-    if (match && (groupId === 'chips-source' || c.classList.contains('chip-colored')) && c.style.color) {
+    // Si coincide y es chip de fuente, streaming o chip-colored, aplicar fondo de color
+    if (match && (groupId === 'chips-source' || groupId === 'chips-streaming' || c.classList.contains('chip-colored')) && c.style.color) {
       const ownColor = c.dataset.ownColor || c.style.color;
       c.dataset.ownColor = ownColor;
       c.style.background = ownColor;
@@ -1841,6 +2057,8 @@ function autoRellenarDescarga() {
     setActiveChip('chips-source', 'HDRIP');
   else if (combined2.includes('60FPS'))
     setActiveChip('chips-source', '60FPS');
+
+  updatePeliBadgePreview();
 }
 
 /* ======================== FORM ======================== */
@@ -1862,6 +2080,8 @@ function getFormData() {
     quality:       document.getElementById('f-quality').value,
     audioFormat:   document.getElementById('f-audioformat').value,
     source:        document.getElementById('f-source').value,
+    hdr:           document.getElementById('f-hdr').value,
+    streaming:     document.getElementById('f-streaming').value,
     yearFilter:    document.getElementById('f-year-filter').value.trim(),
     audio:         document.getElementById('f-audio').value,
     resolution:    dp.resolucion2 || parsed.resolucion2 || '',
@@ -1871,6 +2091,7 @@ function getFormData() {
     subtitles:     dp.subtitles2  || parsed.subtitles2  || '',
     uploader:      dp.uploader2   || '',
     image:         posterDataUrl || document.getElementById('f-image').value.trim(),
+    legacyCover:   !!document.getElementById('f-legacy-cover')?.checked,
     screenshot:    document.getElementById('f-screenshot').value.trim(),
     trailer:       document.getElementById('f-trailer').value.trim(),
     links:         document.getElementById('f-links').value.trim(),
@@ -1917,6 +2138,8 @@ function clearForm() {
   setActiveChip('chips-audio', 'Latino');
   setActiveChip('chips-source', '');
   setActiveChip('chips-audioformat', '');
+  setActiveChip('chips-hdr', '');
+  setActiveChip('chips-streaming', '');
   document.getElementById('f-quality').value = 'Full HD';
   document.getElementById('f-source').value = '';
   document.getElementById('f-audio').value = 'Latino';
@@ -1925,6 +2148,7 @@ function clearForm() {
   posterDataUrl = null;
   hidePosterPreview();
   resetDropZone();
+  const legacyEl = document.getElementById('f-legacy-cover'); if (legacyEl) legacyEl.checked = false;
   editingIndex = -1;
   document.getElementById('form-panel-title').innerHTML = 'Agregar <span>Película</span>';
   document.getElementById('form-submit-btn').textContent = '+ AGREGAR AL CATÁLOGO';
@@ -2020,6 +2244,36 @@ function previewImgUrl(url) {
   }
 }
 
+// Arma las 5 capas de peliculas/series sobre el preview en vivo del formulario
+function updatePeliBadgePreview() {
+  const imgPreview = document.getElementById('img-preview');
+  if (!imgPreview) return;
+
+  const tipo = document.getElementById('f-type')?.value || '';
+  const esMusica = tipo.includes('Música');
+  // Portadas ya diseñadas (Illustrator) con las cintas incluidas: no se les superpone nada
+  // ni se les recorta al marco, para no duplicar el diseño.
+  const isLegacyCover = !!document.getElementById('f-legacy-cover')?.checked;
+
+  // HDR y Streaming: si el usuario activó el chip a mano, ese valor manda.
+  // Si no hay chip activo, recién ahí se cae al autodetector por texto.
+  const hdrManual = document.getElementById('f-hdr')?.value || '';
+  const streamingManual = document.getElementById('f-streaming')?.value || '';
+  const layers = { idioma: peliIdiomaKey(), fuente: peliFuenteKey(), calidad: peliCalidadKey(), hdr: hdrManual || peliHdrKey(), streaming: streamingManual || peliStreamingKey() };
+  const anyFuente = !esMusica && !isLegacyCover && !!layers.fuente;
+
+  imgPreview.classList.toggle('has-frame', anyFuente);
+
+  ['idioma','fuente','calidad','hdr','streaming'].forEach(cat => {
+    const el = document.getElementById('peli-' + cat);
+    if (!el) return;
+    const key = (esMusica || isLegacyCover) ? null : layers[cat];
+    const path = key ? peliBadgePath(cat, key) : '';
+    if (path) { el.src = path; el.style.display = 'block'; }
+    else { el.style.display = 'none'; }
+  });
+}
+
 function showPosterPreview(src) {
   const wrap = document.getElementById('poster-preview-wrap');
   const img = document.getElementById('img-preview');
@@ -2027,6 +2281,7 @@ function showPosterPreview(src) {
   img.src = src;
   wrap.style.display = 'block';
   dz.style.display = 'none'; // ocultar drop-zone cuando hay imagen
+  updatePeliBadgePreview();
 }
 
 function hidePosterPreview() {
@@ -2229,9 +2484,19 @@ function renderList(resetPage) {
   list.innerHTML = pageItems.map(m => {
     const ri = movies.indexOf(m);
     const views = viewsCache[viewKeyFor(m, ri)];
+    const peliBadges = m.legacyCover ? null : getPeliBadgeKeysFromMovie(m);
+    const badgeLayersHtml = peliBadges ? ['idioma','fuente','calidad','hdr','streaming'].map(cat => {
+      const key = peliBadges[cat];
+      if (!key) return '';
+      const path = peliBadgePath(cat, key);
+      return path ? `<img class="movie-item-badge-overlay" src="${path}" alt="" onerror="this.style.display='none'"/>` : '';
+    }).join('') : '';
     return `
     <div class="movie-item">
-      <img class="movie-item-poster" src="${m.image||''}" alt="${m.title}" onerror="this.src='${fallback}'"/>
+      <div class="movie-item-poster-wrap">
+        <img class="movie-item-poster" src="${m.image||''}" alt="${m.title}" onerror="this.src='${fallback}'"/>
+        ${badgeLayersHtml}
+      </div>
       <div class="movie-item-info">
         <div class="movie-item-title">${m.title}</div>
         <div class="movie-item-meta">
@@ -2330,12 +2595,17 @@ function editMovie(idx) {
   setActiveChip('chips-quality', esMusicaEdit ? (m.quality||'') : (m.quality||'Full HD'));
   setActiveChip('chips-audio', esMusicaEdit ? (m.audio||'') : (m.audio||'Latino'));
   setActiveChip('chips-source', m.source||'');
+  setActiveChip('chips-hdr', m.hdr||'');
+  setActiveChip('chips-streaming', m.streaming||'');
   setActiveChips('chips-audioformat', (m.audioFormat||'').split(',').map(s=>s.trim()).filter(Boolean));
   document.getElementById('f-quality').value = esMusicaEdit ? (m.quality||'') : (m.quality||'Full HD');
   document.getElementById('f-source').value = m.source||'';
+  document.getElementById('f-hdr').value = m.hdr||'';
+  document.getElementById('f-streaming').value = m.streaming||'';
   document.getElementById('f-audio').value = esMusicaEdit ? (m.audio||'') : (m.audio||'Latino');
   document.getElementById('f-audioformat').value = m.audioFormat||'';
   document.getElementById('f-image').value = m.image||'';
+  const legacyEl = document.getElementById('f-legacy-cover'); if (legacyEl) legacyEl.checked = !!m.legacyCover;
   document.getElementById('f-screenshot').value = m.screenshot||'';
   updateScreenshotCount();
   document.getElementById('f-trailer').value = m.trailer||'';
