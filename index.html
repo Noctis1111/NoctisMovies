@@ -999,6 +999,17 @@ header::after {
       .s2026-inner { padding: 0 0.75rem; }
       .s2026-wrap { margin: 1rem 0.5rem 1.25rem; border-radius: 14px; }
     }
+    /* ── Móviles Android de alta densidad (ej. Motorola Edge 50 Pro, 1220x2712px)
+       reportan un innerWidth "de escritorio" (~1220px) porque el navegador no
+       reduce la resolución física a píxeles CSS reales. Para no confundirlos con
+       una PC/laptop con la ventana angosta a ese mismo ancho, esta regla solo
+       aplica en pantallas TÁCTILES sin cursor (hover:none + pointer:coarse),
+       que es lo que realmente distingue un celular/tablet de una PC con mouse
+       o trackpad, sin importar el ancho en píxeles CSS que reporte. En PC, a
+       igual ancho, esta regla NO aplica y todo sigue como está. */
+    @media (max-width: 1220px) and (hover: none) and (pointer: coarse) {
+      #movie-grid { grid-template-columns: repeat(2, 1fr); }
+    }
   <style>
      50%{opacity:1} }
   </style>
@@ -1612,8 +1623,24 @@ function build2026(movies) {
   // Cantidad de tarjetas visibles por página: 4 en escritorio, 3 en pantallas pequeñas (celulares)
   const CARDS_PER_PAGE_DESKTOP = 4;
   const CARDS_PER_PAGE_MOBILE = 3;
-  const MOBILE_BREAKPOINT = 1000; // px — antes bajaba a 3 tarjetas recién en 768; ahora baja
-                                   // en el mismo punto en que el layout general pasa a una sola columna (1000px)
+  // Algunos Android de alta densidad (ej. Motorola Edge 50 Pro, 1220x2712px) reportan
+  // un innerWidth "de escritorio" (~1220px) en vez de los ~400-450px habituales, porque
+  // el navegador no reduce la resolución física a píxeles CSS reales. Detectamos esos
+  // casos por (hover:none)+(pointer:coarse) — lo que realmente distingue un celular/tablet
+  // (sin cursor) de una PC/laptop con mouse o trackpad — y solo ahí subimos el umbral a
+  // 1220px. En PC, aunque se achique la ventana a ese mismo ancho, se mantiene en 1000px
+  // como ya estaba.
+  // IMPORTANTE: esto se recalcula en vivo (no es un valor fijo tomado solo al cargar),
+  // para que si cambia el ancho de ventana o la capacidad táctil del dispositivo
+  // (ej. conectar/desconectar un mouse a una tablet Android) la detección se actualice
+  // sin necesidad de recargar la página.
+  function isTouchDevice() {
+    return window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  }
+  function getMobileBreakpoint() {
+    return isTouchDevice() ? 1220 : 1000; // px — antes bajaba a 3 tarjetas recién en 768; ahora baja
+                                           // en el mismo punto en que el layout general pasa a una sola columna (1000px en PC, 1220px en Android táctil)
+  }
   const GAP = 16; // 1rem = 16px
   const AUTO_INTERVAL = 5000; // ms
   const AUTO_RESUME_DELAY = 4000; // ms de espera tras soltar el dedo antes de reanudar el auto-scroll
@@ -1624,7 +1651,7 @@ function build2026(movies) {
   const nextBtn = document.getElementById('s2026-next');
 
   function isMobileView() {
-    return window.innerWidth <= MOBILE_BREAKPOINT;
+    return window.innerWidth <= getMobileBreakpoint();
   }
 
   function getCardsPerPage() {
@@ -1747,6 +1774,14 @@ function build2026(movies) {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(init, 150);
   });
+
+  // Recalcular también si cambia la capacidad táctil del dispositivo (hover/pointer),
+  // por ejemplo al conectar o desconectar un mouse/trackpad en una tablet Android:
+  // esto cambia el umbral (1220 vs 1000) y por lo tanto cuántas tarjetas corresponden.
+  const touchMql = window.matchMedia('(hover: none) and (pointer: coarse)');
+  const onTouchChange = () => init();
+  if (touchMql.addEventListener) touchMql.addEventListener('change', onTouchChange);
+  else if (touchMql.addListener) touchMql.addListener(onTouchChange); // Safari viejo
 
   // Recalcular también si el ANCHO REAL del contenedor cambia por cualquier otro motivo
   // (la barra de scroll vertical aparece más tarde, tipografías o imágenes que terminan
