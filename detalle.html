@@ -482,7 +482,11 @@
     /* Cintas de pelicula/serie (idioma, fuente, calidad, hdr, streaming) superpuestas al poster principal */
     .poster-cintas-overlay { position: absolute !important; inset: 0 !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important; object-fit: contain !important; border-radius: 12px; pointer-events: none; z-index: 2; }
     .poster-img { width: 100%; height: auto; max-height: 500px; object-fit: contain; object-position: top center; border-radius: 12px; border: 1px solid var(--border); display: block; box-shadow: 0 8px 40px rgba(0,0,0,0.7); transition: transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out; }
-    .poster-wrap:hover .poster-img { transform: scale(1.02); box-shadow: 0 12px 50px rgba(0,0,0,0.8); }
+    .poster-frame { transition: transform 0.4s ease-in-out; }
+    /* Con marco/cintas: se escala el marco COMPLETO (foto + cintas) como una sola unidad, para
+       que no se desalineen ni la foto tape a las cintas. Sin marco: zoom simple de siempre, solo la foto. */
+    .poster-wrap:hover .poster-frame:has(.poster-img.has-frame) { transform: scale(1.02); }
+    .poster-wrap:hover .poster-frame:not(:has(.poster-img.has-frame)) .poster-img { transform: scale(1.02); box-shadow: 0 12px 50px rgba(0,0,0,0.8); }
 
     /* ── Camuflaje activo: efecto Adult/Hentai (poster principal) ── */
     .poster-wrap.card-h .poster-img {
@@ -1176,15 +1180,16 @@
     .related-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
     .related-card { position: relative; text-decoration: none; display: block; overflow: visible; background: transparent; border: none; transition: transform 0.4s ease-in-out; }
     .related-card:hover { transform: translateY(-4px); z-index: 20; }
-    .related-poster { position: relative; aspect-ratio: 1280/740; overflow: visible; border-radius: 8px; }
-    .related-poster img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; box-shadow: 0 0 0 rgba(0,0,0,0); transition: transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out; display: block; }
+    .related-poster { position: relative; aspect-ratio: 1280/740; overflow: visible; border-radius: 8px; transition: transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out; }
+    .related-poster img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; box-shadow: 0 0 0 rgba(0,0,0,0); display: block; }
     /* Cuando hay cinta de fuente (marco), la foto se recorta al hueco real del marco — mismos valores calibrados que index.html */
     .related-poster img.has-frame { top: 9.9%; left: 6.8%; width: calc(100% - 6.8% - 1.3%); height: calc(100% - 9.9% - 1.4%); position: absolute; }
     .related-badge-overlay { position: absolute !important; inset: 0 !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important; object-fit: contain !important; border-radius: 8px; pointer-events: none; z-index: 2; }
-    /* El zoom de hover (.related-poster img) es generico y afectaria tambien al
-       overlay del badge si no se excluye explicitamente aqui */
-    .related-card:hover .related-poster img.related-badge-overlay { transform: none; position: absolute; z-index: 4; box-shadow: none; }
-    .related-card:hover .related-poster img { transform: scale(1.08); box-shadow: 0 12px 28px rgba(0,0,0,0.55); position: relative; z-index: 999; }
+    /* Con marco/cintas: se escala TODA la tarjeta (foto + cintas) como una sola unidad, asi quedan
+       siempre alineadas y las cintas nunca se tapan por la foto. Sin marco (portada antigua ya lista):
+       se mantiene el zoom simple de siempre, solo sobre la foto. */
+    .related-card:hover .related-poster:has(img.has-frame) { transform: scale(1.05); box-shadow: 0 12px 28px rgba(0,0,0,0.55); }
+    .related-card:hover .related-poster:not(:has(img.has-frame)) img { transform: scale(1.08); box-shadow: 0 12px 28px rgba(0,0,0,0.55); }
 
     /* ── Camuflaje activo: efecto Adult/Hentai (tarjetas relacionadas) ── */
     /* En reposo recorta limpio (evita que el blur sangre); en hover se libera para el mismo pop-out que las demás */
@@ -1394,6 +1399,8 @@
       .datos-sinopsis-col .section-box { width: 100% !important; padding: 1rem 1.1rem !important; }
       .dato-row { flex-wrap: wrap !important; gap: 0.2rem !important; }
       .dato-label { min-width: auto !important; }
+      /* MÁS TÍTULOS: en pantallas chicas (tablets/celulares) 3 portadas en vez de 4, para que no queden diminutas */
+      .related-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 0.6rem !important; }
     }
     @media (max-width: 600px) {
       .banner-vip { grid-template-columns: 1fr; gap: 0.75rem; text-align: center; }
@@ -1422,6 +1429,19 @@
     /* Fecha de subida: misma fila que las demas etiquetas, pero pegada al
        extremo derecho (margin-left:auto la empuja al otro lado de la fila) */
     .title-tag.tag-date { margin-left: auto; border-style: dashed; color: #b8bfcc; font-weight: 700; font-size: 0.85rem; padding: 4px 12px; }
+
+    /* ── Móviles Android de alta densidad (ej. Motorola Edge 50 Pro, 1220x2712px)
+       reportan un innerWidth "de escritorio" (~1220px) porque el navegador no
+       reduce la resolución física a píxeles CSS reales. Para no confundirlos con
+       una PC/laptop con la ventana angosta a ese mismo ancho, esta regla solo
+       aplica en pantallas TÁCTILES sin cursor (hover:none + pointer:coarse),
+       que es lo que realmente distingue un celular/tablet de una PC con mouse
+       o trackpad, sin importar el ancho en píxeles CSS que reporte. En PC, a
+       igual ancho, esta regla NO aplica y todo sigue como está (4 portadas
+       arriba de 768px, 3 por debajo). */
+    @media (max-width: 1220px) and (hover: none) and (pointer: coarse) {
+      .related-grid { grid-template-columns: repeat(3, 1fr) !important; }
+    }
 
     /* NOT FOUND */
     .not-found { text-align: center; padding: 6rem 2rem; }
@@ -2421,13 +2441,47 @@ function toggleEnlaces() {
 function renderRelated(movies, currentIdx) {
   const section = document.getElementById('related-section');
   const grid = document.getElementById('related-grid');
-  // Mostrar hasta 8 películas diferentes, priorizando mismo tipo
+  // Guardamos la última data para poder re-renderizar si cambia el ancho/tipo
+  // de pantalla (ver listener de matchMedia más abajo).
+  renderRelated._lastMovies = movies;
+  renderRelated._lastIdx = currentIdx;
+  // Mostrar hasta 4 películas diferentes, priorizando mismo tipo. En pantallas
+  // grandes se ven las 4 tal cual. Pero cuando el CSS reduce la grilla a 3
+  // columnas —ya sea en cualquier pantalla angosta (regla existente ≤768px)
+  // o en Android táctil de alta densidad como el Motorola Edge 50 Pro (regla
+  // ≤1220px + hover:none + pointer:coarse, ver CSS de .related-grid)—
+  // limitamos a 3 elementos también, para que llenen la fila completa y no
+  // quede una 4ta tarjeta huérfana sola en una segunda fila. En PC esto solo
+  // ocurre si la ventana se angosta por debajo de 768px; con la ventana
+  // normal/ancha siempre se ven las 4.
   const current = movies[currentIdx];
   let pool = movies.filter((_, i) => i !== currentIdx);
   // Primero mismo tipo, luego resto
   const sameType = pool.filter(m => m.type === (current && current.type));
   const others = pool.filter(m => m.type !== (current && current.type));
-  const related = [...sameType, ...others].slice(0, 4);
+  const isNarrowGrid = window.matchMedia(
+    '(max-width: 768px), (max-width: 1220px) and (hover: none) and (pointer: coarse)'
+  ).matches;
+  const relatedLimit = isNarrowGrid ? 3 : 4;
+  const related = [...sameType, ...others].slice(0, relatedLimit);
+
+  // Escuchar cambios reales de ancho/tipo de pantalla (resize de la ventana
+  // en PC, rotar el celular, etc.) y volver a armar la grilla con el conteo
+  // correcto (3 o 4) sin necesidad de recargar la página. Se registra una
+  // sola vez, no en cada llamada a renderRelated.
+  if (!renderRelated._mqlBound) {
+    renderRelated._mqlBound = true;
+    const mql = window.matchMedia(
+      '(max-width: 768px), (max-width: 1220px) and (hover: none) and (pointer: coarse)'
+    );
+    const onChange = () => {
+      if (renderRelated._lastMovies) {
+        renderRelated(renderRelated._lastMovies, renderRelated._lastIdx);
+      }
+    };
+    if (mql.addEventListener) mql.addEventListener('change', onChange);
+    else if (mql.addListener) mql.addListener(onChange); // Safari viejo
+  }
 
   if (related.length === 0) { section.style.display = 'none'; return; }
   grid.innerHTML = related.map(m => {
