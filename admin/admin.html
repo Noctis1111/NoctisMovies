@@ -804,9 +804,12 @@
       .admin-main { padding: 0.75rem; gap: 1rem; }
       .panel-body { padding: 0.75rem; }
       /* El layout de 2 cols dentro del formulario se apila */
-      .admin-main > div:first-child > .panel > .panel-body > div[style*="grid-template-columns:1fr 230px"] {
+      .admin-main > div:first-child > .panel > .panel-body > div[style*="grid-template-columns:1fr 230px"],
+      div[style*="grid-template-columns:1fr 230px"] {
         grid-template-columns: 1fr !important;
       }
+      .golden-cols { grid-template-columns: 1fr !important; }
+      div[style*="grid-template-columns:1fr 1fr 1fr"] { grid-template-columns: 1fr !important; }
       /* Datos+Sinopsis / Tipo / Año también en columna */
       div[style*="grid-template-columns:1fr auto auto"] {
         grid-template-columns: 1fr !important;
@@ -824,8 +827,8 @@
       .admin-header { padding: 0 1rem; }
       .admin-main { padding: 0.5rem; }
       .stat-num { font-size: 1.4rem; }
-      .movie-item-poster { width: 38px; height: 54px; }
-      .movie-item-poster-wrap { width: 38px; height: 54px; }
+      .movie-item-poster { width: 54px; height: 31px; }
+      .movie-item-poster-wrap { width: 54px; height: 31px; }
       .item-btn { width: 32px; height: 32px; }
       .item-btn svg { width: 15px; height: 15px; }
     }
@@ -1154,6 +1157,99 @@
           <textarea class="import-area" id="import-area" placeholder='[{"title":"..."}]' style="min-height:100px;"></textarea>
           <button class="export-btn" onclick="importJSON()" style="margin-bottom:0.3rem;">✓ Importar y cargar</button>
           <p style="font-size:0.7rem;color:var(--muted);">⚠ Esto reemplazará el catálogo actual en memoria.</p>
+        </div>
+      </div>
+
+      <!-- ✨ EDICIÓN GOLDEN QUALITY — junta varias ediciones de calidad de un mismo título en una sola -->
+      <div class="io-section" style="margin-top:0.75rem;">
+        <div class="io-title">✨ Edición Golden Quality</div>
+        <p style="font-size:0.75rem;color:var(--muted);margin-bottom:0.7rem;">
+          Busca un título ya subido y arma automáticamente una edición combinada: junta las últimas
+          ediciones de calidad de esa película en un solo título con un bloque "MAS INFO".
+        </p>
+        <!-- 2 columnas: a la izquierda los controles de búsqueda, a la derecha los resultados -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start;margin-bottom:0.7rem;">
+          <div>
+            <div class="form-group" style="margin-bottom:0.6rem;">
+              <label>Buscar película en el catálogo</label>
+              <input type="text" id="golden-search" placeholder="Ej: Familia Revuelta" style="height:2.7rem;"/>
+            </div>
+            <div class="form-group" style="margin-bottom:0.6rem;">
+              <label>Ediciones a juntar</label>
+              <input type="number" id="golden-count" min="1" max="20" placeholder="Ej: 3" style="height:2.7rem;"/>
+            </div>
+            <button class="export-btn primary-export" style="margin:0;height:2.7rem;width:100%;white-space:nowrap;" onclick="buscarGolden()">🔍 Buscar</button>
+          </div>
+          <div id="golden-matches"></div>
+        </div>
+
+        <div id="golden-result" class="golden-cols-wrap" style="margin-top:0.8rem;">
+
+          <!-- ══ 2 COLUMNAS: Título+Bloque | Portada (portada al doble de tamaño, con sello Golden en vivo) ══ -->
+          <div class="golden-cols" style="display:grid;grid-template-columns:1fr 460px;gap:1rem;align-items:start;">
+
+            <!-- COLUMNA IZQUIERDA: Título + Bloque generado -->
+            <div>
+              <div class="form-group">
+                <label>Título completo (editable)</label>
+                <input type="text" id="golden-title"/>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label>Bloque generado (Datos + Sinopsis + MAS INFO)</label>
+                <textarea id="golden-block" rows="14" style="width:100%;font-family:monospace;font-size:0.78rem;background:var(--surface3);border:1px solid var(--border);border-radius:6px;color:var(--white);padding:0.6rem;"></textarea>
+              </div>
+            </div>
+
+            <!-- COLUMNA DERECHA: Portada de esta edición, al doble de tamaño, con el sello Golden ya superpuesto -->
+            <div>
+              <div class="form-group">
+                <label>Portada (poster) *</label>
+                <div class="drop-zone" id="golden-drop-zone" onclick="document.getElementById('golden-poster-file').click()">
+                  <div class="drop-zone-inner" id="golden-drop-zone-inner">
+                    <div style="font-size:2.2rem;margin-bottom:0.3rem;">🖼</div>
+                    <div style="font-size:0.9rem;color:var(--white);font-weight:600;">Arrastra la imagen aquí</div>
+                    <div style="font-size:0.75rem;color:var(--muted);margin-top:0.15rem;">o haz clic para seleccionar</div>
+                    <div style="font-size:0.7rem;color:var(--muted);margin-top:0.1rem;">WEBP · JPG · PNG</div>
+                  </div>
+                </div>
+                <div id="golden-poster-preview-wrap" style="display:none;position:relative;width:100%;aspect-ratio:1280/740;overflow:hidden;border-radius:10px;border:1px solid var(--border);background:#080a0f;">
+                  <!-- Preview = canvas real (mismo drawImageCoverInGoldenWindow + mismo orden de capas que
+                       construirCanvasGolden), así lo que se ve acá es pixel a pixel lo que se descarga. -->
+                  <canvas id="golden-preview-canvas" width="1280" height="740" style="position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;"></canvas>
+                  <button onclick="clearGoldenPoster()" title="Quitar imagen" style="position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,0.7);border:1px solid var(--border);color:#fff;font-size:0.75rem;cursor:pointer;line-height:1;z-index:9;">✕</button>
+                </div>
+                <input type="file" id="golden-poster-file" accept="image/webp,image/jpeg,image/png" style="display:none" onchange="handleGoldenImageFile(this.files[0])"/>
+              </div>
+              <div class="form-group">
+                <label>URL de la portada</label>
+                <input type="url" id="golden-poster-url" placeholder="https://..." oninput="previewGoldenPosterUrl(this.value)" style="margin-bottom:0;"/>
+              </div>
+              <div id="golden-poster-from-matches" style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.3rem;"></div>
+              <div style="font-size:0.66rem;color:var(--muted);margin-top:0.3rem;">Tip: también podés usar con un clic la portada de alguna edición encontrada arriba.</div>
+
+              <!-- 🎧 Audio propio de esta sección: NO tiene ninguna relación con los chips de Audio/HDR
+                   del formulario "Agregar Película" de arriba. Es un sello aparte, opcional, que solo
+                   afecta al preview y a la imagen que se copia/descarga acá. -->
+              <div class="form-group" style="margin-top:0.7rem;margin-bottom:0;">
+                <label>🎧 Audio <span style="color:var(--muted);font-size:0.62rem;font-weight:400;">(sello sobre esta portada · opcional · aparte del formulario de arriba)</span></label>
+                <div class="chip-group" id="chips-golden-audio" style="flex-wrap:wrap;gap:0.35rem;">
+                  <button type="button" class="chip" data-value="Latino" onclick="setGoldenAudioChip(this)">Latino</button>
+                  <button type="button" class="chip" data-value="Inglés" onclick="setGoldenAudioChip(this)">Inglés</button>
+                  <button type="button" class="chip" data-value="Japonés" onclick="setGoldenAudioChip(this)">Japonés</button>
+                  <button type="button" class="chip" data-value="Koreano" onclick="setGoldenAudioChip(this)">Koreano</button>
+                  <button type="button" class="chip" data-value="Chino" onclick="setGoldenAudioChip(this)">Chino</button>
+                </div>
+                <input type="hidden" id="golden-audio" value=""/>
+              </div>
+            </div>
+
+          </div><!-- fin 2 cols título/bloque + portada -->
+
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-top:0.7rem;">
+            <button class="export-btn" onclick="copiarGoldenBlock()">📋 Copiar bloque</button>
+            <button class="export-btn" onclick="copiarGoldenImagen()">🖼 Copiar imagen</button>
+            <button class="export-btn primary-export" style="background:var(--gold);border-color:var(--gold);color:#000;" onclick="generarGoldenPortada()">⬇ Generar portada con sello Golden</button>
+          </div>
         </div>
       </div>
     </div>
@@ -2224,6 +2320,568 @@ function previewImg(url) {
   else { p.classList.remove('show'); }
 }
 
+/* ======================== ✨ EDICIÓN GOLDEN QUALITY ======================== */
+let goldenMatchesData = [];
+let goldenTotalMatches = 0;
+
+// Corta el título justo después del "(AÑO)" para quedarse con el nombre base,
+// sin la parte de calidad/fuente/audio que viene después (ej: "WEB-DL 4K DV HDR10 Latino-Inglés").
+function baseTituloSinCalidad(title) {
+  const m = (title || '').match(/^(.*?\(\d{4}\))/);
+  return m ? m[1].trim() : (title || '').trim();
+}
+
+function buscarGolden() {
+  const q = document.getElementById('golden-search').value.trim().toLowerCase();
+  const n = Math.max(1, parseInt(document.getElementById('golden-count').value) || 3);
+  if (!q) { showToast('Escribí parte del título a buscar.', 'error'); return; }
+
+  const movies = getMovies();
+  // Nunca incluir ediciones Golden Quality ya armadas antes (si no, se auto-incluyen
+  // a sí mismas en la próxima búsqueda y duplican/corrompen las resoluciones juntadas).
+  const matches = movies.filter(m =>
+    (m.title || '').toLowerCase().includes(q) &&
+    !/edici[oó]n golden quality/i.test(m.title || '')
+  );
+
+  if (!matches.length) {
+    document.getElementById('golden-matches').innerHTML = '<p style="color:var(--muted);font-size:0.8rem;">No se encontró ningún título con eso.</p>';
+    goldenMatchesData = [];
+    goldenTotalMatches = 0;
+    document.getElementById('golden-title').value = '';
+    document.getElementById('golden-block').value = '';
+    return;
+  }
+  // El catálogo ya está en orden "más reciente primero" (se guarda con unshift),
+  // así que las primeras N que matchean son justo las últimas N subidas.
+  goldenTotalMatches = matches.length;
+  goldenMatchesData = matches.slice(0, n);
+
+  renderGoldenMatches();
+  construirGolden(goldenMatchesData);
+}
+
+// Redibuja la lista de "edición(es) encontradas" a partir de goldenMatchesData.
+// Se separa de buscarGolden() para poder llamarla también al quitar una edición
+// de la lista sin tener que rehacer la búsqueda entera.
+function renderGoldenMatches() {
+  const matchesBox = document.getElementById('golden-matches');
+  if (!goldenMatchesData.length) { matchesBox.innerHTML = ''; return; }
+
+  matchesBox.innerHTML =
+    '<p style="font-size:0.75rem;color:var(--gold2);margin-bottom:0.4rem;">' + goldenMatchesData.length + ' de ' + goldenTotalMatches + ' edición(es) encontradas — se usan las ' + goldenMatchesData.length + ' más recientes:</p>' +
+    goldenMatchesData.map((m, i) =>
+      '<div style="display:flex;align-items:center;gap:0.5rem;font-size:0.78rem;color:var(--white);padding:0.3rem 0;border-bottom:1px solid var(--border);">' +
+        (m.image ? '<img src="' + m.image + '" style="width:28px;height:16px;object-fit:cover;border-radius:3px;flex-shrink:0;"/>' : '') +
+        '<span>' + (m.title || '(sin título)') + '</span>' +
+        (m.resolution ? '<span style="color:var(--muted);margin-left:auto;">' + m.resolution + '</span>' : '') +
+        (m.uploadDate ? '<span style="color:var(--muted);white-space:nowrap;">· ' + m.uploadDate + '</span>' : '') +
+        '<button onclick="quitarGoldenMatch(' + i + ')" title="Quitar de la lista" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.85rem;line-height:1;padding:0.1rem 0.2rem;flex-shrink:0;">✕</button>' +
+      '</div>'
+    ).join('');
+
+  renderGoldenPosterPicks();
+}
+
+// Miniaturas clickeables de las portadas ya subidas de cada edición encontrada,
+// para poder usar directamente una de esas en vez de subir/pegar una nueva.
+function renderGoldenPosterPicks() {
+  const box = document.getElementById('golden-poster-from-matches');
+  if (!box) return;
+  const conImagen = goldenMatchesData.filter(m => m.image);
+  if (!conImagen.length) { box.innerHTML = ''; return; }
+  box.innerHTML = conImagen.map(m =>
+    '<img src="' + m.image + '" title="Usar esta portada" onclick="usarPosterDeMatch(\'' + m.image.replace(/'/g, "\\'") + '\')" style="width:52px;height:30px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:pointer;"/>'
+  ).join('');
+}
+
+function usarPosterDeMatch(url) {
+  goldenPosterDataUrl = null;
+  document.getElementById('golden-poster-url').value = url;
+  showGoldenPosterPreview(url);
+  showToast('Portada elegida ✓', 'success');
+  goldenPosterFetchToken++; // cancela cualquier descarga anterior en curso
+  clearTimeout(goldenPosterFetchTimer);
+  descargarGoldenPosterEnSegundoPlano(url);
+}
+
+function quitarGoldenMatch(index) {
+  goldenMatchesData.splice(index, 1);
+  goldenTotalMatches = Math.max(0, goldenTotalMatches - 1);
+  if (!goldenMatchesData.length) {
+    document.getElementById('golden-matches').innerHTML = '<p style="color:var(--muted);font-size:0.8rem;">No quedan ediciones seleccionadas.</p>';
+    document.getElementById('golden-title').value = '';
+    document.getElementById('golden-block').value = '';
+    return;
+  }
+  renderGoldenMatches();
+  construirGolden(goldenMatchesData);
+}
+
+function construirGolden(elegidas) {
+  const base = elegidas[0];
+  const tituloBase = baseTituloSinCalidad(base.title || '');
+  const tituloGolden = tituloBase + ' - EDICIÓN GOLDEN QUALITY';
+
+  // Resoluciones únicas de todas las ediciones elegidas, sin repetir, ordenadas de MENOR a MAYOR
+  // (ej: 1920x800 - 1920x1080 - 3840x2160), sin importar el orden en que se encontraron las ediciones.
+  const resoluciones = [];
+  elegidas.forEach(m => {
+    const r = (m.resolution || '').trim();
+    if (r && !resoluciones.includes(r)) resoluciones.push(r);
+  });
+  function resolucionArea(r) {
+    const m = r.match(/(\d+)\s*[x×]\s*(\d+)/i);
+    return m ? parseInt(m[1], 10) * parseInt(m[2], 10) : 0;
+  }
+  resoluciones.sort((a, b) => resolucionArea(a) - resolucionArea(b));
+
+  const lineas = [];
+  lineas.push(tituloGolden);
+  lineas.push('');
+  if (base.originalTitle) lineas.push('Título Original: ' + base.originalTitle);
+  if (base.year)          lineas.push('Año: ' + base.year);
+  if (base.country)       lineas.push('Pais(es): ' + base.country);
+  if (base.duration)      lineas.push('Duración: ' + base.duration);
+  if (base.genre)         lineas.push('Genero: ' + base.genre);
+  lineas.push('');
+  if (base.description)   lineas.push(base.description);
+  lineas.push('');
+  lineas.push('MAS INFO');
+  lineas.push('Calidad: MULTI-CALIDAD INGRESANDO AL LINK MAS INFO');
+  lineas.push('Resolución: ' + resoluciones.join(' - '));
+  lineas.push('Formato: MKV');
+
+  document.getElementById('golden-title').value = tituloGolden;
+  document.getElementById('golden-block').value = lineas.join('\n');
+}
+
+function copiarGoldenBlock() {
+  const txt = document.getElementById('golden-block').value;
+  if (!txt) return;
+  navigator.clipboard.writeText(txt).then(() => showToast('✓ Bloque copiado', 'success'));
+}
+
+// Sistema de portada de la edición Golden: archivo local (drag&drop / selector), URL pegada,
+// o un clic sobre la portada de alguna de las ediciones encontradas (ver renderGoldenPosterPicks).
+let goldenPosterDataUrl = null; // guarda base64 (archivo local, o URL remota ya descargada)
+
+function handleGoldenImageFile(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    goldenPosterDataUrl = e.target.result;
+    document.getElementById('golden-poster-url').value = '';
+    showGoldenPosterPreview(goldenPosterDataUrl);
+    showToast('Imagen cargada ✓', 'success');
+  };
+  reader.readAsDataURL(file);
+}
+
+// Proxies públicos que solo agregan cabeceras CORS (no tocan la imagen), probados en orden.
+// Hacen falta porque TMDB no siempre manda "Access-Control-Allow-Origin" en sus imágenes,
+// lo que deja el <canvas> "contaminado" e impide exportarlo/copiarlo (toDataURL/toBlob fallan).
+const CORS_PROXIES = [
+  u => u, // primero probamos directo, por si el servidor ya manda CORS
+  u => 'https://images.weserv.nl/?url=' + encodeURIComponent(u.replace(/^https?:\/\//, '')),
+  u => 'https://corsproxy.io/?url=' + encodeURIComponent(u),
+  u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
+];
+
+// Descarga una imagen remota y la devuelve como data URL (base64), probando la cadena de
+// proxies de arriba hasta que uno funcione. Devuelve null si ninguno pudo.
+async function fetchImageAsDataUrl(url) {
+  for (const proxyFn of CORS_PROXIES) {
+    try {
+      const res = await fetch(proxyFn(url), { mode: 'cors' });
+      if (!res.ok) continue;
+      const blob = await res.blob();
+      if (!blob || !blob.type.startsWith('image/')) continue;
+      return await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (e) {
+      continue; // probamos el siguiente proxy de la lista
+    }
+  }
+  return null;
+}
+
+// Token para descartar descargas viejas si el usuario sigue escribiendo/eligiendo otra portada
+// mientras una descarga anterior todavía está en curso.
+let goldenPosterFetchToken = 0;
+let goldenPosterFetchTimer = null;
+
+// Descarga en segundo plano la portada remota y la deja lista como base64 (goldenPosterDataUrl)
+// ANTES de que el usuario haga clic en "Generar"/"Copiar imagen", para que esas acciones ya no
+// dependan de CORS en ese momento. Muestra un aviso si ningún proxy pudo traerla.
+function descargarGoldenPosterEnSegundoPlano(url) {
+  const miToken = ++goldenPosterFetchToken;
+  fetchImageAsDataUrl(url).then(dataUrl => {
+    if (miToken !== goldenPosterFetchToken) return; // quedó obsoleta, el usuario cambió de portada
+    if (dataUrl) {
+      goldenPosterDataUrl = dataUrl;
+      showToast('✓ Portada descargada, lista para exportar', 'success');
+    } else {
+      showToast('No pude descargar esa portada (CORS/red) — al generar o copiar puede volver a fallar. Si pasa, subila como archivo local.', 'error');
+    }
+  });
+}
+
+function previewGoldenPosterUrl(url) {
+  goldenPosterFetchToken++; // cancela cualquier descarga en curso de una URL anterior
+  if (url && url.startsWith('http')) {
+    goldenPosterDataUrl = null;
+    showGoldenPosterPreview(url);
+    clearTimeout(goldenPosterFetchTimer);
+    goldenPosterFetchTimer = setTimeout(() => descargarGoldenPosterEnSegundoPlano(url), 700);
+  } else {
+    hideGoldenPosterPreview();
+  }
+}
+
+// ── 🎧 Audio de la sección Golden Quality — TOTALMENTE APARTE del chip Audio del
+// formulario "Agregar Película" de arriba. No lee ni escribe f-audio en ningún momento.
+const GOLDEN_AUDIO_KEY = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino' };
+
+function setGoldenAudioChip(btn) {
+  const group = document.getElementById('chips-golden-audio');
+  const hidden = document.getElementById('golden-audio');
+  const wasActive = btn.classList.contains('chip-active');
+  group.querySelectorAll('.chip').forEach(c => c.classList.remove('chip-active'));
+  if (wasActive) {
+    hidden.value = ''; // clic sobre el que ya estaba activo → lo apaga (sin audio)
+  } else {
+    btn.classList.add('chip-active');
+    hidden.value = btn.dataset.value;
+  }
+  updateGoldenAudioBadge();
+}
+
+function updateGoldenAudioBadge() {
+  renderGoldenPreviewCanvas();
+}
+
+function clearGoldenAudioChip() {
+  const group = document.getElementById('chips-golden-audio');
+  if (group) group.querySelectorAll('.chip').forEach(c => c.classList.remove('chip-active'));
+  const hidden = document.getElementById('golden-audio');
+  if (hidden) hidden.value = '';
+  updateGoldenAudioBadge();
+}
+
+// Imagen (Image element, no el canvas) de la portada actualmente mostrada en el preview.
+// Se dibuja sin crossOrigin: el preview nunca lee píxeles del canvas (toDataURL/getImageData),
+// solo pinta, así que ni siquiera necesita que el servidor mande CORS para verse bien acá.
+// La descarga en base64 (goldenPosterDataUrl) sigue siendo la que se usa para exportar.
+let goldenPreviewPosterImg = null;
+let goldenPreviewToken = 0; // descarta cargas de preview que quedaron obsoletas
+
+function showGoldenPosterPreview(src) {
+  const wrap = document.getElementById('golden-poster-preview-wrap');
+  const dz = document.getElementById('golden-drop-zone');
+  wrap.style.display = 'block';
+  dz.style.display = 'none';
+
+  const miToken = ++goldenPreviewToken;
+  const img = new Image();
+  img.onload = () => {
+    if (miToken !== goldenPreviewToken) return; // el usuario ya eligió otra portada
+    goldenPreviewPosterImg = img;
+    renderGoldenPreviewCanvas();
+  };
+  img.onerror = () => {
+    if (miToken !== goldenPreviewToken) return;
+    goldenPreviewPosterImg = null;
+    renderGoldenPreviewCanvas();
+  };
+  img.src = src;
+}
+
+function hideGoldenPosterPreview() {
+  const wrap = document.getElementById('golden-poster-preview-wrap');
+  const dz = document.getElementById('golden-drop-zone');
+  wrap.style.display = 'none';
+  dz.style.display = 'flex';
+  goldenPreviewToken++; // descarta cualquier carga de imagen que siga en vuelo
+  goldenPreviewPosterImg = null;
+}
+
+function clearGoldenPoster() {
+  goldenPosterDataUrl = null;
+  document.getElementById('golden-poster-url').value = '';
+  document.getElementById('golden-poster-file').value = '';
+  hideGoldenPosterPreview();
+}
+
+// Ruta del sello "Golden Quality" — misma convención que el resto de las cintas
+// (peliBadgePath): admin.html vive en /admin/, las badges en la raíz del repo.
+const GOLDEN_BADGE_PATH = '../badges/golden/golden.png';
+
+function loadImageEl(src, tryCrossOrigin) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    if (tryCrossOrigin) img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('No se pudo cargar la imagen: ' + src));
+    img.src = src;
+  });
+}
+
+// Hueco transparente real del marco golden.png (medido sobre el archivo: banda ancha arriba
+// con el texto "EDICIÓN GOLDEN", franja izquierda con "NoctisMovies QUALITY", borde fino a la
+// derecha y abajo). La portada tiene que entrar en ESTE rectángulo, no en el lienzo completo,
+// para no quedar tapada por el marco ni descuadrada.
+// Valores ya calibrados y confirmados — el panel de sliders que los ajustaba en vivo se sacó
+// porque ya no hace falta. Si el marco golden.png cambia de diseño, hay que volver a medir esto.
+const GOLDEN_INNER = { top: 0.112, left: 0.069, right: 0.013, bottom: 0.024, zoom: 0.81 };
+
+// ── Render del preview en vivo ──
+// Usa TAL CUAL drawImageCoverInGoldenWindow (la misma función que usa construirCanvasGolden
+// para la imagen final), así el preview deja de ser una aproximación en CSS y pasa a ser un
+// pixel a pixel de lo que se va a descargar/copiar. Cachea el sello dorado y las cintas de
+// audio (no hace falta re-descargarlas en cada movida de slider).
+let goldenFrameBadgeCache = null;
+let goldenFrameBadgeLoading = null;
+const goldenAudioBadgeCache = {}; // key -> Image ya cargada
+
+function renderGoldenPreviewCanvas() {
+  const canvas = document.getElementById('golden-preview-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const CW = canvas.width, CH = canvas.height;
+  ctx.clearRect(0, 0, CW, CH);
+  ctx.fillStyle = '#080a0f';
+  ctx.fillRect(0, 0, CW, CH);
+
+  if (goldenPreviewPosterImg) {
+    drawImageCoverInGoldenWindow(ctx, goldenPreviewPosterImg, CW, CH);
+  }
+
+  // Cinta de audio de esta sección (si hay una elegida), va debajo del sello dorado.
+  const audioVal = document.getElementById('golden-audio')?.value || '';
+  const audioKey = GOLDEN_AUDIO_KEY[audioVal];
+  if (audioKey) {
+    const cached = goldenAudioBadgeCache[audioKey];
+    if (cached === undefined) {
+      goldenAudioBadgeCache[audioKey] = null; // marca "cargando" para no pedirla 2 veces
+      loadImageEl(peliBadgePath('idioma', audioKey), false)
+        .then(im => { goldenAudioBadgeCache[audioKey] = im; renderGoldenPreviewCanvas(); })
+        .catch(() => { goldenAudioBadgeCache[audioKey] = null; });
+    } else if (cached) {
+      ctx.drawImage(cached, 0, 0, CW, CH);
+    }
+  }
+
+  // Sello Golden, siempre arriba de todo.
+  if (goldenFrameBadgeCache) {
+    ctx.drawImage(goldenFrameBadgeCache, 0, 0, CW, CH);
+  } else if (!goldenFrameBadgeLoading) {
+    goldenFrameBadgeLoading = loadImageEl(GOLDEN_BADGE_PATH, false)
+      .then(im => { goldenFrameBadgeCache = im; renderGoldenPreviewCanvas(); })
+      .catch(() => { showToast('No se encontró el sello local: ' + GOLDEN_BADGE_PATH, 'error'); });
+  }
+}
+
+// Dibuja "img" dentro del canvas simulando object-fit:cover (recorta lo que sobre,
+// igual que se ve el poster real en el sitio), sin deformarlo.
+function drawImageCover(ctx, img, cw, ch) {
+  const ir = img.width / img.height;
+  const cr = cw / ch;
+  let sx, sy, sw, sh;
+  if (ir > cr) { // imagen más ancha que el marco -> recorta a los costados
+    sh = img.height;
+    sw = sh * cr;
+    sx = (img.width - sw) / 2;
+    sy = 0;
+  } else { // imagen más alta que el marco -> recorta arriba/abajo
+    sw = img.width;
+    sh = sw / cr;
+    sx = 0;
+    sy = (img.height - sh) / 2;
+  }
+  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
+}
+
+// Dibuja la portada dentro del hueco transparente REAL del marco (GOLDEN_INNER), simulando
+// object-fit:cover pero acotado a ese rectángulo — así la portada queda alineada con lo que el
+// marco efectivamente deja ver, en vez de centrarse en el lienzo de 1280x740 completo (que
+// ignora que el marco ya tapa una franja grande arriba y a la izquierda).
+function drawImageCoverInGoldenWindow(ctx, img, cw, ch) {
+  const dx = GOLDEN_INNER.left * cw;
+  const dy = GOLDEN_INNER.top * ch;
+  const dw = cw - dx - GOLDEN_INNER.right * cw;
+  const dh = ch - dy - GOLDEN_INNER.bottom * ch;
+  const zoom = GOLDEN_INNER.zoom || 1;
+
+  const ir = img.width / img.height;
+  const dr = dw / dh;
+  let sx, sy, sw, sh;
+  if (ir > dr) {
+    sh = img.height;
+    sw = sh * dr;
+    sx = (img.width - sw) / 2;
+    sy = 0;
+  } else {
+    sw = img.width;
+    sh = sw / dr;
+    sx = 0;
+    sy = (img.height - sh) / 2;
+  }
+  // Zoom: recorta más (agranda) o menos (achica, revela más fondo) sobre el mismo centro,
+  // sin cambiar el recuadro destino. Con zoom<1 el crop pedido puede superar el tamaño real
+  // de la imagen fuente — hay que topar ANCHO y ALTO con el MISMO factor a la vez (no cada
+  // uno por separado), o el rectángulo recortado deja de tener la proporción del recuadro
+  // destino y drawImage lo estira/deforma para que entre igual.
+  if (zoom !== 1) {
+    const cx = sx + sw / 2, cy = sy + sh / 2;
+    let factor = 1 / zoom; // >1 agranda el recorte (aleja), <1 lo achica (acerca)
+    const maxFactor = Math.min(img.width / sw, img.height / sh); // tope real de la imagen fuente
+    factor = Math.min(factor, maxFactor);
+    const zsw = sw * factor;
+    const zsh = sh * factor;
+    sx = Math.max(0, Math.min(cx - zsw / 2, img.width - zsw));
+    sy = Math.max(0, Math.min(cy - zsh / 2, img.height - zsh));
+    sw = zsw; sh = zsh;
+  }
+  ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+}
+
+// Arma el canvas 1280x740 con la portada elegida + el sello dorado encima, y el
+// sello de Audio de ESTA sección (si está activo) — nunca el Audio/HDR del formulario de arriba.
+// Lo usan tanto "descargar" como "copiar imagen" para no duplicar la lógica.
+// "forcePosterDataUrl": si se pasa, se usa esta imagen (base64) en vez de goldenPosterDataUrl /
+// el campo de URL — se usa como reintento cuando la carga directa deja el canvas tainted.
+async function construirCanvasGolden(forcePosterDataUrl) {
+  if (!goldenMatchesData.length) { showToast('Primero buscá y armá una edición.', 'error'); return null; }
+  const posterSrc = forcePosterDataUrl || goldenPosterDataUrl || document.getElementById('golden-poster-url').value.trim();
+  if (!posterSrc) { showToast('Falta la portada de esta edición.', 'error'); return null; }
+
+  const CW = 1280, CH = 740; // misma proporción que .poster-preview-wrap (1280/740)
+  const isRemote = posterSrc.startsWith('http');
+  let posterImg, badgeImg;
+  try {
+    posterImg = await loadImageEl(posterSrc, isRemote);
+  } catch (e) {
+    throw new Error('No se pudo cargar la portada' + (isRemote ? ' (CORS/red)' : '') + ': ' + posterSrc);
+  }
+  try {
+    badgeImg = await loadImageEl(GOLDEN_BADGE_PATH, false);
+  } catch (e) {
+    throw new Error('No se encontró el sello local: ' + GOLDEN_BADGE_PATH);
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = CW;
+  canvas.height = CH;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#080a0f';
+  ctx.fillRect(0, 0, CW, CH);
+  drawImageCoverInGoldenWindow(ctx, posterImg, CW, CH);
+
+  // Sello de Audio propio de esta sección (chips "🎧 Audio" de acá abajo, no el de arriba).
+  // Va ENTRE la portada y el marco Golden — se dibuja antes que el sello dorado para que
+  // este último quede siempre arriba de todo, igual que en el preview en vivo.
+  const audioVal = document.getElementById('golden-audio')?.value || '';
+  const audioKey = GOLDEN_AUDIO_KEY[audioVal];
+  if (audioKey) {
+    try {
+      const audioBadgeImg = await loadImageEl(peliBadgePath('idioma', audioKey), false);
+      ctx.drawImage(audioBadgeImg, 0, 0, CW, CH);
+    } catch (e) {
+      // Si no encuentra la cinta de audio seguimos sin ella, no bloqueamos la portada.
+    }
+  }
+
+  ctx.drawImage(badgeImg, 0, 0, CW, CH); // el sello Golden va estirado a todo el marco, arriba de todo
+
+  return canvas;
+}
+
+// Genera y descarga la portada armada (archivo, URL pegada, o elegida de una edición
+// encontrada) CON el sello dorado de Golden Quality encima, lista para usar en YouTube
+// u otro lado. NO toca el catálogo: esta sección solo genera/exporta la imagen, no
+// agrega ningún título a movies.json.
+async function generarGoldenPortada() {
+  const titulo = document.getElementById('golden-title').value.trim();
+  const fileBase = generateSlug(titulo || 'golden-quality') || 'golden-quality';
+  const posterSrc = goldenPosterDataUrl || document.getElementById('golden-poster-url').value.trim();
+
+  try {
+    let canvas = await construirCanvasGolden();
+    if (!canvas) return;
+    let dataUrl;
+    try {
+      dataUrl = canvas.toDataURL('image/png');
+    } catch (taintErr) {
+      // El canvas quedó "tainted" (la portada remota no mandó cabeceras CORS al cargarla como
+      // <img>). Reintentamos descargando esa misma portada como bytes (fetch + proxies) y
+      // usándola ya en base64, que nunca deja el canvas contaminado.
+      const dataUrlPoster = await fetchImageAsDataUrl(posterSrc);
+      if (!dataUrlPoster) throw taintErr;
+      goldenPosterDataUrl = dataUrlPoster; // la dejamos guardada para que no vuelva a fallar
+      canvas = await construirCanvasGolden(dataUrlPoster);
+      if (!canvas) return;
+      dataUrl = canvas.toDataURL('image/png');
+    }
+
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = fileBase + '-golden.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    showToast('✓ Portada con sello Golden generada y descargada', 'success');
+  } catch (err) {
+    // Causas típicas: ni siquiera los proxies pudieron traer la portada (URL rota / sin
+    // internet / bloqueada), o no encontró badges/golden/golden.png. En ese caso abrimos la
+    // portada sola en una pestaña nueva para no dejar al usuario sin nada, y avisamos qué pasó.
+    console.error('generarGoldenPortada:', err);
+    if (posterSrc) window.open(posterSrc, '_blank');
+    showToast('No se pudo componer el sello: ' + (err?.message || err) + ' — se abrió la portada sola en una pestaña.', 'error');
+  }
+}
+
+// Copia la portada + sello Golden directo al portapapeles (como imagen), para pegarla
+// donde haga falta (YouTube, WhatsApp, etc.) sin tener que descargar el archivo primero.
+async function copiarGoldenImagen() {
+  try {
+    let canvas = await construirCanvasGolden();
+    if (!canvas) return;
+
+    if (!navigator.clipboard || !window.ClipboardItem) {
+      showToast('Tu navegador no soporta copiar imágenes al portapapeles. Usá "Generar portada" para descargarla.', 'error');
+      return;
+    }
+
+    const posterSrcActual = goldenPosterDataUrl || document.getElementById('golden-poster-url').value.trim();
+    let blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) {
+      // toBlob() devuelve null (en vez de tirar excepción) cuando el canvas quedó "tainted"
+      // por CORS. Reintentamos descargando la portada como bytes (fetch + proxies) y
+      // reconstruyendo el canvas ya con esa imagen en base64.
+      const dataUrlPoster = await fetchImageAsDataUrl(posterSrcActual);
+      if (!dataUrlPoster) throw new Error('No se pudo descargar la portada (CORS/red) ni con los proxies de respaldo.');
+      goldenPosterDataUrl = dataUrlPoster;
+      canvas = await construirCanvasGolden(dataUrlPoster);
+      if (!canvas) return;
+      blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    }
+    if (!blob) throw new Error('No se pudo generar la imagen ni siquiera con los proxies de respaldo.');
+
+    await navigator.clipboard.write([ new ClipboardItem({ 'image/png': blob }) ]);
+    showToast('✓ Imagen con sello Golden copiada al portapapeles', 'success');
+  } catch (err) {
+    const posterSrc = goldenPosterDataUrl || document.getElementById('golden-poster-url').value.trim();
+    console.error('copiarGoldenImagen:', err);
+    if (posterSrc) window.open(posterSrc, '_blank');
+    showToast('No se pudo copiar la imagen: ' + (err?.message || err) + ' — se abrió la portada sola en una pestaña.', 'error');
+  }
+}
+
 // Sistema de portada combinado (archivo + URL)
 let posterDataUrl = null; // guarda base64 si es archivo local
 
@@ -2328,6 +2986,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) handleImageFile(file);
   });
+
+  const gdz = document.getElementById('golden-drop-zone');
+  if (gdz) {
+    gdz.addEventListener('dragover', e => { e.preventDefault(); gdz.classList.add('dragover'); });
+    gdz.addEventListener('dragleave', () => gdz.classList.remove('dragover'));
+    gdz.addEventListener('drop', e => {
+      e.preventDefault(); gdz.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) handleGoldenImageFile(file);
+    });
+  }
 });
 
 /* ======================== LIST ======================== */
