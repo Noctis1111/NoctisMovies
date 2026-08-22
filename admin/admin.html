@@ -205,14 +205,14 @@
   padding: 0 2rem !important; 
 }
 
-/* Reducción de altura a 48px para un look más fino y elegante */
+/* Altura reducida a 34px — barra más fina para dar más espacio vertical al panel de abajo */
 .admin-header-inner { 
   max-width: 1900px !important; 
   margin: 0 auto !important; 
   display: flex !important; 
   align-items: center !important; 
   gap: 1.5rem !important; 
-  height: 48px !important; /* Navbar compacto */
+  height: 34px !important; /* Navbar ultra-compacto */
 }
 
 .admin-logo-link { text-decoration: none !important; }
@@ -220,11 +220,11 @@
 /* 2. LOGOTIPO: Alineación horizontal e iluminación */
 .admin-logo { 
   font-family: 'Bebas Neue', sans-serif !important; 
-  font-size: 1.35rem !important; 
-  letter-spacing: 2px !important; 
+  font-size: 1.1rem !important; 
+  letter-spacing: 1.6px !important; 
   color: #ffffff !important; 
   display: block !important; 
-  line-height: 48px !important; /* Centrado vertical exacto con la barra */
+  line-height: 34px !important; /* Centrado vertical exacto con la barra */
   transition: opacity 0.2s ease !important;
 }
 .admin-logo-link:hover .admin-logo { opacity: 0.9 !important; }
@@ -238,18 +238,18 @@
 .admin-logo small { 
   display: inline-block !important; /* Fuerza el salto a la derecha */
   font-family: 'Barlow', sans-serif !important; 
-  font-size: 0.68rem !important; 
+  font-size: 0.6rem !important; 
   font-weight: 700 !important;
   color: #e5bc4b !important; /* Ahora resalta en el dorado de la web */
-  letter-spacing: 1.5px !important; 
+  letter-spacing: 1.2px !important; 
   text-transform: uppercase !important; 
   
   /* Micro-cápsula contenedora para que no se pierda visualmente */
   background: rgba(229, 188, 75, 0.12) !important; 
   border: 1px solid rgba(229, 188, 75, 0.35) !important;
-  padding: 2px 8px !important;
+  padding: 1px 6px !important;
   border-radius: 4px !important;
-  margin-left: 12px !important; /* Separación horizontal del logo */
+  margin-left: 8px !important; /* Separación horizontal del logo */
   line-height: normal !important; /* Resetea herencia del padre */
   vertical-align: middle !important;
 }
@@ -262,11 +262,11 @@
 }
 
 .admin-nav a, .admin-nav button { 
-  padding: 0.35rem 0.85rem !important; /* Proporciones adaptadas al nuevo alto */
+  padding: 0.22rem 0.65rem !important; /* Proporciones adaptadas al nuevo alto */
   border-radius: 5px !important; 
-  font-size: 0.78rem !important; 
+  font-size: 0.68rem !important; 
   font-weight: 600 !important; 
-  letter-spacing: 1px !important; 
+  letter-spacing: 0.8px !important; 
   text-transform: uppercase !important; 
   text-decoration: none !important; 
   cursor: pointer !important; 
@@ -733,8 +733,8 @@
     .movie-list { display: flex; flex-direction: column; gap: 0.75rem; }
     .movie-item { display: flex; align-items: center; gap: 1rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem 1rem; transition: border-color 0.2s; }
     .movie-item:hover { border-color: rgba(201,168,76,0.2); }
-    .movie-item-poster { width: 90px; height: 52px; object-fit: cover; border-radius: 6px; flex-shrink: 0; background: var(--surface3); aspect-ratio: 1280/740; }
-    .movie-item-poster-wrap { position: relative; width: 90px; height: 52px; flex-shrink: 0; }
+    .movie-item-poster { width: 108px; height: 62px; object-fit: cover; border-radius: 6px; flex-shrink: 0; background: var(--surface3); aspect-ratio: 1280/740; }
+    .movie-item-poster-wrap { position: relative; width: 108px; height: 62px; flex-shrink: 0; }
     .movie-item-poster-wrap .movie-item-poster { width: 100%; height: 100%; }
     .movie-item-badge-overlay { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 6px; pointer-events: none; }
     .movie-item-info { flex: 1; min-width: 0; }
@@ -1188,15 +1188,28 @@
           <!-- ══ 2 COLUMNAS: Título+Bloque | Portada (portada al doble de tamaño, con sello Golden en vivo) ══ -->
           <div class="golden-cols" style="display:grid;grid-template-columns:1fr 460px;gap:1rem;align-items:start;">
 
-            <!-- COLUMNA IZQUIERDA: Título + Bloque generado -->
+            <!-- COLUMNA IZQUIERDA: Título + Datos/Sinopsis + MAS INFO, cada uno con su botón de copiar -->
             <div>
               <div class="form-group">
                 <label>Título completo (editable)</label>
-                <input type="text" id="golden-title"/>
+                <div style="display:flex;gap:0.5rem;">
+                  <input type="text" id="golden-title" style="flex:1;margin-bottom:0;"/>
+                  <button class="export-btn" style="width:auto;white-space:nowrap;padding:0 1rem;margin:0;" onclick="copiarGoldenCampo('golden-title','Título')">📋 Copiar</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Datos + Sinopsis</label>
+                <div style="display:flex;gap:0.5rem;align-items:flex-start;">
+                  <textarea id="golden-datos" rows="9" style="flex:1;font-family:monospace;font-size:0.78rem;background:var(--surface3);border:1px solid var(--border);border-radius:6px;color:var(--white);padding:0.6rem;"></textarea>
+                  <button class="export-btn" style="width:auto;white-space:nowrap;padding:0.8rem 1.4rem;margin:0;font-size:1rem;align-self:stretch;" onclick="copiarGoldenCampo('golden-datos','Datos + Sinopsis')">📋 Copiar</button>
+                </div>
               </div>
               <div class="form-group" style="margin-bottom:0;">
-                <label>Bloque generado (Datos + Sinopsis + MAS INFO)</label>
-                <textarea id="golden-block" rows="14" style="width:100%;font-family:monospace;font-size:0.78rem;background:var(--surface3);border:1px solid var(--border);border-radius:6px;color:var(--white);padding:0.6rem;"></textarea>
+                <label>MAS INFO</label>
+                <div style="display:flex;gap:0.5rem;align-items:flex-start;">
+                  <textarea id="golden-masinfo" rows="5" style="flex:1;font-family:monospace;font-size:0.78rem;background:var(--surface3);border:1px solid var(--border);border-radius:6px;color:var(--white);padding:0.6rem;"></textarea>
+                  <button class="export-btn" style="width:auto;white-space:nowrap;padding:0.8rem 1.4rem;margin:0;font-size:1rem;align-self:stretch;" onclick="copiarGoldenCampo('golden-masinfo','MAS INFO')">📋 Copiar</button>
+                </div>
               </div>
             </div>
 
@@ -1245,8 +1258,7 @@
 
           </div><!-- fin 2 cols título/bloque + portada -->
 
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;margin-top:0.7rem;">
-            <button class="export-btn" onclick="copiarGoldenBlock()">📋 Copiar bloque</button>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.7rem;">
             <button class="export-btn" onclick="copiarGoldenImagen()">🖼 Copiar imagen</button>
             <button class="export-btn primary-export" style="background:var(--gold);border-color:var(--gold);color:#000;" onclick="generarGoldenPortada()">⬇ Generar portada con sello Golden</button>
           </div>
@@ -1759,13 +1771,48 @@ function autoRellenarTodo() {
   if (p.infoDescarga) document.getElementById('f-descarga-raw').value = p.infoDescarga;
   // Enlaces
   if (p.enlaces) document.getElementById('f-links').value = p.enlaces;
-  // URLs Capturas (detectadas entre la sinopsis y "MAS INFO")
+  // URLs Capturas (detectadas entre la sinopsis y "MAS INFO").
+  // Si esta pasada NO trae capturas, se busca si ya existe otra edición de la
+  // MISMA película ("Título (Año)" igual) con capturas guardadas, y se copian
+  // de ahí — mismo criterio que el trailer.
   if (p.screenshots) {
     document.getElementById('f-screenshot').value = p.screenshots;
     updateScreenshotCount();
+  } else if (p.titulo && !document.getElementById('f-screenshot').value.trim()) {
+    const baseNuevoSs = baseTituloSinCalidad(p.titulo);
+    const hermanoSs = getMovies().find(m => m.screenshot && baseTituloSinCalidad(m.title || '') === baseNuevoSs);
+    if (hermanoSs) {
+      document.getElementById('f-screenshot').value = hermanoSs.screenshot;
+      updateScreenshotCount();
+      showToast('🖼 Capturas copiadas automáticamente de "' + hermanoSs.title + '"', 'info');
+    }
   }
-  // Trailer YouTube (detectado en cualquier posición del bloque pegado)
-  if (p.trailer) document.getElementById('f-trailer').value = p.trailer;
+  // Trailer YouTube (detectado en cualquier posición del bloque pegado).
+  // Si esta pasada NO trae trailer, se busca automáticamente si ya existe otra
+  // edición de la MISMA película ("Título (Año)" igual) con trailer guardado en
+  // el catálogo, y se copia de ahí — así no hay que pegarlo de nuevo en cada calidad.
+  if (p.trailer) {
+    document.getElementById('f-trailer').value = p.trailer;
+  } else if (p.titulo && !document.getElementById('f-trailer').value.trim()) {
+    const baseNuevo = baseTituloSinCalidad(p.titulo);
+    const hermano = getMovies().find(m => m.trailer && baseTituloSinCalidad(m.title || '') === baseNuevo);
+    if (hermano) {
+      document.getElementById('f-trailer').value = hermano.trailer;
+      showToast('🎬 Trailer copiado automáticamente de "' + hermano.title + '"', 'info');
+    }
+  }
+  // Portada (poster): mismo criterio — casi siempre se usa la misma portada para
+  // todas las ediciones de una película, así que si el campo está vacío se toma
+  // la de otra edición ya guardada con el mismo "Título (Año)".
+  if (p.titulo && !document.getElementById('f-image').value.trim()) {
+    const baseImg = baseTituloSinCalidad(p.titulo);
+    const hermanoImg = getMovies().find(m => m.image && baseTituloSinCalidad(m.title || '') === baseImg);
+    if (hermanoImg) {
+      document.getElementById('f-image').value = hermanoImg.image;
+      previewImgUrl(hermanoImg.image);
+      showToast('🖼 Portada copiada automáticamente de "' + hermanoImg.title + '"', 'info');
+    }
+  }
 
   // Año filtro (primer año de 4 dígitos)
   if (p.year) {
@@ -2349,7 +2396,8 @@ function buscarGolden() {
     goldenMatchesData = [];
     goldenTotalMatches = 0;
     document.getElementById('golden-title').value = '';
-    document.getElementById('golden-block').value = '';
+    document.getElementById('golden-datos').value = '';
+    document.getElementById('golden-masinfo').value = '';
     return;
   }
   // El catálogo ya está en orden "más reciente primero" (se guarda con unshift),
@@ -2371,12 +2419,12 @@ function renderGoldenMatches() {
   matchesBox.innerHTML =
     '<p style="font-size:0.75rem;color:var(--gold2);margin-bottom:0.4rem;">' + goldenMatchesData.length + ' de ' + goldenTotalMatches + ' edición(es) encontradas — se usan las ' + goldenMatchesData.length + ' más recientes:</p>' +
     goldenMatchesData.map((m, i) =>
-      '<div style="display:flex;align-items:center;gap:0.5rem;font-size:0.78rem;color:var(--white);padding:0.3rem 0;border-bottom:1px solid var(--border);">' +
-        (m.image ? '<img src="' + m.image + '" style="width:28px;height:16px;object-fit:cover;border-radius:3px;flex-shrink:0;"/>' : '') +
+      '<div style="display:flex;align-items:center;gap:0.6rem;font-size:0.85rem;color:var(--white);padding:0.4rem 0;border-bottom:1px solid var(--border);">' +
+        (m.image ? '<img src="' + m.image + '" style="width:44px;height:25px;object-fit:cover;border-radius:4px;flex-shrink:0;"/>' : '') +
         '<span>' + (m.title || '(sin título)') + '</span>' +
-        (m.resolution ? '<span style="color:var(--muted);margin-left:auto;">' + m.resolution + '</span>' : '') +
-        (m.uploadDate ? '<span style="color:var(--muted);white-space:nowrap;">· ' + m.uploadDate + '</span>' : '') +
-        '<button onclick="quitarGoldenMatch(' + i + ')" title="Quitar de la lista" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.85rem;line-height:1;padding:0.1rem 0.2rem;flex-shrink:0;">✕</button>' +
+        (m.resolution ? '<span style="color:var(--muted);margin-left:auto;font-size:0.78rem;">' + m.resolution + '</span>' : '') +
+        (m.uploadDate ? '<span style="color:var(--muted);white-space:nowrap;font-size:0.78rem;">· ' + m.uploadDate + '</span>' : '') +
+        '<button onclick="quitarGoldenMatch(' + i + ')" title="Quitar de la lista" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.9rem;line-height:1;padding:0.1rem 0.2rem;flex-shrink:0;">✕</button>' +
       '</div>'
     ).join('');
 
@@ -2411,7 +2459,8 @@ function quitarGoldenMatch(index) {
   if (!goldenMatchesData.length) {
     document.getElementById('golden-matches').innerHTML = '<p style="color:var(--muted);font-size:0.8rem;">No quedan ediciones seleccionadas.</p>';
     document.getElementById('golden-title').value = '';
-    document.getElementById('golden-block').value = '';
+    document.getElementById('golden-datos').value = '';
+    document.getElementById('golden-masinfo').value = '';
     return;
   }
   renderGoldenMatches();
@@ -2436,30 +2485,33 @@ function construirGolden(elegidas) {
   }
   resoluciones.sort((a, b) => resolucionArea(a) - resolucionArea(b));
 
-  const lineas = [];
-  lineas.push(tituloGolden);
-  lineas.push('');
-  if (base.originalTitle) lineas.push('Título Original: ' + base.originalTitle);
-  if (base.year)          lineas.push('Año: ' + base.year);
-  if (base.country)       lineas.push('Pais(es): ' + base.country);
-  if (base.duration)      lineas.push('Duración: ' + base.duration);
-  if (base.genre)         lineas.push('Genero: ' + base.genre);
-  lineas.push('');
-  if (base.description)   lineas.push(base.description);
-  lineas.push('');
-  lineas.push('MAS INFO');
-  lineas.push('Calidad: MULTI-CALIDAD INGRESANDO AL LINK MAS INFO');
-  lineas.push('Resolución: ' + resoluciones.join(' - '));
-  lineas.push('Formato: MKV');
+  const lineasDatos = [];
+  if (base.originalTitle) lineasDatos.push('Título Original: ' + base.originalTitle);
+  if (base.year)          lineasDatos.push('Año: ' + base.year);
+  if (base.country)       lineasDatos.push('Pais(es): ' + base.country);
+  if (base.duration)      lineasDatos.push('Duración: ' + base.duration);
+  if (base.genre)         lineasDatos.push('Genero: ' + base.genre);
+  if (base.description) { lineasDatos.push(''); lineasDatos.push(base.description); }
+
+  const lineasMasInfo = [
+    'MAS INFO',
+    'Calidad: MULTI-CALIDAD INGRESANDO AL LINK MAS INFO',
+    'Resolución: ' + resoluciones.join(' - '),
+    'Formato: MKV',
+    '',
+    '',
+    searchUrlFor(base),
+  ];
 
   document.getElementById('golden-title').value = tituloGolden;
-  document.getElementById('golden-block').value = lineas.join('\n');
+  document.getElementById('golden-datos').value = lineasDatos.join('\n');
+  document.getElementById('golden-masinfo').value = lineasMasInfo.join('\n');
 }
 
-function copiarGoldenBlock() {
-  const txt = document.getElementById('golden-block').value;
+function copiarGoldenCampo(id, nombre) {
+  const txt = document.getElementById(id).value;
   if (!txt) return;
-  navigator.clipboard.writeText(txt).then(() => showToast('✓ Bloque copiado', 'success'));
+  navigator.clipboard.writeText(txt).then(() => showToast('✓ ' + nombre + ' copiado', 'success'));
 }
 
 // Sistema de portada de la edición Golden: archivo local (drag&drop / selector), URL pegada,
