@@ -1068,6 +1068,7 @@
                   <img id="peli-calidad" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:4;"/>
                   <img id="peli-hdr" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:5;"/>
                   <img id="peli-streaming" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:6;"/>
+                  <img id="peli-musica" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:4;"/>
                   <button onclick="clearPoster()" title="Quitar imagen" style="position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.7);border:1px solid var(--border);color:#fff;font-size:0.7rem;cursor:pointer;line-height:1;z-index:9;">✕</button>
                 </div>
                 <input type="file" id="f-image-file" accept="image/webp,image/jpeg,image/png" style="display:none" onchange="handleImageFile(this.files[0])"/>
@@ -1410,7 +1411,25 @@ const PELI_FILE_FOR = {
     'paramount-plus':'paramount+','peacock':'peacock','prime-video':'primevideo','star-plus':'star+',
     'apple-tv-plus':'tv+','vix':'vix',
   },
+  musica: { 'mp3':'mp3', '16-bits':'16-bits', '24-bits':'24-bits', '16-24-bits':'16-24-bits', 'wav-32-bits':'wav-32-bits' },
 };
+
+// Formato(s) de audio activos (ej: "Lossless 16-bit, Hi-Res 24-bit") -> qué cinta de
+// badges/musica/ corresponde. Si hay 16-bit Y 24-bit a la vez, se usa la cinta combinada
+// "16-24-bits" en vez de superponer las dos por separado.
+function musicaBadgeKeyFromFormats(activeList) {
+  const has = v => activeList.includes(v);
+  if (has('Master 32-bit')) return 'wav-32-bits';
+  if (has('Lossless 16-bit') && has('Hi-Res 24-bit')) return '16-24-bits';
+  if (has('Hi-Res 24-bit')) return '24-bits';
+  if (has('Lossless 16-bit')) return '16-bits';
+  if (has('MP3')) return 'mp3';
+  return null;
+}
+function musicaBadgeKey() {
+  const raw = document.getElementById('f-audioformat')?.value || '';
+  return musicaBadgeKeyFromFormats(raw.split(',').map(s => s.trim()).filter(Boolean));
+}
 // admin.html vive en /admin/, las badges en la raiz del repo -> subir un nivel
 function peliBadgePath(cat, key) {
   const file = PELI_FILE_FOR[cat] && PELI_FILE_FOR[cat][key];
@@ -1508,6 +1527,7 @@ function getPeliBadgeKeysFromMovie(m) {
     calidad: map[m.quality] || null,
     hdr: (m.hdr || hdr),
     streaming: (m.streaming || streaming),
+    musica: (m.type||'').includes('Música') ? musicaBadgeKeyFromFormats((m.audioFormat||'').split(',').map(s=>s.trim()).filter(Boolean)) : null,
   };
 }
 
@@ -2003,6 +2023,7 @@ function initChips() {
           }
           const activos = Array.from(group.querySelectorAll('.chip.chip-active')).map(c => c.dataset.value);
           hiddenInput.value = activos.join(', ');
+          updatePeliBadgePreview();
           return;
         }
 
@@ -2981,7 +3002,10 @@ function updatePeliBadgePreview() {
   const hdrManual = document.getElementById('f-hdr')?.value || '';
   const streamingManual = document.getElementById('f-streaming')?.value || '';
   const layers = { idioma: peliIdiomaKey(), fuente: peliFuenteKey(), calidad: peliCalidadKey(), hdr: hdrManual || peliHdrKey(), streaming: streamingManual || peliStreamingKey() };
-  const anyFuente = !esMusica && !isLegacyCover && !!layers.fuente;
+  const musicaKey = (esMusica && !isLegacyCover) ? musicaBadgeKey() : null;
+  // El marco de "fuente" (películas/series) y el de "música" recortan la foto al mismo
+  // hueco real del marco → misma clase has-frame para ambos casos.
+  const anyFuente = !isLegacyCover && (!!layers.fuente || !!musicaKey);
 
   imgPreview.classList.toggle('has-frame', anyFuente);
 
@@ -2993,6 +3017,14 @@ function updatePeliBadgePreview() {
     if (path) { el.src = path; el.style.display = 'block'; }
     else { el.style.display = 'none'; }
   });
+
+  // Música: cinta propia según el/los formato(s) de audio activos (badges/musica/)
+  const musicaEl = document.getElementById('peli-musica');
+  if (musicaEl) {
+    const musicaPath = musicaKey ? peliBadgePath('musica', musicaKey) : '';
+    if (musicaPath) { musicaEl.src = musicaPath; musicaEl.style.display = 'block'; }
+    else { musicaEl.style.display = 'none'; }
+  }
 }
 
 function showPosterPreview(src) {
@@ -3217,7 +3249,7 @@ function renderList(resetPage) {
     const ri = movies.indexOf(m);
     const views = viewsCache[viewKeyFor(m, ri)];
     const peliBadges = m.legacyCover ? null : getPeliBadgeKeysFromMovie(m);
-    const badgeLayersHtml = peliBadges ? ['idioma','fuente','calidad','hdr','streaming'].map(cat => {
+    const badgeLayersHtml = peliBadges ? ['idioma','fuente','calidad','hdr','streaming','musica'].map(cat => {
       const key = peliBadges[cat];
       if (!key) return '';
       const path = peliBadgePath(cat, key);
