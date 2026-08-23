@@ -1257,6 +1257,7 @@ const PELI_FILE_FOR = {
     'paramount-plus':'paramount+','peacock':'peacock','prime-video':'primevideo','star-plus':'star+',
     'apple-tv-plus':'tv+','vix':'vix',
   },
+  musica: { 'mp3':'mp3', '16-bits':'16-bits', '24-bits':'24-bits', '16-24-bits':'16-24-bits', 'wav-32-bits':'wav-32-bits' },
 };
 // index.html vive en la raíz del repo, igual que la carpeta badges/ -> sin subir nivel
 function peliBadgePath(cat, key) {
@@ -1265,8 +1266,27 @@ function peliBadgePath(cat, key) {
   return `badges/${cat}/${encodeURIComponent(file)}.png`;
 }
 
+// Formato(s) de audio activos (ej: "Lossless 16-bit, Hi-Res 24-bit") -> qué cinta de
+// badges/musica/ corresponde. Si hay 16-bit Y 24-bit a la vez, se usa la cinta combinada
+// "16-24-bits" en vez de superponer las dos por separado. (idéntico a admin.html)
+function musicaBadgeKeyFromFormats(activeList) {
+  const has = v => activeList.includes(v);
+  if (has('Master 32-bit')) return 'wav-32-bits';
+  if (has('Lossless 16-bit') && has('Hi-Res 24-bit')) return '16-24-bits';
+  if (has('Hi-Res 24-bit')) return '24-bits';
+  if (has('Lossless 16-bit')) return '16-bits';
+  if (has('MP3')) return 'mp3';
+  return null;
+}
+
 function getPeliBadgeKeysFromMovie(m) {
-  if ((m.type || '').includes('Música')) return null; // solo para peliculas/series
+  const isMusica = (m.type || '').includes('Música');
+  if (isMusica) {
+    return {
+      fuente: null, idioma: null, calidad: null, hdr: null, streaming: null,
+      musica: musicaBadgeKeyFromFormats((m.audioFormat||'').split(',').map(s=>s.trim()).filter(Boolean)),
+    };
+  }
   const map = { '4K':'4k', 'Full HD':'full-hd', '1080p':'1080p', '720p':'720p', '480p':'480p' };
   const audioMap = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino' };
   const text = ((m.title||'') + ' ' + (m.descargaRaw||'')).toUpperCase();
@@ -1300,6 +1320,7 @@ function getPeliBadgeKeysFromMovie(m) {
     calidad: map[m.quality] || null,
     hdr: (m.hdr || hdr),
     streaming: (m.streaming || streaming),
+    musica: null,
   };
 }
 
@@ -1310,7 +1331,7 @@ function getPeliBadgeKeysFromMovie(m) {
 function hasFrame(m) {
   if (m && m.legacyCover) return false;
   const badges = getPeliBadgeKeysFromMovie(m);
-  return !!(badges && badges.fuente);
+  return !!(badges && (badges.fuente || badges.musica));
 }
 
 // Arma el HTML de las cintas superpuestas para una portada, con la clase indicada
@@ -1318,7 +1339,7 @@ function badgeOverlayHtml(m, cssClass) {
   if (m && m.legacyCover) return '';
   const badges = getPeliBadgeKeysFromMovie(m);
   if (!badges) return '';
-  return ['idioma','fuente','calidad','hdr','streaming'].map(cat => {
+  return ['idioma','fuente','calidad','hdr','streaming','musica'].map(cat => {
     const key = badges[cat];
     if (!key) return '';
     const path = peliBadgePath(cat, key);
