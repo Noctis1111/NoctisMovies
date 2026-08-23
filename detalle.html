@@ -1185,11 +1185,10 @@
     /* Cuando hay cinta de fuente (marco), la foto se recorta al hueco real del marco — mismos valores calibrados que index.html */
     .related-poster img.has-frame { top: 9.9%; left: 6.8%; width: calc(100% - 6.8% - 1.3%); height: calc(100% - 9.9% - 1.4%); position: absolute; }
     .related-badge-overlay { position: absolute !important; inset: 0 !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important; object-fit: contain !important; border-radius: 8px; pointer-events: none; z-index: 2; }
-    /* Con marco/cintas: se escala TODA la tarjeta (foto + cintas) como una sola unidad, asi quedan
-       siempre alineadas y las cintas nunca se tapan por la foto. Sin marco (portada antigua ya lista):
-       se mantiene el zoom simple de siempre, solo sobre la foto. */
-    .related-card:hover .related-poster:has(img.has-frame) { transform: scale(1.05); box-shadow: 0 12px 28px rgba(0,0,0,0.55); }
-    .related-card:hover .related-poster:not(:has(img.has-frame)) img { transform: scale(1.08); box-shadow: 0 12px 28px rgba(0,0,0,0.55); }
+    /* Zoom on hover: la <img> se eleva por encima de cintas y marca de agua (mismo criterio
+       que .movie-card:hover .card-poster img en index.html), asi la portada real "tapa" el
+       logo/cintas al acercarse, en vez de quedarse estáticos debajo. */
+    .related-card:hover .related-poster img { transform: scale(1.08); box-shadow: 0 12px 28px rgba(0,0,0,0.55); position: relative; z-index: 999; }
 
     /* ── Camuflaje activo: efecto Adult/Hentai (tarjetas relacionadas) ── */
     /* En reposo recorta limpio (evita que el blur sangre); en hover se libera para el mismo pop-out que las demás */
@@ -1599,7 +1598,8 @@
 
             <!-- Aviso sobre disponibilidad de enlaces según antigüedad del contenido -->
             <div style="max-width:480px;margin:0.6rem auto 0;text-align:center;font-size:0.78rem;line-height:1.5;color:var(--muted);">
-              ⚠️ Te recuerdo que los títulos más antiguos tienen mayor probabilidad de estar caídos (No resubo contenido).
+              ⚠️ Te recuerdo que los títulos más antiguos tienen mayor probabilidad de estar caídos (No resubo contenido).<br>
+              A excepción de Terabox, que se mantiene activo y no cae.
             </div>
           </div>
         </div>
@@ -2059,40 +2059,7 @@ function formatUploadDate(ud) {
   return (dd ? dd + ' ' : '') + meses[mNum - 1] + ' ' + y;
 }
 
-// Cintas de formato de musica: 6 archivos PNG con hueco transparente, subidos
-// al repo en la carpeta /badges/ (no base64, se repiten en cientos de tarjetas
-// publicas y asi el navegador los cachea una sola vez en vez de descargarlos
-// de nuevo dentro del HTML en cada visita).
-const MUSIC_BADGE_FILES = {
-  '16':      'badges/16-bits.png',
-  '24':      'badges/24-bits.png',
-  '1624':    'badges/16-24-bits.png',
-  'mp3':     'badges/mp3.png',
-  'wav32':   'badges/wav-32-bits.png',
-  'flacwav': 'badges/flac-wav.png',
-};
-
-function getMusicBadgeKeyFromMovie(m) {
-  if (!(m.type || '').includes('Música')) return null;
-  const fmts = (m.audioFormat || '').split(',').map(s => s.trim());
-  const hasMP3 = fmts.includes('MP3');
-  const has16  = fmts.includes('Lossless 16-bit');
-  const has24  = fmts.includes('Hi-Res 24-bit');
-  const has32  = fmts.includes('Master 32-bit');
-  const raw = ((m.format || '') + ' ' + (m.descargaRaw || '')).toUpperCase();
-  const hasFLAC = /\bFLAC\b/.test(raw);
-  const hasWAV  = /\bWAV\b/.test(raw);
-
-  if (hasFLAC && hasWAV) return 'flacwav';
-  if (hasMP3) return 'mp3';
-  if (has32 || (hasWAV && !hasFLAC)) return 'wav32';
-  if (has16 && has24) return '1624';
-  if (has24) return '24';
-  if (has16 || hasFLAC) return '16';
-  return null;
-}
-
-// ── Sistema de cintas de Película/Serie (idéntico al de index.html) ──
+// ── Sistema de cintas de Película/Serie/Música (idéntico al de index.html) ──
 // Cada categoria: key interno -> nombre EXACTO del archivo (sin .png) dentro de badges/<categoria>/
 const PELI_FILE_FOR = {
   fuente: {
@@ -2108,6 +2075,7 @@ const PELI_FILE_FOR = {
     'paramount-plus':'paramount+','peacock':'peacock','prime-video':'primevideo','star-plus':'star+',
     'apple-tv-plus':'tv+','vix':'vix',
   },
+  musica: { 'mp3':'mp3', '16-bits':'16-bits', '24-bits':'24-bits', '16-24-bits':'16-24-bits', 'wav-32-bits':'wav-32-bits' },
 };
 // detalle.html vive en la raíz del repo, igual que la carpeta badges/ -> sin subir nivel
 function peliBadgePath(cat, key) {
@@ -2116,8 +2084,27 @@ function peliBadgePath(cat, key) {
   return `badges/${cat}/${encodeURIComponent(file)}.png`;
 }
 
+// Formato(s) de audio activos (ej: "Lossless 16-bit, Hi-Res 24-bit") -> qué cinta de
+// badges/musica/ corresponde. Si hay 16-bit Y 24-bit a la vez, se usa la cinta combinada
+// "16-24-bits" en vez de superponer las dos por separado. (idéntico a admin.html/index.html)
+function musicaBadgeKeyFromFormats(activeList) {
+  const has = v => activeList.includes(v);
+  if (has('Master 32-bit')) return 'wav-32-bits';
+  if (has('Lossless 16-bit') && has('Hi-Res 24-bit')) return '16-24-bits';
+  if (has('Hi-Res 24-bit')) return '24-bits';
+  if (has('Lossless 16-bit')) return '16-bits';
+  if (has('MP3')) return 'mp3';
+  return null;
+}
+
 function getPeliBadgeKeysFromMovie(m) {
-  if ((m.type || '').includes('Música')) return null; // solo para peliculas/series
+  const isMusica = (m.type || '').includes('Música');
+  if (isMusica) {
+    return {
+      fuente: null, idioma: null, calidad: null, hdr: null, streaming: null,
+      musica: musicaBadgeKeyFromFormats((m.audioFormat||'').split(',').map(s=>s.trim()).filter(Boolean)),
+    };
+  }
   const map = { '4K':'4k', 'Full HD':'full-hd', '1080p':'1080p', '720p':'720p', '480p':'480p' };
   const audioMap = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino' };
   const text = ((m.title||'') + ' ' + (m.descargaRaw||'')).toUpperCase();
@@ -2151,17 +2138,18 @@ function getPeliBadgeKeysFromMovie(m) {
     calidad: map[m.quality] || null,
     hdr: (m.hdr || hdr),
     streaming: (m.streaming || streaming),
+    musica: null,
   };
 }
 
-// Indica si la portada debe recortarse al hueco del marco (cuando hay cinta de fuente activa) —
-// mismo criterio que index.html/admin.html. Las portadas "legacyCover" ya vienen con el diseño
-// (cintas/marco) hecho en Illustrator, asi que nunca se les recorta ni se les superpone nada
-// encima (evita el doble marco).
+// Indica si la portada debe recortarse al hueco del marco (cuando hay cinta de fuente o de
+// música activa) — mismo criterio que index.html/admin.html. Las portadas "legacyCover" ya
+// vienen con el diseño (cintas/marco) hecho en Illustrator, asi que nunca se les recorta ni
+// se les superpone nada encima (evita el doble marco).
 function hasFrame(m) {
   if (m && m.legacyCover) return false;
   const badges = getPeliBadgeKeysFromMovie(m);
-  return !!(badges && badges.fuente);
+  return !!(badges && (badges.fuente || badges.musica));
 }
 
 // Arma el HTML de las cintas superpuestas para una portada, con la clase indicada
@@ -2169,7 +2157,7 @@ function badgeOverlayHtml(m, cssClass) {
   if (m && m.legacyCover) return '';
   const badges = getPeliBadgeKeysFromMovie(m);
   if (!badges) return '';
-  return ['idioma','fuente','calidad','hdr','streaming'].map(cat => {
+  return ['idioma','fuente','calidad','hdr','streaming','musica'].map(cat => {
     const key = badges[cat];
     if (!key) return '';
     const path = peliBadgePath(cat, key);
@@ -2492,7 +2480,6 @@ function renderRelated(movies, currentIdx) {
     const isE = /erotico/.test(typeNorm);
     const isM = isMusicContent(m);
     const dateLabel = formatUploadDate(m.uploadDate);
-    const badgeKey = getMusicBadgeKeyFromMovie(m);
     return `
     <a class="related-card${isH ? ' card-h' : ''}${isE ? ' card-e' : ''}${isM ? ' card-m' : ''}" href="detalle.html?id=${movies[ri].slug || ri}">
       <div class="related-frame${dateLabel ? '' : ' no-date'}">
@@ -2502,7 +2489,6 @@ function renderRelated(movies, currentIdx) {
           <img class="${hasFrame(m) ? 'has-frame' : ''}" src="${m.image || ''}" alt="${m.title}" onerror="this.src='${fallback}'"/>
         ${badgeOverlayHtml(m, 'related-badge-overlay')}
         ${isM ? `<span class="m-badge"><img src="${MUSIC_LOGO_B64}" alt="Música"/></span>` : ''}
-        ${badgeKey && MUSIC_BADGE_FILES[badgeKey] ? `<img class="related-badge-overlay" src="${MUSIC_BADGE_FILES[badgeKey]}" alt=""/>` : ''}
       </div>
       </div>
       <div class="related-info">
@@ -2593,30 +2579,21 @@ async function init() {
     this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='300'%3E%3Crect fill='%230e1117' width='200' height='300'/%3E%3Ctext fill='%236b7280' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='40'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E";
   };
   const badgeEl = document.getElementById('d-poster-badge');
-  const badgeKey = getMusicBadgeKeyFromMovie(m);
+  if (badgeEl) badgeEl.style.display = 'none'; // reemplazado por el sistema unificado de cintas (poster-cintas-overlay), que ya incluye música
   const posterFrameElEarly = document.querySelector('.poster-frame');
-  if (badgeEl) {
-    if (badgeKey && MUSIC_BADGE_FILES[badgeKey]) {
-      badgeEl.src = MUSIC_BADGE_FILES[badgeKey];
-      badgeEl.style.display = 'block';
-    } else {
-      badgeEl.style.display = 'none';
-    }
-  }
 
-  // Cintas de Película/Serie (idioma, fuente, calidad, hdr, streaming) sobre el poster principal.
+  // Cintas de Película/Serie/Música (idioma, fuente, calidad, hdr, streaming, musica) sobre el poster principal.
   // Las portadas "legacyCover" (ya diseñadas en Illustrator) no llevan nada de esto encima.
   if (posterFrameElEarly) {
     posterFrameElEarly.querySelectorAll('.poster-cintas-overlay').forEach(el => el.remove());
     const peliBadgesActive = getPeliBadgeKeysFromMovie(m);
-    const anyPeliBadge = !m.legacyCover && !!(peliBadgesActive && ['idioma','fuente','calidad','hdr','streaming'].some(k => peliBadgesActive[k]));
+    const anyPeliBadge = !m.legacyCover && !!(peliBadgesActive && ['idioma','fuente','calidad','hdr','streaming','musica'].some(k => peliBadgesActive[k]));
     posterEl.classList.toggle('has-frame', hasFrame(m));
     if (anyPeliBadge) posterFrameElEarly.insertAdjacentHTML('beforeend', badgeOverlayHtml(m, 'poster-cintas-overlay'));
 
-    // El marco de proporcion fija (1280x740) se activa si hay cinta de musica O de pelicula/serie,
-    // para que las cintas (diseñadas a esa proporcion) no se deformen
-    const needsFixedRatio = (badgeKey && MUSIC_BADGE_FILES[badgeKey]) || anyPeliBadge;
-    posterFrameElEarly.classList.toggle('poster-frame-fixed-ratio', !!needsFixedRatio);
+    // El marco de proporcion fija (1280x740) se activa si hay cualquier cinta (música o
+    // película/serie), para que las cintas (diseñadas a esa proporcion) no se deformen
+    posterFrameElEarly.classList.toggle('poster-frame-fixed-ratio', anyPeliBadge);
   }
 
   // Camuflaje activo: marcar el poster si el tipo es Adult/Hentai
