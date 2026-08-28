@@ -1,6 +1,6 @@
 [
   {
-    "title": "Coyote vs. Acme (2026) HDTS 720p Español Latino-Inglés",
+    "title": "Coyote vs. Acme (2026) HDTS 720p Inglés (Subtitulado Español Incrustado)",
     "originalTitle": "Coyote vs. Acme",
     "year": "2026",
     "type": "Película",
@@ -14,12 +14,12 @@
     "hdr": "",
     "streaming": "",
     "yearFilter": "2026",
-    "audio": "Latino",
+    "audio": "Inglés",
     "resolution": "720p",
     "format": "MPEG-4",
     "size": "712 MiB",
     "codec": "H.264 / AVC | 8bit",
-    "subtitles": "N/A",
+    "subtitles": "Español (Incrustados / Hardsub)",
     "uploader": "",
     "image": "https://media.themoviedb.org/t/p/w500_and_h282_face/jIjnl7Ijz5urp8o1dgCLTRvSqDv.jpg",
     "legacyCover": false,
@@ -28,7 +28,7 @@
     "links": "1024terabox\nhttps://1024terabox.com/s/1losP-JYGUh8wwY2wz8aOcQ",
     "password": "",
     "description": "Gira en torno a Wile E. Coyote, quien, tras innumerables productos defectuosos de la corporación Acme que le han estallado en la cara en sus intentos fallidos por atrapar al Correcaminos, decide contratar a un abogado humano sin suerte para demandar a la gran empresa corporativa en un juicio histórico que combina animación y acción real.",
-    "descargaRaw": "MAS INFO\n• Fuente de Ketchup Entertainment\nMAS INFO\nAudio: Español Latino / Inglés (AAC LC 2.0)\nCalidad: HDTS\nResolución: 720p\nFormato: MPEG-4\nTamaño: 712 MiB\nCodec: H.264 / AVC | 8bit\nSubtítulos: N/A",
+    "descargaRaw": "MAS INFO\n• Fuente de Ketchup Entertainment\nMAS INFO\nAudio: Inglés (AAC LC 2.0)\nCalidad: HDTS\nResolución: 720p\nFormato: MPEG-4\nTamaño: 712 MiB\nCodec: H.264 / AVC | 8bit\nSubtítulos: Español (Incrustados / Hardsub)",
     "slug": "coyote-vs-acme-2026-hdts-720p-espanol-latino-ingles",
     "uploadDate": "2026-08-28"
   },
