@@ -1016,6 +1016,7 @@
                 <button type="button" class="chip" data-value="X265" style="border-color:#6e6e6e;color:#6e6e6e;">X265</button>
                 <button type="button" class="chip" data-value="WEB-DL" style="border-color:#0fb528;color:#0fb528;">WEB-DL</button>
                 <button type="button" class="chip" data-value="WEB-RIP" style="border-color:#ee4394;color:#ee4394;">WEB-RIP</button>
+                <button type="button" class="chip" data-value="WEB-SCR" style="border-color:#2ccca4;color:#2ccca4;">WEB-SCR</button>
                 <button type="button" class="chip" data-value="BLU-RAY" style="border-color:#6ac2eb;color:#6ac2eb;">BLU-RAY</button>
                 <button type="button" class="chip" data-value="HDRIP" style="border-color:#f8b800;color:#f8b800;">HDRip</button>
                 <button type="button" class="chip" data-value="HDTS" style="border-color:#3330ac;color:#3330ac;">HDTS</button>
@@ -1265,6 +1266,83 @@
           </div>
         </div>
       </div>
+
+    <!-- 🔒 NOCTIS PRIVADO — catálogo aparte, con enlaces directos (sin acortador), oculto:
+         no se enlaza desde index/detalle/admin. Vive en su propio JSON (noctis-privado.json)
+         y se ve solo en lelouchhangyaku-noctis-x7f2.html -->
+    <div class="io-section" style="margin-top:0.75rem;">
+      <div class="io-title">🔒 Noctis Privado</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start;">
+
+        <!-- COLUMNA 1: pegar lote + procesar -->
+        <div>
+          <p style="font-size:0.75rem;color:var(--muted);margin-bottom:0.7rem;">
+            Pegá el lote completo (uno o varios bloques separados por líneas de números repetidos, tipo <code>1111...</code> / <code>2222...</code>).
+            Por cada bloque se busca el título en tu catálogo ya subido (movies.json en memoria) y de ahí se hereda la portada,
+            año, país, duración, género y sinopsis automáticamente. Solo se extrae del texto pegado el bloque de "Más Info" y
+            los enlaces directos (se descartan los acortadores).
+          </p>
+
+          <div class="form-group">
+            <label>Pegar lote completo</label>
+            <textarea id="np-bulk" rows="10" style="width:100%;font-family:monospace;font-size:0.78rem;background:var(--surface3);border:1px solid var(--border);border-radius:6px;color:var(--white);padding:0.6rem;" placeholder="Pegá acá todo el lote (uno o varios bloques)..."></textarea>
+          </div>
+
+          <details style="margin-bottom:0.6rem;">
+            <summary style="cursor:pointer;font-size:0.75rem;color:var(--muted);">⚙ Dominios (acortadores / multiservidor) — editable</summary>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.5rem;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label style="font-size:0.7rem;">Acortadores (se descartan) — separados por coma</label>
+                <input type="text" id="np-shorteners" value="tpi.li"/>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label style="font-size:0.7rem;">Multiservidor (se numeran) — separados por coma</label>
+                <input type="text" id="np-multiserver" value="pastelink.net, jpst.it"/>
+              </div>
+            </div>
+          </details>
+
+          <button class="export-btn" style="margin-bottom:0.7rem;" onclick="procesarNoctisPrivadoBulk()">⚙ Procesar bloques</button>
+
+          <div id="np-guardar-wrap-top" style="display:none;margin-bottom:0.7rem;">
+            <button class="export-btn primary-export" style="background:var(--gold);border-color:var(--gold);color:#000;" onclick="guardarNoctisPrivadoDraft()">💾 Guardar todo en Noctis Privado</button>
+          </div>
+
+          <div id="np-preview"></div>
+
+          <div id="np-guardar-wrap" style="display:none;margin-top:0.7rem;">
+            <button class="export-btn primary-export" style="background:var(--gold);border-color:var(--gold);color:#000;" onclick="guardarNoctisPrivadoDraft()">💾 Guardar todo en Noctis Privado</button>
+          </div>
+        </div>
+
+        <!-- COLUMNA 2: ya guardados + descargar/publicar -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+            <div style="font-size:0.8rem;color:var(--white);font-weight:600;">📦 Ya guardados (<span id="np-count">0</span>)</div>
+            <button class="export-btn" style="width:auto;padding:0.2rem 0.6rem;margin:0;font-size:0.68rem;" onclick="repararIdsDuplicadosPrivado()" title="Corrige ítems que quedaron con el mismo ID (por guardar 2 con el mismo título juntos)">🔧 Reparar IDs duplicados</button>
+          </div>
+          <div id="np-saved-list"></div>
+          <div id="np-pagination" style="margin-top:0.5rem;"></div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:1rem;">
+            <button class="export-btn" onclick="downloadPrivadoJSON()">⬇ Descargar noctis-privado.json</button>
+            <button class="export-btn" onclick="copyPrivadoJSON()">📋 Copiar JSON</button>
+          </div>
+          <button class="export-btn" style="margin-top:0.5rem;" onclick="publishPrivadoToGithub()">🚀 Publicar en GitHub</button>
+          <div id="np-gh-status" style="font-size:0.75rem;margin-top:0.4rem;"></div>
+
+          <div class="io-section" style="margin-top:0.75rem;">
+            <div class="io-title">📥 Importar noctis-privado.json</div>
+            <p style="font-size:0.75rem;color:var(--muted);margin-bottom:0.5rem;">Pega el contenido guardado para cargarlo (ej: desde otro dispositivo o backup).</p>
+            <textarea class="import-area" id="np-import-area" placeholder='[{"titulo":"...","masInfo":"...","enlaces":[...]}]' style="min-height:100px;"></textarea>
+            <button class="export-btn" onclick="importPrivadoJSON()" style="margin-bottom:0.3rem;">✓ Importar y cargar</button>
+            <p style="font-size:0.7rem;color:var(--muted);">⚠ Esto reemplaza la lista actual de Noctis Privado (no se mezcla con lo que ya tenías).</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
     </div>
 
     <!-- COLUMNA DERECHA: LISTA -->
@@ -1400,7 +1478,7 @@ function saveMovies(arr) {
 const PELI_FILE_FOR = {
   fuente: {
     '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','brrip':'brrip','dcp-rip':'dcp-rip',
-    'hdrip':'hdrip','hdts':'hdts','remux':'remux','web-dl':'web-dl','web-rip':'web-rip','x265':'x265',
+    'hdrip':'hdrip','hdts':'hdts','remux':'remux','web-dl':'web-dl','web-rip':'web-rip','web-scr':'web-scr','x265':'x265',
   },
   idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino' },
   calidad: { '480p':'420p','720p':'720p','1080p':'1080p','full-hd':'full hd','4k':'4k' },
@@ -1925,7 +2003,7 @@ function autoRellenarTodo() {
   }
 
 
-  // FUENTE — Prioridad: X265 > REMUX > WEB-DL > WEB-RIP > BLU-RAY > BDRIP > BRRIP > HDTS > HDRIP > DVDRIP > 60FPS
+  // FUENTE — Prioridad: X265 > REMUX > WEB-DL > WEB-RIP > WEB-SCR > BLU-RAY > BDRIP > BRRIP > HDTS > HDRIP > DVDRIP > 60FPS
   // Solo se detecta por el texto explícito del título/calidad (NO por el codec, ya que casi todo viene en H265 hoy en día)
   const combined = calUp + ' ' + tituloUp; // buscar en título y calidad, sin el codec
   if (combined.includes('X265') || combined.includes('X 265') || combined.includes('HEVC'))
@@ -1936,6 +2014,8 @@ function autoRellenarTodo() {
     setActiveChip('chips-source','WEB-DL');
   else if (combined.includes('WEBRIP')||combined.includes('WEB-RIP'))
     setActiveChip('chips-source','WEB-RIP');
+  else if (combined.includes('WEBSCR')||combined.includes('WEB-SCR')||combined.includes('WEB SCR'))
+    setActiveChip('chips-source','WEB-SCR');
   else if (combined.includes('BLURAY')||combined.includes('BLU-RAY')||combined.includes('BLU RAY'))
     setActiveChip('chips-source','BLU-RAY');
   else if (combined.includes('PLACEBO'))
@@ -2488,6 +2568,14 @@ function quitarGoldenMatch(index) {
   construirGolden(goldenMatchesData);
 }
 
+function goldenSearchUrl() {
+  // Usa el TEXTO QUE ESCRIBISTE en el buscador (ej: "Hostel"), no el título de la edición que
+  // quedó de "base" — así el link siempre trae TODAS las coincidencias, sin importar cuál
+  // edición se subió más reciente y terminó primera en la lista.
+  const q = (document.getElementById('golden-search').value || '').trim();
+  return new URL('../index.html?search=' + encodeURIComponent(q), window.location.href).href;
+}
+
 function construirGolden(elegidas) {
   const base = elegidas[0];
   const tituloBase = baseTituloSinCalidad(base.title || '');
@@ -2521,7 +2609,7 @@ function construirGolden(elegidas) {
     'Formato: MKV',
     '',
     '',
-    searchUrlFor(base),
+    goldenSearchUrl(),
   ];
 
   document.getElementById('golden-title').value = tituloGolden;
@@ -3562,6 +3650,459 @@ function importJSON() {
     showToast('JSON inválido. Revisa el formato.','error');
   }
 }
+
+/* ======================== 🔒 NOCTIS PRIVADO ======================== */
+// Catálogo aparte (enlaces directos, sin acortadores). Vive en su propio JSON
+// (noctis-privado.json), nunca se mezcla con movies.json. Reusa el mismo
+// getMovies()/GitHub config que ya existen para el catálogo normal.
+
+function getPrivado() { try { return JSON.parse(localStorage.getItem('noctis_privado') || '[]'); } catch { return []; } }
+function savePrivado(list) { localStorage.setItem('noctis_privado', JSON.stringify(list)); renderPrivadoSavedList(); }
+
+let noctisPrivadoDraft = []; // bloques procesados, pendientes de guardar (editable en el preview)
+
+// Normaliza texto para comparar títulos ("Toy Story 5 (2026) WEB-DL..." == "toy story 5 (2026) web-dl...")
+function normTitulo(s) {
+  return (s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+// Busca en el catálogo ya subido (movies.json en memoria) la MISMA película, sin importar
+// la calidad/fuente/audio del título (mismo criterio que ya usás en Trailer/Capturas/Portada
+// automáticos y en Golden Quality) — así con que tengas publicada UNA sola calidad de la
+// película alcanza para heredar la portada en TODAS las demás ediciones privadas.
+// Si hay VARIAS ediciones con el mismo título base (ej: Toy Story 5 en 1080p, 4K DV, 4K SDR,
+// cada una con su propio Streaming), se prioriza la que matchee también la Resolución exacta —
+// así hereda el streaming/portada de LA EDICIÓN CORRECTA, no de cualquiera.
+function normalizarResolucion(r) {
+  const m = String(r || '').match(/([0-9]+)\s*[×xX]\s*([0-9]+)/);
+  return m ? (m[1] + 'x' + m[2]) : null;
+}
+function resolucionDesdeMasInfo(masInfo) {
+  const m = (masInfo || '').match(/Resoluci[oó]n:\s*([0-9]+)\s*[×xX]\s*([0-9]+)/i);
+  return m ? (m[1] + 'x' + m[2]) : null;
+}
+function matchMovieByTitle(titulo, masInfo) {
+  const target = baseTituloSinCalidad(titulo || '');
+  if (!target) return null;
+  const movies = getMovies();
+  const candidatos = movies.filter(m => baseTituloSinCalidad(m.title || '') === target);
+  if (!candidatos.length) return null;
+  const resBuscada = normalizarResolucion(resolucionDesdeMasInfo(masInfo));
+  if (resBuscada) {
+    const exacto = candidatos.find(m => normalizarResolucion(m.resolution) === resBuscada);
+    if (exacto) return exacto;
+  }
+  return candidatos[0]; // sin masInfo/resolución para comparar → mismo comportamiento de antes
+}
+
+// Separa el texto pegado en bloques, usando como separador cualquier línea compuesta
+// SOLO por un dígito repetido (1111..., 2222..., etc). Si no hay ninguna línea así,
+// se trata todo el texto pegado como un único bloque.
+function splitNoctisPrivadoBloques(raw) {
+  const lineas = raw.replace(/\r\n/g, '\n').split('\n');
+  const reSep = /^(\d)\1{4,}$/; // mismo dígito repetido 5+ veces
+  const bloques = [];
+  let actual = [];
+  let huboSeparador = false;
+  for (const l of lineas) {
+    if (reSep.test(l.trim())) {
+      huboSeparador = true;
+      if (actual.some(x => x.trim())) bloques.push(actual.join('\n'));
+      actual = [];
+      continue;
+    }
+    actual.push(l);
+  }
+  if (actual.some(x => x.trim())) bloques.push(actual.join('\n'));
+  if (!huboSeparador) return [raw]; // un solo bloque, sin separadores
+  return bloques;
+}
+
+// Campos técnicos que forman el bloque "Más Info" (mismo criterio que camposDescarga del parser normal)
+const NP_CAMPOS_MASINFO = ['audio','calidad','resolución','resolucion','formato','tamaño','tamano','codec','códec','subtítulos','subtitulos','subtítulo','subtitulo'];
+
+function parseNoctisPrivadoBloque(raw, shorteners, multiserver) {
+  const lineas = raw.replace(/\r\n/g, '\n').split('\n').map(l => l.trim());
+  const reUrl = /^https?:\/\//i;
+
+  // Título: primera línea no vacía que NO sea una URL (se salta la URL de gdrivelatinohd de arriba)
+  let titulo = '';
+  for (const l of lineas) {
+    if (!l) continue;
+    if (reUrl.test(l)) continue;
+    titulo = l;
+    break;
+  }
+
+  // Más Info: cualquier línea cuyo texto antes de ":" matchee un campo técnico conocido
+  const masInfoLineas = [];
+  for (const l of lineas) {
+    if (!l) continue;
+    const ci = l.indexOf(':');
+    if (ci < 0) continue;
+    const key = l.slice(0, ci).toLowerCase().trim();
+    if (key.length <= 30 && NP_CAMPOS_MASINFO.some(c => key === c || key.includes(c))) {
+      masInfoLineas.push(l);
+    }
+  }
+  const masInfo = masInfoLineas.join('\n');
+
+  // Enlaces: cada URL del bloque, clasificada por su dominio (no importa la posición ni la
+  // etiqueta de texto que la preceda — así funciona igual con "Multiserver", "1fichier",
+  // varias partes/capítulos, etc.)
+  const enlaces = [];
+  let multiCount = 0;
+  const vistos = new Set();
+  const dominiosDescartar = ['gdrivelatinohd.net','youtu.be','youtube.com','imgur.com','blogger.googleusercontent.com','blogspot.com'];
+  for (const l of lineas) {
+    if (!l || !reUrl.test(l)) continue;
+    let host;
+    try { host = new URL(l).hostname.replace(/^www\./i, '').toLowerCase(); } catch { continue; }
+    if (vistos.has(l)) continue;
+    vistos.add(l);
+    if (dominiosDescartar.some(d => host === d || host.endsWith('.' + d))) continue;
+    if (shorteners.some(d => host === d || host.endsWith('.' + d))) continue;
+    if (multiserver.some(d => host === d || host.endsWith('.' + d))) {
+      multiCount++;
+      enlaces.push({ etiqueta: 'Multiservidor ' + multiCount, url: l });
+      continue;
+    }
+    const etiqueta = host.replace(/\.(com|net|to|org|co|io|me|app)$/i, '');
+    enlaces.push({ etiqueta, url: l });
+  }
+
+  return { titulo, masInfo, enlaces };
+}
+
+// Detecta Calidad/Audio/Fuente de un ítem de Noctis Privado a partir de SU PROPIO texto
+// (título + "Más Info"), con las mismas reglas que ya usa el formulario principal — así la
+// cinta que se ve es la de ESA edición puntual, no la de la película que matcheó en el catálogo.
+function detectarChipsDesdePrivado(titulo, masInfo) {
+  const tituloUp  = (titulo || '').toUpperCase();
+  const masInfoUp = (masInfo || '').toUpperCase();
+  const resMatch = (masInfo || '').match(/Resoluci[oó]n:\s*([0-9]+)\s*[×xX]\s*([0-9]+)/i);
+  const anchoRes = resMatch ? parseInt(resMatch[1]) : 0;
+  const altoRes  = resMatch ? parseInt(resMatch[2]) : 0;
+  const esFullHDExacta = anchoRes === 1920 && altoRes === 1080;
+  const resDice4K   = anchoRes >= 3840 || altoRes >= 2160;
+  const resDice1080 = anchoRes === 1920 || altoRes === 1080;
+  const resDice720  = anchoRes === 1280 || altoRes === 720;
+  const resDice480  = altoRes === 480 || anchoRes === 854 || anchoRes === 640;
+  const calQUp = tituloUp + ' ' + masInfoUp;
+
+  let quality = null;
+  if (resDice4K) quality = '4K';
+  else if (esFullHDExacta) quality = 'Full HD';
+  else if (resDice1080) quality = '1080p';
+  else if (resDice720) quality = '720p';
+  else if (resDice480) quality = '480p';
+  else if (calQUp.includes('3840')||calQUp.includes('2160')||calQUp.includes('4K')||calQUp.includes('2K')||calQUp.includes('HDR10')||calQUp.includes('DV HDR'))
+    quality = '4K';
+  else if (!resMatch && calQUp.includes('FULL HD'))
+    quality = 'Full HD';
+  else if (calQUp.includes('1920')||calQUp.includes('1080')||calQUp.includes('FULL HD')||calQUp.includes('FULL'))
+    quality = '1080p';
+  else if (calQUp.includes('1280')||calQUp.includes('720'))
+    quality = '720p';
+  else if (calQUp.includes('480'))
+    quality = '480p';
+
+  let audio = null;
+  if (tituloUp.includes('LATINO')) audio = 'Latino';
+  else if (tituloUp.includes('INGLES')||tituloUp.includes('INGLÉS')) audio = 'Inglés';
+  else if (masInfoUp.includes('JAPON')) audio = 'Japonés';
+  else if (masInfoUp.includes('KOREAN')||masInfoUp.includes('COREANO')||masInfoUp.includes('KOREANO')) audio = 'Koreano';
+
+  const combined = tituloUp + ' ' + masInfoUp;
+  let source = null;
+  if (combined.includes('X265') || combined.includes('X 265') || combined.includes('HEVC')) source = 'X265';
+  else if (combined.includes('REMUX')) source = 'REMUX';
+  else if (combined.includes('WEBDL')||combined.includes('WEB-DL')||combined.includes('WEB DL')) source = 'WEB-DL';
+  else if (combined.includes('WEBRIP')||combined.includes('WEB-RIP')) source = 'WEB-RIP';
+  else if (combined.includes('WEBSCR')||combined.includes('WEB-SCR')||combined.includes('WEB SCR')) source = 'WEB-SCR';
+  else if (combined.includes('BLURAY')||combined.includes('BLU-RAY')||combined.includes('BLU RAY')) source = 'BLU-RAY';
+  else if (combined.includes('BDRIP')) source = 'BDRIP';
+  else if (combined.includes('BRRIP')) source = 'BRRIP';
+  else if (combined.includes('HDTS')) source = 'HDTS';
+  else if (combined.includes('HDRIP')) source = 'HDRIP';
+  else if (combined.includes('DVDRIP')) source = 'HDRIP';
+  else if (/DCP/i.test(combined)) source = 'DCP-RIP';
+  else if (combined.includes('60FPS')) source = '60FPS';
+
+  return { quality, audio, source };
+}
+
+// Arma las mismas 5 llaves de cinta (idioma/fuente/calidad/hdr/streaming) que usa el Catálogo,
+// para un ítem de Noctis Privado. HDR se detecta del texto (título + masInfo). Streaming se
+// pisa EN VIVO con lo que tenga cargado esa misma edición en movies.json (matchMovieByTitle,
+// título base + resolución exacta) — igual que la portada — y si esa edición no está en el
+// catálogo, cae al detector de texto como último recurso.
+function getPrivadoBadgeKeys(item) {
+  const det = detectarChipsDesdePrivado(item.titulo, item.masInfo);
+  const catalogMatch = matchMovieByTitle(item.titulo, item.masInfo);
+  return getPeliBadgeKeysFromMovie({
+    title: item.titulo,
+    descargaRaw: item.masInfo,
+    quality: det.quality,
+    audio: det.audio,
+    source: det.source,
+    hdr: '',
+    streaming: (catalogMatch && catalogMatch.streaming) || '',
+    type: 'Película',
+  });
+}
+
+function privadoPosterHtml(item, sizeClass) {
+  const badges = getPrivadoBadgeKeys(item);
+  const badgeLayersHtml = badges ? ['idioma','fuente','calidad','hdr','streaming'].map(cat => {
+    const key = badges[cat];
+    if (!key) return '';
+    const path = peliBadgePath(cat, key);
+    return path ? `<img class="movie-item-badge-overlay" src="${path}" alt="" onerror="this.style.display='none'"/>` : '';
+  }).join('') : '';
+  const npFallback = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='108' height='62'%3E%3Crect fill='%23161b24' width='108' height='62'/%3E%3C/svg%3E`;
+  return `
+    <div class="movie-item-poster-wrap ${sizeClass||''}">
+      <img class="movie-item-poster" src="${item.imagen||''}" alt="${(item.titulo||'').replace(/"/g,'')}" onerror="this.src='${npFallback}'"/>
+      ${badgeLayersHtml}
+    </div>`;
+}
+
+function slugify(s) {
+  return (s || '').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+function procesarNoctisPrivadoBulk() {
+  const raw = document.getElementById('np-bulk').value;
+  if (!raw || !raw.trim()) { showToast('Pegá el lote primero.', 'error'); return; }
+  const shorteners  = document.getElementById('np-shorteners').value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+  const multiserver = document.getElementById('np-multiserver').value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+
+  const bloques = splitNoctisPrivadoBloques(raw);
+  noctisPrivadoDraft = bloques.map(b => {
+    const p = parseNoctisPrivadoBloque(b, shorteners, multiserver);
+    const match = matchMovieByTitle(p.titulo, p.masInfo);
+    return {
+      titulo: p.titulo,
+      imagen: match ? match.image : '',
+      matched: !!match,
+      masInfo: p.masInfo,
+      enlaces: p.enlaces,
+    };
+  }).filter(x => x.titulo); // descarta bloques vacíos/basura
+
+  renderNoctisPrivadoPreview();
+  showToast(`✓ ${noctisPrivadoDraft.length} bloque(s) procesado(s)`, 'success');
+}
+
+function renderNoctisPrivadoPreview() {
+  const wrap = document.getElementById('np-preview');
+  const guardarWrap = document.getElementById('np-guardar-wrap');
+  const guardarWrapTop = document.getElementById('np-guardar-wrap-top');
+  if (!noctisPrivadoDraft.length) { wrap.innerHTML = ''; guardarWrap.style.display = 'none'; guardarWrapTop.style.display = 'none'; return; }
+  guardarWrap.style.display = 'block';
+  guardarWrapTop.style.display = 'block';
+
+  wrap.innerHTML = noctisPrivadoDraft.map((item, i) => `
+    <div style="border:1px solid var(--border);border-radius:8px;padding:0.7rem;margin-bottom:0.6rem;background:var(--surface3);">
+      <div style="display:flex;gap:0.6rem;align-items:flex-start;">
+        ${privadoPosterHtml(item)}
+        <div style="flex:1;min-width:0;">
+          <input type="text" value="${(item.titulo||'').replace(/"/g,'&quot;')}" oninput="noctisPrivadoDraft[${i}].titulo=this.value" style="margin-bottom:0.35rem;font-weight:600;"/>
+          ${item.matched
+            ? `<div style="font-size:0.68rem;color:var(--green);">✓ Coincide con el catálogo — portada/datos heredados</div>`
+            : `<div style="font-size:0.68rem;color:#e5b44b;">⚠️ Sin coincidencia en el catálogo — pegá una URL de portada abajo</div>
+               <input type="url" placeholder="URL de portada (manual)" value="${item.imagen||''}" oninput="noctisPrivadoDraft[${i}].imagen=this.value" style="margin-top:0.3rem;font-size:0.72rem;"/>`
+          }
+        </div>
+        <button class="export-btn" style="width:auto;padding:0.3rem 0.6rem;margin:0;flex-shrink:0;" onclick="noctisPrivadoDraft.splice(${i},1);renderNoctisPrivadoPreview();">🗑</button>
+      </div>
+
+      <div style="margin-top:0.5rem;">
+        <label style="font-size:0.68rem;color:var(--muted);">Más Info</label>
+        <textarea rows="4" style="width:100%;font-family:monospace;font-size:0.72rem;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--white);padding:0.4rem;" oninput="noctisPrivadoDraft[${i}].masInfo=this.value">${item.masInfo||''}</textarea>
+      </div>
+      ${(() => { const m = matchMovieByTitle(item.titulo, item.masInfo); return m && m.streaming
+        ? `<div style="margin-top:0.35rem;font-size:0.68rem;color:var(--muted);">📺 Streaming: <span style="color:var(--white);">${m.streaming}</span> (heredado de esta edición en el Catálogo)</div>`
+        : `<div style="margin-top:0.35rem;font-size:0.68rem;color:var(--muted);">📺 Streaming: sin match en el Catálogo todavía — no se muestra cinta hasta que subas esta edición en "Agregar Película".</div>`; })()}
+
+      <div style="margin-top:0.5rem;">
+        <label style="font-size:0.68rem;color:var(--muted);">Enlaces directos (${item.enlaces.length})</label>
+        ${item.enlaces.map((e, j) => `
+          <div style="display:flex;gap:0.35rem;margin-top:0.3rem;">
+            <input type="text" value="${(e.etiqueta||'').replace(/"/g,'&quot;')}" oninput="noctisPrivadoDraft[${i}].enlaces[${j}].etiqueta=this.value" style="width:130px;flex-shrink:0;font-size:0.72rem;margin-bottom:0;"/>
+            <input type="url" value="${(e.url||'').replace(/"/g,'&quot;')}" oninput="noctisPrivadoDraft[${i}].enlaces[${j}].url=this.value" style="flex:1;font-size:0.72rem;margin-bottom:0;"/>
+            <button class="export-btn" style="width:auto;padding:0.3rem 0.5rem;margin:0;flex-shrink:0;" onclick="noctisPrivadoDraft[${i}].enlaces.splice(${j},1);renderNoctisPrivadoPreview();">🗑</button>
+          </div>
+        `).join('') || `<div style="font-size:0.7rem;color:var(--muted);margin-top:0.3rem;">Sin enlaces detectados.</div>`}
+      </div>
+    </div>
+  `).join('');
+}
+
+function guardarNoctisPrivadoDraft() {
+  if (!noctisPrivadoDraft.length) return;
+  const lista = getPrivado();
+  for (const item of noctisPrivadoDraft) {
+    lista.push({
+      // Random() además de Date.now() — si guardás 2 bloques con el MISMO título en la misma
+      // tanda, Date.now() puede repetirse (corre en el mismo milisegundo) y quedaban con el
+      // mismo id, haciendo que marcar "descargado" en uno marcara el otro también.
+      id: slugify(item.titulo) + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8),
+      titulo: item.titulo,
+      imagen: item.imagen || '',
+      masInfo: item.masInfo || '',
+      enlaces: item.enlaces || [],
+    });
+  }
+  npPage = 1;
+  savePrivado(lista);
+  noctisPrivadoDraft = [];
+  document.getElementById('np-bulk').value = '';
+  renderNoctisPrivadoPreview();
+  showToast(`💾 ${lista.length} título(s) en Noctis Privado`, 'success');
+}
+
+const NP_PAGE_SIZE = 6;
+let npPage = 1;
+
+function renderPrivadoSavedList() {
+  const lista = getPrivado();
+  document.getElementById('np-count').textContent = lista.length;
+  const wrap = document.getElementById('np-saved-list');
+  const pagWrap = document.getElementById('np-pagination');
+
+  if (!lista.length) {
+    wrap.innerHTML = '<div style="font-size:0.75rem;color:var(--muted);">Todavía no guardaste nada acá.</div>';
+    pagWrap.innerHTML = '';
+    return;
+  }
+
+  // Más reciente primero (lo último que guardaste arriba, lo más viejo al final) —
+  // guardamos con push() así que invertimos solo para mostrar, sin tocar el array real.
+  const orden = lista.map((item, realIdx) => ({ item, realIdx })).reverse();
+
+  const totalPages = Math.max(1, Math.ceil(orden.length / NP_PAGE_SIZE));
+  if (npPage > totalPages) npPage = totalPages;
+  if (npPage < 1) npPage = 1;
+  const start = (npPage - 1) * NP_PAGE_SIZE;
+  const pageItems = orden.slice(start, start + NP_PAGE_SIZE);
+
+  const npFallback = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='44'%3E%3Crect fill='%23161b24' width='30' height='44'/%3E%3C/svg%3E`;
+  wrap.innerHTML = pageItems.map(({ item, realIdx }) => `
+    <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;border-bottom:1px solid var(--border);">
+      ${privadoPosterHtml(item)}
+      <div style="flex:1;font-size:0.78rem;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.titulo}</div>
+      <div style="font-size:0.68rem;color:var(--muted);flex-shrink:0;">${(item.enlaces||[]).length} enlace(s)</div>
+      <button class="export-btn" style="width:auto;padding:0.25rem 0.5rem;margin:0;flex-shrink:0;" onclick="borrarPrivadoItem(${realIdx})">🗑</button>
+    </div>
+  `).join('');
+
+  if (totalPages <= 1) { pagWrap.innerHTML = ''; return; }
+  let pagHtml = `<button class="page-btn" onclick="npGoPage(${npPage-1})" ${npPage===1?'disabled':''}>‹</button>`;
+  for (let i = 1; i <= totalPages; i++) {
+    pagHtml += `<button class="page-btn ${i===npPage?'active':''}" onclick="npGoPage(${i})">${i}</button>`;
+  }
+  pagHtml += `<button class="page-btn" onclick="npGoPage(${npPage+1})" ${npPage===totalPages?'disabled':''}>›</button>`;
+  pagHtml += `<span class="page-info">&nbsp;Página ${npPage} de ${totalPages}</span>`;
+  pagWrap.innerHTML = pagHtml;
+}
+
+function npGoPage(p) {
+  npPage = p;
+  renderPrivadoSavedList();
+}
+
+function repararIdsDuplicadosPrivado() {
+  const lista = getPrivado();
+  const vistos = new Set();
+  let reparados = 0;
+  lista.forEach(item => {
+    if (vistos.has(item.id)) {
+      item.id = slugify(item.titulo || 'item') + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+      reparados++;
+    }
+    vistos.add(item.id);
+  });
+  if (!reparados) { showToast('No había IDs duplicados. ✓', 'info'); return; }
+  savePrivado(lista);
+  showToast(`🔧 ${reparados} ID(s) duplicado(s) corregido(s)`, 'success');
+}
+
+function borrarPrivadoItem(i) {
+  const lista = getPrivado();
+  const item = lista[i];
+  if (!item) return;
+  if (!confirm('¿Borrar «' + item.titulo + '»?')) return;
+  lista.splice(i, 1);
+  savePrivado(lista);
+}
+
+function downloadPrivadoJSON() {
+  const json = JSON.stringify(getPrivado(), null, 2);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+  a.download = 'noctis-privado.json'; a.click();
+  showToast('noctis-privado.json descargado ✓', 'success');
+}
+
+function copyPrivadoJSON() {
+  navigator.clipboard.writeText(JSON.stringify(getPrivado(), null, 2))
+    .then(() => showToast('noctis-privado.json copiado ✓', 'success'))
+    .catch(() => showToast('No se pudo copiar', 'error'));
+}
+
+function importPrivadoJSON() {
+  const raw = document.getElementById('np-import-area').value.trim();
+  if (!raw) { showToast('Pega el JSON primero.', 'error'); return; }
+  try {
+    const data = JSON.parse(raw);
+    if (!Array.isArray(data)) throw new Error('No es un array');
+    if (!confirm(`¿Importar ${data.length} título(s)? Esto reemplaza la lista actual de Noctis Privado.`)) return;
+    savePrivado(data); // ya re-renderiza la lista sola
+    npPage = 1;
+    document.getElementById('np-import-area').value = '';
+    showToast(`✓ ${data.length} título(s) de Noctis Privado importado(s)`, 'success');
+  } catch (e) {
+    showToast('JSON inválido. Revisá el formato.', 'error');
+  }
+}
+
+async function publishPrivadoToGithub() {
+  const owner = document.getElementById('gh-owner').value.trim();
+  const repo = document.getElementById('gh-repo').value.trim();
+  const token = document.getElementById('gh-token').value.trim();
+  const statusEl = document.getElementById('np-gh-status');
+  if (!owner || !repo || !token) { showToast('Configura usuario, repositorio y token primero (arriba, en Sincronización GitHub).', 'error'); return; }
+  statusEl.textContent = 'Publicando...';
+  statusEl.style.color = 'var(--muted)';
+  try {
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/noctis-privado.json`;
+    let sha = null;
+    const getRes = await fetch(apiUrl, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' } });
+    if (getRes.ok) { const d = await getRes.json(); sha = d.sha; }
+    else if (getRes.status !== 404) { const e = await getRes.json().catch(() => ({})); throw new Error(e.message || 'Error ' + getRes.status); }
+    const json = JSON.stringify(getPrivado(), null, 2);
+    const b64 = btoa(Array.from(new TextEncoder().encode(json), b => String.fromCharCode(b)).join(''));
+    const putRes = await fetch(apiUrl, {
+      method: 'PUT',
+      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' },
+      body: JSON.stringify({ message: 'Actualizar noctis-privado — ' + new Date().toLocaleString(), content: b64, ...(sha && { sha }) })
+    });
+    if (!putRes.ok) { const e = await putRes.json().catch(() => ({})); throw new Error(e.message || 'Error ' + putRes.status); }
+    statusEl.textContent = '✓ Publicado.';
+    statusEl.style.color = 'var(--green)';
+    showToast('🚀 Noctis Privado publicado en GitHub', 'success');
+  } catch(e) {
+    statusEl.textContent = '✗ ' + e.message;
+    statusEl.style.color = '#e55';
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', renderPrivadoSavedList);
 
 /* ======================== TOAST ======================== */
 let toastTimer;
