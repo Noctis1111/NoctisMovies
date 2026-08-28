@@ -1679,6 +1679,7 @@
           <a class="side-tag" href="index.html?source=X265">X265</a>
           <a class="side-tag" href="index.html?source=WEB-DL">WEB-DL</a>
           <a class="side-tag" href="index.html?source=WEB-RIP">WEB-RIP</a>
+          <a class="side-tag" href="index.html?source=WEB-SCR">WEB-SCR</a>
           <a class="side-tag" href="index.html?source=BLU-RAY">BLU-RAY</a>
           <a class="side-tag" href="index.html?source=HDRIP">HDRip</a>
           <a class="side-tag" href="index.html?source=HDTS">HDTS</a>
@@ -2064,7 +2065,7 @@ function formatUploadDate(ud) {
 const PELI_FILE_FOR = {
   fuente: {
     '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','brrip':'brrip','dcp-rip':'dcp-rip',
-    'hdrip':'hdrip','hdts':'hdts','remux':'remux','web-dl':'web-dl','web-rip':'web-rip','x265':'x265',
+    'hdrip':'hdrip','hdts':'hdts','remux':'remux','web-dl':'web-dl','web-rip':'web-rip','web-scr':'web-scr','x265':'x265',
   },
   idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino' },
   calidad: { '480p':'420p','720p':'720p','1080p':'1080p','full-hd':'full hd','4k':'4k' },
@@ -2863,6 +2864,7 @@ init();
       if (u.includes('REMUX')) return '#d39407';
       if (u.includes('WEB-DL') || u.includes('WEBDL')) return '#0fb528';
       if (u.includes('WEB-RIP') || u.includes('WEBRIP')) return '#ee4394';
+      if (u.includes('WEB-SCR') || u.includes('WEBSCR')) return '#2ccca4';
       if (u.includes('BLU-RAY') || u.includes('BLURAY') || u.includes('PLACEBO')) return '#6ac2eb';
       if (u.includes('BDRIP')) return '#5e37b6';
       if (u.includes('BRRIP')) return '#046fb6';
