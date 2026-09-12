@@ -481,12 +481,30 @@
     .poster-badge-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; border-radius: 12px; }
     /* Cintas de pelicula/serie (idioma, fuente, calidad, hdr, streaming) superpuestas al poster principal */
     .poster-cintas-overlay { position: absolute !important; inset: 0 !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important; object-fit: contain !important; border-radius: 12px; pointer-events: none; z-index: 2; }
+    /* Portadas de MÚSICA (cuadradas 600x600): la portada real se ve COMPLETA sin recortar
+       (object-fit:contain) y detrás, la misma imagen agrandada + difuminada rellena todo el
+       marco, en vez de dejar franjas vacías o estirar/recortar la portada cuadrada. */
+    .poster-frame .poster-square-bg {
+      position: absolute !important; inset: 0; overflow: hidden; border-radius: 12px; z-index: 0 !important;
+      background-color: #0d0f14;
+    }
+    .poster-frame.poster-frame-fixed-ratio .poster-square-bg.poster-square-bg-framed {
+      inset: auto; top: 9.9%; left: 6.8%; width: calc(100% - 6.8% - 1.3%); height: calc(100% - 9.9% - 1.4%); border-radius: 6px;
+    }
+    .poster-square-bg-img {
+      position: absolute; top: -25%; left: -25%; width: 150%; height: 150%;
+      background-size: cover; background-position: center; background-repeat: no-repeat;
+      filter: blur(20px) saturate(1.7) brightness(1.05);
+    }
+    .poster-frame .poster-img.img-contain-music { position: relative !important; z-index: 1 !important; object-fit: contain !important; background: transparent; }
+    .poster-frame.poster-frame-fixed-ratio .poster-img.img-contain-music.has-frame { position: absolute !important; }
     .poster-img { width: 100%; height: auto; max-height: 500px; object-fit: contain; object-position: top center; border-radius: 12px; border: 1px solid var(--border); display: block; box-shadow: 0 8px 40px rgba(0,0,0,0.7); transition: transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out; }
     .poster-frame { transition: transform 0.4s ease-in-out; }
     /* Con marco/cintas: se escala el marco COMPLETO (foto + cintas) como una sola unidad, para
        que no se desalineen ni la foto tape a las cintas. Sin marco: zoom simple de siempre, solo la foto. */
-    .poster-wrap:hover .poster-frame:has(.poster-img.has-frame) { transform: scale(1.02); }
-    .poster-wrap:hover .poster-frame:not(:has(.poster-img.has-frame)) .poster-img { transform: scale(1.02); box-shadow: 0 12px 50px rgba(0,0,0,0.8); }
+    .poster-wrap:hover .poster-frame:has(.poster-img.has-frame),
+    .poster-wrap:hover .poster-frame:has(.poster-square-bg) { transform: scale(1.02); }
+    .poster-wrap:hover .poster-frame:not(:has(.poster-img.has-frame)):not(:has(.poster-square-bg)) .poster-img { transform: scale(1.02); box-shadow: 0 12px 50px rgba(0,0,0,0.8); }
 
     /* ── Camuflaje activo: efecto Adult/Hentai (poster principal) ── */
     .poster-wrap.card-h .poster-img {
@@ -666,6 +684,10 @@
     .slider-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; transition: background 0.2s; }
     .slider-dot.active { background: var(--gold); }
     .capturas-placeholder { width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.85rem; background: var(--surface3); }
+    /* ALBUMS sin portadas cargadas: la fila de álbumes real ocupa ~260-290px de alto
+       (portadas cuadradas), no 16:9 a todo el ancho — si no, queda un cuadro gigante vacío */
+    .media-row.music .capturas-placeholder { aspect-ratio: unset; height: 220px; border-radius: 10px; }
+    @media (max-width: 600px) { .media-row.music .capturas-placeholder { height: 160px; } }
 
     /* ============================================================
        CAPTURAS +18 — BLUR / REVELAR / VISOR GRANDE COMPARTIBLE
@@ -1185,10 +1207,25 @@
     /* Cuando hay cinta de fuente (marco), la foto se recorta al hueco real del marco — mismos valores calibrados que index.html */
     .related-poster img.has-frame { top: 9.9%; left: 6.8%; width: calc(100% - 6.8% - 1.3%); height: calc(100% - 9.9% - 1.4%); position: absolute; }
     .related-badge-overlay { position: absolute !important; inset: 0 !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important; object-fit: contain !important; border-radius: 8px; pointer-events: none; z-index: 2; }
-    /* Zoom on hover: la <img> se eleva por encima de cintas y marca de agua (mismo criterio
-       que .movie-card:hover .card-poster img en index.html), asi la portada real "tapa" el
-       logo/cintas al acercarse, en vez de quedarse estáticos debajo. */
-    .related-card:hover .related-poster img { transform: scale(1.08); box-shadow: 0 12px 28px rgba(0,0,0,0.55); position: relative; z-index: 999; }
+    /* Portadas de MÚSICA (cuadradas): la foto se ve completa (sin recortar) con un fondo
+       difuminado de la misma imagen detrás, igual que en index.html */
+    .related-poster .poster-square-bg {
+      position: absolute !important; inset: 0; overflow: hidden; border-radius: 8px; z-index: 0 !important;
+      background-color: #0d0f14; transition: transform 0.4s ease-in-out;
+    }
+    .related-poster .poster-square-bg-img {
+      position: absolute; top: -25%; left: -25%; width: 150%; height: 150%;
+      background-size: cover; background-position: center; background-repeat: no-repeat;
+      filter: blur(20px) saturate(1.7) brightness(1.05);
+    }
+    .related-poster img.img-contain-music { position: relative !important; z-index: 1 !important; object-fit: contain !important; background: transparent; }
+    .related-poster img.img-contain-music.has-frame { position: absolute !important; }
+    /* Con marco/cintas: se escala TODA la tarjeta (foto + cintas) como una sola unidad, asi quedan
+       siempre alineadas y las cintas nunca se tapan por la foto. Sin marco (portada antigua ya lista):
+       se mantiene el zoom simple de siempre, solo sobre la foto. */
+    .related-card:hover .related-poster:has(img.has-frame),
+    .related-card:hover .related-poster:has(.poster-square-bg) { transform: scale(1.05); box-shadow: 0 12px 28px rgba(0,0,0,0.55); }
+    .related-card:hover .related-poster:not(:has(img.has-frame)):not(:has(.poster-square-bg)) img { transform: scale(1.08); box-shadow: 0 12px 28px rgba(0,0,0,0.55); }
 
     /* ── Camuflaje activo: efecto Adult/Hentai (tarjetas relacionadas) ── */
     /* En reposo recorta limpio (evita que el blur sangre); en hover se libera para el mismo pop-out que las demás */
@@ -1291,7 +1328,9 @@
       box-shadow: 0 2px 10px rgba(230,48,60,0.7);
     }
 
-    /* ── Marca de agua para tipo "Música" (tarjetas relacionadas) — mismo criterio que index.html ── */
+    /* ── Marca de agua para tipo "Música" (tarjetas relacionadas) — mismo criterio que index.html:
+       visible pero discreta, y al pasar el cursor DESAPARECE POR COMPLETO (logo + degradado) para
+       ver la portada real. ── */
     .related-poster .m-badge {
       position: absolute;
       inset: 0;
@@ -1300,9 +1339,10 @@
       justify-content: center;
       pointer-events: none;
       z-index: 5;
-      background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 33%, rgba(0,0,0,0.6) 66%, rgba(0,0,0,0.85) 100%);
+      background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 33%, rgba(0,0,0,0.7) 76%, rgba(0,0,0,1) 100%);
       border-radius: inherit;
-      transition: background 0.3s ease-in-out, transform 0.4s ease-in-out;
+      opacity: 1;
+      transition: opacity 0.3s ease-in-out, transform 0.4s ease-in-out;
       transform: scale(1);
     }
     .related-poster .m-badge img {
@@ -1313,7 +1353,7 @@
       transition: opacity 0.3s ease-in-out;
     }
     .related-card.card-m:hover .m-badge {
-      background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.12) 33%, rgba(0,0,0,0.22) 66%, rgba(0,0,0,0.32) 100%);
+      opacity: 0;
       transform: scale(1.08);
     }
     .related-info { padding: 0; margin-top: 0.5rem; background: none; }
@@ -1409,11 +1449,40 @@
     /* SIDEBAR */
     .sidebar { display: flex; flex-direction: column; gap: 1rem; }
     .side-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+
+    /* ── Efecto de borde animado (una sola luz recorriendo TODO el contorno
+       real de la caja, curvas incluidas, con degradado tipo cola de cometa/
+       serpiente) al pasar el cursor por encima. Se aplica a TIPO, CALIDAD,
+       FORMATO DE AUDIO, FUENTE, AUDIO y AÑO. El movimiento y el degradado los
+       calcula el script al final del body (getPointAtLength cuadro a cuadro),
+       porque un stroke de SVG no puede degradarse a lo largo de una línea
+       que dobla en varias direcciones usando solo CSS. ── */
+    .side-box { position: relative; }
+    .side-box .sb-trace-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+    .side-box .sb-trace-rect {
+      fill: none;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      opacity: 0;
+      filter: drop-shadow(0 0 4px var(--gold)) drop-shadow(0 0 8px rgba(201,168,76,0.55));
+      transition: opacity 0.3s ease;
+    }
+    .side-box:hover .sb-trace-rect { opacity: 1; }
+    .side-box:hover { box-shadow: 0 0 16px rgba(201,168,76,0.25); }
+
     .side-box-title { font-family: 'Bebas Neue', sans-serif; font-size: 0.95rem; letter-spacing: 2px; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); color: var(--gold); }
     .side-filter-group { padding: 0.75rem 1rem; }
     .side-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
     .side-tag { padding: 3px 10px; border-radius: 4px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
     .side-tag:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+
+    /* ── BLU-RAY 3D: efecto anaglifo (rojo/cian), para diferenciarlo del
+       resto ya que es contenido 3D. ── */
+    .side-tag.tag-3d { text-shadow: -1px 0 rgba(255,45,99,0.9), 1px 0 rgba(0,224,255,0.9); }
+    .side-tag.tag-3d:hover {
+      text-shadow: -1.5px 0 rgba(255,45,99,1), 1.5px 0 rgba(0,224,255,1);
+      transform: perspective(240px) rotateX(6deg) translateY(-1px);
+    }
 
     /* TOAST */
     .toast { position: fixed; bottom: 2rem; right: 2rem; padding: 0.9rem 1.5rem; border-radius: 10px; font-weight: 600; font-size: 0.9rem; z-index: 9999; opacity: 0; transform: translateY(20px); transition: all 0.3s; pointer-events: none; }
@@ -1509,6 +1578,7 @@
       <div class="detail-top">
         <div class="poster-wrap">
           <div class="poster-frame">
+            <div id="d-poster-square-bg"></div>
             <img class="poster-img" id="d-poster" src="" alt="Poster"/>
             <img class="poster-badge-overlay" id="d-poster-badge" src="" alt="" style="display:none;"/>
           </div>
@@ -1628,7 +1698,7 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
-    <div class="side-box">
+    <div class="side-box"><svg class="sb-trace-svg"><rect class="sb-trace-rect" x="1" y="1" width="100%" height="100%" rx="11" ry="11"/></svg>
       <div class="side-box-title">TIPO</div>
       <div class="side-filter-group">
         <div class="side-tags">
@@ -1643,7 +1713,7 @@
         </div>
       </div>
     </div>
-    <div class="side-box">
+    <div class="side-box"><svg class="sb-trace-svg"><rect class="sb-trace-rect" x="1" y="1" width="100%" height="100%" rx="11" ry="11"/></svg>
       <div class="side-box-title">CALIDAD</div>
       <div class="side-filter-group">
         <div class="side-tags">
@@ -1656,7 +1726,7 @@
         </div>
       </div>
     </div>
-    <div class="side-box">
+    <div class="side-box"><svg class="sb-trace-svg"><rect class="sb-trace-rect" x="1" y="1" width="100%" height="100%" rx="11" ry="11"/></svg>
       <div class="side-box-title">🎧 FORMATO DE AUDIO</div>
       <div class="side-filter-group">
         <div class="side-tags">
@@ -1668,7 +1738,7 @@
         </div>
       </div>
     </div>
-    <div class="side-box">
+    <div class="side-box"><svg class="sb-trace-svg"><rect class="sb-trace-rect" x="1" y="1" width="100%" height="100%" rx="11" ry="11"/></svg>
       <div class="side-box-title">FUENTE</div>
       <div class="side-filter-group">
         <div class="side-tags">
@@ -1681,13 +1751,14 @@
           <a class="side-tag" href="index.html?source=WEB-RIP">WEB-RIP</a>
           <a class="side-tag" href="index.html?source=WEB-SCR">WEB-SCR</a>
           <a class="side-tag" href="index.html?source=BLU-RAY">BLU-RAY</a>
+          <a class="side-tag tag-3d" href="index.html?source=BLU-RAY-3D">BLU-RAY 3D</a>
           <a class="side-tag" href="index.html?source=HDRIP">HDRip</a>
           <a class="side-tag" href="index.html?source=HDTS">HDTS</a>
           <a class="side-tag" href="index.html?source=DCP-RIP">DCP-RIP</a>
         </div>
       </div>
     </div>
-    <div class="side-box">
+    <div class="side-box"><svg class="sb-trace-svg"><rect class="sb-trace-rect" x="1" y="1" width="100%" height="100%" rx="11" ry="11"/></svg>
       <div class="side-box-title">AUDIO</div>
       <div class="side-filter-group">
         <div class="side-tags">
@@ -1699,7 +1770,7 @@
         </div>
       </div>
     </div>
-    <div class="side-box">
+    <div class="side-box"><svg class="sb-trace-svg"><rect class="sb-trace-rect" x="1" y="1" width="100%" height="100%" rx="11" ry="11"/></svg>
       <div class="side-box-title">AÑO</div>
       <div class="side-filter-group">
         <div class="side-tags" id="year-tags-sidebar" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.3rem;">
@@ -2064,7 +2135,7 @@ function formatUploadDate(ud) {
 // Cada categoria: key interno -> nombre EXACTO del archivo (sin .png) dentro de badges/<categoria>/
 const PELI_FILE_FOR = {
   fuente: {
-    '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','brrip':'brrip','dcp-rip':'dcp-rip',
+    '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','blu-ray-3d':'blu-ray-3d','brrip':'brrip','dcp-rip':'dcp-rip',
     'hdrip':'hdrip','hdts':'hdts','remux':'remux','web-dl':'web-dl','web-rip':'web-rip','web-scr':'web-scr','x265':'x265',
   },
   idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino' },
@@ -2169,6 +2240,24 @@ function badgeOverlayHtml(m, cssClass) {
 function isMusicContent(m) {
   const t = (m.type || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   return t.includes('musica') || t.includes('music');
+}
+
+// Portada de música "pura" (formato cuadrado 600x600 típico de plataformas de música).
+// Mismo criterio que index.html: si el tipo incluye "Música" la portada real sigue siendo
+// cuadrada. Solo se excluye si es "legacyCover" (ya diseñada a mano en Illustrator).
+function isPureMusicCover(m) {
+  if (!(m.type || '').includes('Música') && !(m.type || '').toLowerCase().includes('music')) return false;
+  if (m && m.legacyCover) return false;
+  return true;
+}
+
+// HTML del fondo difuminado (misma imagen, agrandada y borrosa) que rellena el marco cuando
+// la portada real es cuadrada y no lo cubre entero. Se usa junto con object-fit:contain en el <img> real.
+function posterSquareBgHtml(m) {
+  if (!isPureMusicCover(m) || !m.image) return '';
+  const safeUrl = String(m.image).replace(/"/g, '&quot;');
+  const framedClass = hasFrame(m) ? ' poster-square-bg-framed' : '';
+  return `<div class="poster-square-bg${framedClass}"><div class="poster-square-bg-img" style="background-image:url(&quot;${safeUrl}&quot;)"></div></div>`;
 }
 
 // ── Efecto "gotas de agua" (ondas concéntricas) para fichas de Música / Híbrido ──
@@ -2487,7 +2576,8 @@ function renderRelated(movies, currentIdx) {
         ${dateLabel ? `<div class="related-date">${dateLabel}</div>` : ''}
         <div class="related-poster">
           ${isH ? '<span class="h-ribbon">+18</span><span class="h-hint">CONTENIDO EXPLÍCITO</span>' : ''}
-          <img class="${hasFrame(m) ? 'has-frame' : ''}" src="${m.image || ''}" alt="${m.title}" onerror="this.src='${fallback}'"/>
+          ${posterSquareBgHtml(m)}
+          <img class="${hasFrame(m) ? 'has-frame' : ''}${isPureMusicCover(m) ? ' img-contain-music' : ''}" src="${m.image || ''}" alt="${m.title}" onerror="this.src='${fallback}'"/>
         ${badgeOverlayHtml(m, 'related-badge-overlay')}
         ${isM ? `<span class="m-badge"><img src="${MUSIC_LOGO_B64}" alt="Música"/></span>` : ''}
       </div>
@@ -2579,6 +2669,9 @@ async function init() {
   posterEl.onerror = function() {
     this.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='300'%3E%3Crect fill='%230e1117' width='200' height='300'/%3E%3Ctext fill='%236b7280' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='40'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E";
   };
+  posterEl.classList.toggle('img-contain-music', isPureMusicCover(m));
+  const posterSquareBgEl = document.getElementById('d-poster-square-bg');
+  if (posterSquareBgEl) posterSquareBgEl.innerHTML = posterSquareBgHtml(m);
   const badgeEl = document.getElementById('d-poster-badge');
   if (badgeEl) badgeEl.style.display = 'none'; // reemplazado por el sistema unificado de cintas (poster-cintas-overlay), que ya incluye música
   const posterFrameElEarly = document.querySelector('.poster-frame');
@@ -3123,6 +3216,90 @@ init();
     a.click();
     a.remove();
   }
+</script>
+<script>
+  // ── Efecto de borde animado del sidebar: una sola luz recorriendo TODO el
+  // contorno real de cada caja (curvas incluidas), con degradado tipo cola de
+  // cometa/serpiente — fuerte en la cabeza, se apaga hacia atrás. Un stroke
+  // de SVG no puede degradarse a lo largo de una línea que dobla en varias
+  // direcciones usando solo CSS, así que acá se recalcula el degradado
+  // (linearGradient) cuadro a cuadro con la posición real de la cabeza y la
+  // cola sobre el contorno (getPointAtLength). ──
+  (function () {
+    var RAF = window.requestAnimationFrame || function (cb) { return setTimeout(cb, 16); };
+    var TRAIL_FRACTION = 0.24; // qué tanto del contorno cubre la cola visible
+    var SPEED = 220; // px por segundo (aprox. igual en todas las cajas)
+    var NS = 'http://www.w3.org/2000/svg';
+
+    document.querySelectorAll('.side-box').forEach(function (box, i) {
+      var rect = box.querySelector('.sb-trace-rect');
+      var svg = box.querySelector('.sb-trace-svg');
+      if (!rect || !svg) return;
+
+      var gradId = 'sb-grad-d-' + i;
+      var defs = document.createElementNS(NS, 'defs');
+      var grad = document.createElementNS(NS, 'linearGradient');
+      grad.setAttribute('id', gradId);
+      grad.setAttribute('gradientUnits', 'userSpaceOnUse');
+      var stopTail = document.createElementNS(NS, 'stop');
+      stopTail.setAttribute('offset', '0%');
+      stopTail.setAttribute('stop-color', '#c9a84c');
+      stopTail.setAttribute('stop-opacity', '0');
+      var stopMid = document.createElementNS(NS, 'stop');
+      stopMid.setAttribute('offset', '55%');
+      stopMid.setAttribute('stop-color', '#c9a84c');
+      stopMid.setAttribute('stop-opacity', '0.55');
+      var stopHead = document.createElementNS(NS, 'stop');
+      stopHead.setAttribute('offset', '100%');
+      stopHead.setAttribute('stop-color', '#e8c76a');
+      stopHead.setAttribute('stop-opacity', '1');
+      grad.appendChild(stopTail);
+      grad.appendChild(stopMid);
+      grad.appendChild(stopHead);
+      defs.appendChild(grad);
+      svg.appendChild(defs);
+      rect.setAttribute('stroke', 'url(#' + gradId + ')');
+
+      var len = 0, trailLen = 0, pos = 0, last = null, running = false;
+
+      function measure() {
+        len = rect.getTotalLength ? rect.getTotalLength() : 0;
+        trailLen = len * TRAIL_FRACTION;
+        rect.style.strokeDasharray = trailLen + ' ' + Math.max(len - trailLen, 0);
+      }
+      measure();
+      window.addEventListener('resize', measure);
+      setTimeout(measure, 300);
+      setTimeout(measure, 1000);
+
+      function frame(t) {
+        if (!running) return;
+        if (last == null) last = t;
+        var dt = Math.min((t - last) / 1000, 0.05);
+        last = t;
+        if (!len) { RAF(frame); return; }
+        pos = (pos + SPEED * dt) % len;
+
+        var tailPos = (pos - trailLen + len) % len;
+        var head = rect.getPointAtLength(pos);
+        var tail = rect.getPointAtLength(tailPos);
+        grad.setAttribute('x1', tail.x);
+        grad.setAttribute('y1', tail.y);
+        grad.setAttribute('x2', head.x);
+        grad.setAttribute('y2', head.y);
+        rect.style.strokeDashoffset = -tailPos;
+
+        RAF(frame);
+      }
+
+      box.addEventListener('mouseenter', function () {
+        running = true; last = null; RAF(frame);
+      });
+      box.addEventListener('mouseleave', function () {
+        running = false;
+      });
+    });
+  })();
 </script>
 </body>
 </html>
