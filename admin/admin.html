@@ -207,7 +207,7 @@
 
 /* Altura reducida a 34px — barra más fina para dar más espacio vertical al panel de abajo */
 .admin-header-inner { 
-  max-width: 1900px !important; 
+  max-width: 2100px !important; 
   margin: 0 auto !important; 
   display: flex !important; 
   align-items: center !important; 
@@ -308,7 +308,7 @@
 
 /* 5. MAQUETA PRINCIPAL (Mantiene tus rejillas intactas) */
 .admin-main { 
-  max-width: 1900px !important; 
+  max-width: 2100px !important; 
   margin: 0 auto !important; 
   padding: 0 2rem 1.25rem !important; 
   display: grid !important; 
@@ -674,7 +674,8 @@
     .chip.chip-master32.chip-active { color: #2a2410 !important; box-shadow: 0 0 12px rgba(232,219,160,0.6); }
     .chip.chip-master32.chip-active .chip-aft-sub { color: #4a3f1a; }
     /* Fuente/Encode → misma altura más generosa que Formato de Audio */
-    #chips-source.chip-group .chip { padding: 0.62rem 0.9rem; white-space: nowrap; }
+    #chips-source.chip-group { gap: 0.22rem !important; flex-wrap: nowrap !important; }
+    #chips-source.chip-group .chip { padding: 0.5rem 0.3rem !important; font-size: 0.7rem !important; white-space: nowrap; flex: 1 1 0; min-width: 0; text-align: center; }
     /* Calidad / Audio / HDR → una sola fila (van en columnas de 1/3, por eso los chips son más chicos que en Fuente/Encode) */
     #chips-quality.chip-group, #chips-audio.chip-group, #chips-hdr.chip-group {
       flex-wrap: nowrap;
@@ -685,8 +686,8 @@
       scrollbar-width: thin;
     }
     #chips-quality.chip-group .chip, #chips-audio.chip-group .chip, #chips-hdr.chip-group .chip {
-      padding: 0.34rem 0.42rem;
-      font-size: 0.66rem;
+      padding: 0.42rem 0.55rem;
+      font-size: 0.74rem;
       letter-spacing: 0.2px;
       white-space: nowrap;
       flex: 0 0 auto;
@@ -736,7 +737,7 @@
     .movie-item-poster { width: 108px; height: 62px; object-fit: cover; border-radius: 6px; flex-shrink: 0; background: var(--surface3); aspect-ratio: 1280/740; }
     .movie-item-poster-wrap { position: relative; width: 108px; height: 62px; flex-shrink: 0; }
     .movie-item-poster-wrap .movie-item-poster { width: 100%; height: 100%; }
-    .movie-item-badge-overlay { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 6px; pointer-events: none; }
+    .movie-item-badge-overlay { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 6px; pointer-events: none; z-index: 4; }
     .movie-item-info { flex: 1; min-width: 0; }
     .movie-item-title { font-family: 'Barlow Condensed', sans-serif; font-size: 1.12rem; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
     .movie-item-meta { font-size: 0.9rem; color: var(--muted); display: flex; gap: 0.5rem; margin-top: 0.2rem; flex-wrap: wrap; }
@@ -847,6 +848,67 @@
       width: calc(100% - 6.8% - 1.3%) !important; height: calc(100% - 9.9% - 1.4%) !important;
       right: auto !important; bottom: auto !important;
     }
+    /* Mismo hueco real del marco, aplicado a las miniaturas de la lista del Catálogo
+       (y de Noctis Privado, que reusa esta misma clase) */
+    .movie-item-poster.has-frame {
+      position: absolute !important;
+      top: 9.9% !important; left: 6.8% !important;
+      width: calc(100% - 6.8% - 1.3%) !important; height: calc(100% - 9.9% - 1.4%) !important;
+      right: auto !important; bottom: auto !important;
+    }
+
+    /* ── Portadas de MÚSICA (cuadradas 600x600): se ven COMPLETAS sin recortar
+       (object-fit:contain) y detrás, la misma imagen agrandada + difuminada
+       rellena el hueco, igual que en index.html. Se usa tanto en el preview
+       del formulario (#poster-preview-wrap) como en las miniaturas de la
+       lista del Catálogo (.movie-item-poster-wrap). ── */
+    #poster-preview-wrap .poster-square-bg,
+    .movie-item-poster-wrap .poster-square-bg {
+      position: absolute; inset: 0; overflow: hidden; border-radius: inherit; z-index: 0;
+      background-color: #0d0f14;
+    }
+    #poster-preview-wrap .poster-square-bg.poster-square-bg-framed {
+      top: 0; left: 0; width: 100%; height: 97.7%; border-radius: 0 0 3% 3%; inset: auto;
+    }
+    .movie-item-poster-wrap .poster-square-bg.poster-square-bg-framed {
+      top: 0; left: 0; width: 100%; height: 97.7%; border-radius: 6px; inset: auto;
+    }
+    #poster-preview-wrap .poster-square-bg-img,
+    .movie-item-poster-wrap .poster-square-bg-img {
+      position: absolute; top: -8%; left: -8%; width: 116%; height: 116%;
+      background-size: cover; background-position: center; background-repeat: no-repeat;
+      filter: blur(20px) saturate(1.7) brightness(1.05);
+    }
+    /* Las miniaturas del catálogo son chiquitas (108px) — un blur pensado
+       para tarjetas grandes ahí se ve como una mancha; se reduce a su escala. */
+    .movie-item-poster-wrap .poster-square-bg-img {
+      filter: blur(6px) saturate(1.7) brightness(1.05);
+    }
+    #poster-preview-wrap .poster-square-bg::after,
+    .movie-item-poster-wrap .poster-square-bg::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.15));
+    }
+    #img-preview.img-contain-music,
+    .movie-item-poster.img-contain-music {
+      position: relative; z-index: 1; object-fit: contain !important; background: transparent;
+    }
+    /* Mismo relleno extra que el fondo (arriba), para que la foto y el fondo
+       calcen exactos entre sí y no se note la costura. */
+    #img-preview.img-contain-music.has-frame,
+    .movie-item-poster.img-contain-music.has-frame {
+      position: absolute !important;
+      top: 0 !important; left: 0 !important; width: 100% !important; height: 97.7% !important;
+    }
+    /* Miniaturas chicas de "usar esta portada" en Golden Quality — mismo sistema de
+       marco+cintas que el catálogo, solo que en tamaño reducido */
+    .golden-pick-thumb.movie-item-poster-wrap {
+      width: 64px !important; height: 37px !important;
+      cursor: pointer; border-radius: 4px; overflow: hidden;
+      border: 1px solid var(--border); transition: border-color 0.15s;
+    }
+    .golden-pick-thumb.movie-item-poster-wrap:hover { border-color: var(--gold); }
+    .golden-pick-thumb .movie-item-poster { border-radius: 0; }
   </style>
 </head>
 <body>
@@ -913,6 +975,7 @@
                 <div class="form-group" style="margin-bottom:0;display:flex;flex-direction:column;">
                   <label>📋 Pega todo el bloque aquí <span style="color:var(--gold);font-size:0.68rem;font-weight:600;letter-spacing:0;">← TODO junto</span></label>
                   <textarea id="f-datos-raw" class="textarea-links" style="flex:1;min-height:105px;font-size:0.92rem;border-color:rgba(201,168,76,0.3);resize:none;" placeholder="Pega aquí todo el bloque completo:&#10;• Título&#10;• URL&#10;• Título Original / Año / País / Duración / Género&#10;• Sinopsis&#10;• MAS INFO + tamaños temporadas&#10;• Audio / Calidad / Resolución...&#10;• Enlaces&#10;&#10;¡Se separa todo automáticamente!" oninput="autoRellenarTodo()" onpaste="setTimeout(autoRellenarTodo,80)"></textarea>
+                  <div id="aviso-privado-auto" style="font-size:0.68rem;color:var(--muted);margin-top:0.3rem;min-height:1em;"></div>
                   <input type="hidden" id="f-desc"/>
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
@@ -1008,7 +1071,7 @@
 
               <div class="form-group">
               <label>Fuente / Encode</label>
-              <div class="chip-group" id="chips-source" style="flex-wrap:wrap;gap:0.35rem;">
+              <div class="chip-group" id="chips-source">
                 <button type="button" class="chip" data-value="60FPS" style="border-color:#cf0f0f;color:#cf0f0f;">60FPS</button>
                 <button type="button" class="chip" data-value="REMUX" style="border-color:#d39407;color:#d39407;">REMUX</button>
                 <button type="button" class="chip" data-value="BDRIP" style="border-color:#5e37b6;color:#5e37b6;">BDRIP</button>
@@ -1018,6 +1081,7 @@
                 <button type="button" class="chip" data-value="WEB-RIP" style="border-color:#ee4394;color:#ee4394;">WEB-RIP</button>
                 <button type="button" class="chip" data-value="WEB-SCR" style="border-color:#2ccca4;color:#2ccca4;">WEB-SCR</button>
                 <button type="button" class="chip" data-value="BLU-RAY" style="border-color:#6ac2eb;color:#6ac2eb;">BLU-RAY</button>
+                <button type="button" class="chip" data-value="BLU-RAY-3D" style="border-color:#a06ceb;color:#a06ceb;">BLU-RAY 3D</button>
                 <button type="button" class="chip" data-value="HDRIP" style="border-color:#f8b800;color:#f8b800;">HDRip</button>
                 <button type="button" class="chip" data-value="HDTS" style="border-color:#3330ac;color:#3330ac;">HDTS</button>
                 <button type="button" class="chip" data-value="DCP-RIP" style="border-color:#b05a00;color:#b05a00;">DCP-RIP</button>
@@ -1063,6 +1127,7 @@
                   </div>
                 </div>
                 <div id="poster-preview-wrap" style="display:none;position:relative;width:100%;aspect-ratio:1280/740;overflow:hidden;border-radius:10px;border:1px solid var(--border);">
+                  <div id="poster-square-bg" class="poster-square-bg" style="display:none;"><div id="poster-square-bg-img" class="poster-square-bg-img"></div></div>
                   <img id="img-preview" src="" alt="Preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block;z-index:1;"/>
                   <img id="peli-idioma" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:2;"/>
                   <img id="peli-fuente" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:3;"/>
@@ -1178,7 +1243,7 @@
             </div>
             <div class="form-group" style="margin-bottom:0.6rem;">
               <label>Ediciones a juntar</label>
-              <input type="number" id="golden-count" min="1" max="20" placeholder="Ej: 3" style="height:2.7rem;"/>
+              <input type="number" id="golden-count" min="1" max="20" placeholder="Vacío = todas" style="height:2.7rem;"/>
             </div>
             <button class="export-btn primary-export" style="margin:0;height:2.7rem;width:100%;white-space:nowrap;" onclick="buscarGolden()">🔍 Buscar</button>
           </div>
@@ -1241,6 +1306,14 @@
               </div>
               <div id="golden-poster-from-matches" style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.3rem;"></div>
               <div style="font-size:0.66rem;color:var(--muted);margin-top:0.3rem;">Tip: también podés usar con un clic la portada de alguna edición encontrada arriba.</div>
+
+              <label style="display:flex;align-items:flex-start;gap:0.5rem;margin-top:0.6rem;cursor:pointer;font-weight:400;">
+                <input type="checkbox" id="golden-use-movie-badges" onchange="renderGoldenPreviewCanvas()" style="width:auto;margin-top:0.15rem;"/>
+                <span style="font-size:0.74rem;color:var(--white);">
+                  Usar la portada COMPLETA de la edición elegida arriba (con sus propias cintas: Calidad, Audio, HDR, Fuente/Encode — tal como quedó guardada en "Agregar Película"), en vez del sello Golden.
+                  <span style="display:block;color:var(--muted);font-size:0.66rem;margin-top:0.15rem;">Marcado: se activa con la portada de la edición que clickeaste arriba. Desmarcado: vuelve a la portada con el sello Golden.</span>
+                </span>
+              </label>
 
               <!-- 🎧 Audio propio de esta sección: NO tiene ninguna relación con los chips de Audio/HDR
                    del formulario "Agregar Película" de arriba. Es un sello aparte, opcional, que solo
@@ -1318,10 +1391,7 @@
 
         <!-- COLUMNA 2: ya guardados + descargar/publicar -->
         <div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
-            <div style="font-size:0.8rem;color:var(--white);font-weight:600;">📦 Ya guardados (<span id="np-count">0</span>)</div>
-            <button class="export-btn" style="width:auto;padding:0.2rem 0.6rem;margin:0;font-size:0.68rem;" onclick="repararIdsDuplicadosPrivado()" title="Corrige ítems que quedaron con el mismo ID (por guardar 2 con el mismo título juntos)">🔧 Reparar IDs duplicados</button>
-          </div>
+          <div style="font-size:0.8rem;color:var(--white);font-weight:600;margin-bottom:0.5rem;">📦 Ya guardados (<span id="np-count">0</span>)</div>
           <div id="np-saved-list"></div>
           <div id="np-pagination" style="margin-top:0.5rem;"></div>
 
@@ -1330,6 +1400,7 @@
             <button class="export-btn" onclick="copyPrivadoJSON()">📋 Copiar JSON</button>
           </div>
           <button class="export-btn" style="margin-top:0.5rem;" onclick="publishPrivadoToGithub()">🚀 Publicar en GitHub</button>
+          <button class="export-btn" style="margin-top:0.5rem;" onclick="reemparejarPrivadoConCatalogo()">🔁 Re-emparejar datos con catálogo</button>
           <div id="np-gh-status" style="font-size:0.75rem;margin-top:0.4rem;"></div>
 
           <div class="io-section" style="margin-top:0.75rem;">
@@ -1477,7 +1548,7 @@ function saveMovies(arr) {
 // Cada categoria: key interno -> nombre EXACTO del archivo (sin .png) dentro de badges/<categoria>/
 const PELI_FILE_FOR = {
   fuente: {
-    '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','brrip':'brrip','dcp-rip':'dcp-rip',
+    '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','blu-ray-3d':'blu-ray-3d','brrip':'brrip','dcp-rip':'dcp-rip',
     'hdrip':'hdrip','hdts':'hdts','remux':'remux','web-dl':'web-dl','web-rip':'web-rip','web-scr':'web-scr','x265':'x265',
   },
   idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino' },
@@ -1507,6 +1578,25 @@ function musicaBadgeKeyFromFormats(activeList) {
 function musicaBadgeKey() {
   const raw = document.getElementById('f-audioformat')?.value || '';
   return musicaBadgeKeyFromFormats(raw.split(',').map(s => s.trim()).filter(Boolean));
+}
+
+// Portada de música "pura" (formato cuadrado 600x600), igual criterio que index.html:
+// tipo incluye "Música" (aunque venga combinado, ej. "Película | Música") y no es
+// legacyCover (portada ya diseñada a mano en Illustrator).
+function isPureMusicCoverAdmin(m) {
+  if (!(m.type || '').includes('Música')) return false;
+  if (m && m.legacyCover) return false;
+  return true;
+}
+function musicaBadgeKeyFromMovieData(m) {
+  return musicaBadgeKeyFromFormats((m.audioFormat || '').split(',').map(s => s.trim()).filter(Boolean));
+}
+// HTML del fondo difuminado (misma imagen, agrandada y borrosa) para las
+// miniaturas de la lista del Catálogo — mismo sistema que en index.html.
+function posterSquareBgHtmlAdmin(m, framed) {
+  if (!isPureMusicCoverAdmin(m) || !m.image) return '';
+  const safeUrl = String(m.image).replace(/"/g, '&quot;');
+  return `<div class="poster-square-bg${framed ? ' poster-square-bg-framed' : ''}"><div class="poster-square-bg-img" style="background-image:url(&quot;${safeUrl}&quot;)"></div></div>`;
 }
 // admin.html vive en /admin/, las badges en la raiz del repo -> subir un nivel
 function peliBadgePath(cat, key) {
@@ -1627,7 +1717,26 @@ function currentUploadDate() {
     2. Info descarga   (MAS INFO, Temporadas, Audio:, Calidad:, Resolución:, ...)
     3. Enlaces         (nombres de servidor + URLs)
 */
+// Quita bloques completos delimitados por líneas de puros guiones (----------), 3 o más,
+// línea completa (un solo "-" suelto NO cuenta como separador). Todo lo que esté ENTRE dos
+// de esas líneas se descarta antes de parsear nada más — no se toma en cuenta para enlaces
+// públicos NI privados. Sirve para "esconder" un lote de enlaces sin tener que borrarlos.
+function stripZonasExcluidas(raw) {
+  if (!raw) return raw;
+  const reDash = /^-{3,}$/;
+  const lineas = raw.split('\n');
+  const out = [];
+  let dentro = false;
+  for (const l of lineas) {
+    if (reDash.test(l.trim())) { dentro = !dentro; continue; }
+    if (dentro) continue;
+    out.push(l);
+  }
+  return out.join('\n');
+}
+
 function parseBloqueCompleto(raw) {
+  raw = stripZonasExcluidas(raw);
   const r = {
     titulo:'', originalTitle:'', year:'', country:'', duration:'', genre:'', artista:'', sinopsis:'',
     infoDescarga:'', enlaces:'', screenshots:'', trailer:'',
@@ -1715,10 +1824,19 @@ function parseBloqueCompleto(raw) {
   const zonaEnlaces  = idxEnlaces  >= 0 ? lineas.slice(idxEnlaces)              : [];
 
   // ── Parsear zona datos ──
+  // Líneas que empiezan con un símbolo de lista (◽◾▪▫●○■□▶➤•) justo antes de "Audio:" son
+  // texto informativo extra (ej. desglose de tamaños por película/capítulo en una colección),
+  // no sinopsis — van a Info Descarga en vez de pegarse al final de la sinopsis.
+  const reBullet = /^[◽◾▪▫●○■□▶➤•]/;
+  // Líneas promocionales (ej. "🔥 Google Drive Exclusivo para Miembros VIP 🔥") se descartan
+  // por completo: no son necesarias ni en sinopsis ni en Info Descarga.
+  const reDescartar = /🔥/;
   let camposIniciados = false, titCapt = false;
   const sinLines = [];
+  const extraInfoLines = [];
   for (const l of zonaDatos) {
     if (!l || reEncabezado.test(l) || reSepDecor.test(l)) continue;
+    if (reDescartar.test(l)) continue;
     const ci  = l.indexOf(':');
     const key = ci >= 0 ? l.slice(0, ci).toLowerCase().trim() : '';
     const esDato = ci >= 0 && key.length <= 30 && camposDatos.some(c => key === c || key.includes(c));
@@ -1740,6 +1858,7 @@ function parseBloqueCompleto(raw) {
     }
     // URL de captura ya extraída arriba como screenshot: no debe ir a la sinopsis
     if (/^https?:\/\//i.test(l)) continue;
+    if (reBullet.test(l)) { extraInfoLines.push(l); continue; }
     sinLines.push(l);
   }
   r.sinopsis = sinLines.join(' ').trim();
@@ -1760,7 +1879,7 @@ function parseBloqueCompleto(raw) {
     sobrante = zonaDescarga.slice(idxSubtitulosEnDescarga + 1);
   }
 
-  r.infoDescarga = zonaDescargaFinal.filter(l => l).join('\n');
+  r.infoDescarga = [...extraInfoLines, ...zonaDescargaFinal.filter(l => l && !reDescartar.test(l))].join('\n');
   for (const l of zonaDescargaFinal) {
     const ci = l.indexOf(':'); if (ci < 0) continue;
     const key = l.slice(0, ci).toLowerCase().trim();
@@ -1858,7 +1977,7 @@ function parseDatosRaw(raw) {
 }
 
 function autoRellenarTodo() {
-  const raw = document.getElementById('f-datos-raw').value;
+  const raw = stripZonasExcluidas(document.getElementById('f-datos-raw').value);
   const p = parseBloqueCompleto(raw);
 
   // Título
@@ -1869,6 +1988,25 @@ function autoRellenarTodo() {
   if (p.infoDescarga) document.getElementById('f-descarga-raw').value = p.infoDescarga;
   // Enlaces
   if (p.enlaces) document.getElementById('f-links').value = p.enlaces;
+
+  // ── Noctis Privado: arma automáticamente el borrador (título + Más Info + enlaces
+  // directos, sin acortadores) del MISMO bloque que se acaba de pegar acá arriba.
+  // Se guarda solo cuando tocás "+ Agregar al Catálogo" — no hay que pegar nada de
+  // nuevo abajo en Noctis Privado para el caso normal de 1 título a la vez.
+  if (raw && raw.trim()) {
+    const shortenersEl = document.getElementById('np-shorteners');
+    const multiserverEl = document.getElementById('np-multiserver');
+    const shorteners = shortenersEl ? shortenersEl.value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean) : ['tpi.li'];
+    const multiserver = multiserverEl ? multiserverEl.value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean) : ['pastelink.net', 'jpst.it'];
+    const privadoParsed = parseNoctisPrivadoBloque(raw, shorteners, multiserver);
+    window.currentPrivadoDraft = (privadoParsed.titulo && privadoParsed.enlaces.length)
+      ? { titulo: privadoParsed.titulo, masInfo: privadoParsed.masInfo, enlaces: privadoParsed.enlaces }
+      : null;
+    actualizarAvisoPrivadoAuto();
+  } else {
+    window.currentPrivadoDraft = null;
+    actualizarAvisoPrivadoAuto();
+  }
   // URLs Capturas (detectadas entre la sinopsis y "MAS INFO").
   // Si esta pasada NO trae capturas, se busca si ya existe otra edición de la
   // MISMA película ("Título (Año)" igual) con capturas guardadas, y se copian
@@ -2016,6 +2154,8 @@ function autoRellenarTodo() {
     setActiveChip('chips-source','WEB-RIP');
   else if (combined.includes('WEBSCR')||combined.includes('WEB-SCR')||combined.includes('WEB SCR'))
     setActiveChip('chips-source','WEB-SCR');
+  else if (combined.includes('BLURAY3D')||combined.includes('BLU-RAY3D')||combined.includes('BLU-RAY 3D')||combined.includes('BLURAY 3D')||combined.includes('BLU RAY 3D'))
+    setActiveChip('chips-source','BLU-RAY-3D');
   else if (combined.includes('BLURAY')||combined.includes('BLU-RAY')||combined.includes('BLU RAY'))
     setActiveChip('chips-source','BLU-RAY');
   else if (combined.includes('PLACEBO'))
@@ -2065,6 +2205,8 @@ function autoRellenarTodo() {
     setActiveTypeChips('Música');
   else if (genLow.includes('anime')||tituloUp.includes('ANIME'))
     setActiveTypeChips('Anime');
+  else if (genLow.includes('documental')||genLow.includes('documentary'))
+    setActiveTypeChips('Documental');
   else if (isAsianCountry && isSerieSignal)
     setActiveTypeChips('Dorama, Serie');
   else if (isAsianCountry && !isSerieSignal && durMin>=60)
@@ -2298,6 +2440,8 @@ function autoRellenarDescarga() {
     setActiveChip('chips-source', 'WEB-DL');
   else if (combined2.includes('WEBRIP') || combined2.includes('WEB-RIP'))
     setActiveChip('chips-source', 'WEB-RIP');
+  else if (combined2.includes('BLURAY3D')||combined2.includes('BLU-RAY3D')||combined2.includes('BLU-RAY 3D')||combined2.includes('BLURAY 3D')||combined2.includes('BLU RAY 3D'))
+    setActiveChip('chips-source', 'BLU-RAY-3D');
   else if (combined2.includes('BLURAY')||combined2.includes('BLU-RAY')||combined2.includes('BLU RAY'))
     setActiveChip('chips-source', 'BLU-RAY');
   else if (combined2.includes('PLACEBO'))
@@ -2403,6 +2547,8 @@ function clearForm() {
   posterDataUrl = null;
   hidePosterPreview();
   resetDropZone();
+  window.currentPrivadoDraft = null;
+  actualizarAvisoPrivadoAuto();
   const legacyEl = document.getElementById('f-legacy-cover'); if (legacyEl) legacyEl.checked = false;
   editingIndex = -1;
   document.getElementById('form-panel-title').innerHTML = 'Agregar <span>Película</span>';
@@ -2457,7 +2603,41 @@ function submitForm() {
 
   saveLastScreenshots(data.screenshot);
 
-  showToast(isEdit ? '✓ Actualizado' : '✓ Agregado — Total: ' + movies.length, 'success');
+  // ── Guarda también en Noctis Privado, si el bloque pegado arriba traía enlaces
+  // directos — mismo título, misma portada, ya con fecha y link a detalle.html.
+  let privadoGuardado = false;
+  if (window.currentPrivadoDraft && window.currentPrivadoDraft.enlaces.length) {
+    const idxParaUrl = isEdit ? editingIndex : 0; // nuevo = unshift, queda en 0
+    const privList = getPrivado();
+    privList.push({
+      id: slugify(window.currentPrivadoDraft.titulo) + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8),
+      titulo: window.currentPrivadoDraft.titulo,
+      imagen: data.image || '',
+      masInfo: window.currentPrivadoDraft.masInfo || '',
+      enlaces: window.currentPrivadoDraft.enlaces,
+      fecha: formatearFechaLarga(data.uploadDate),
+      detalleUrl: detailUrlFor(data, idxParaUrl),
+      descargado: false,
+      // Datos "de ficha" heredados de la película matcheada en el catálogo al momento
+      // de guardar (mismos nombres de campo que movies.json, para poder reusar
+      // matchMovieByTitle() al re-emparejar entradas viejas más adelante).
+      originalTitle: data.originalTitle || '',
+      year: data.year || '',
+      country: data.country || '',
+      duration: data.duration || '',
+      genre: data.genre || '',
+      description: data.description || '',
+    });
+    savePrivado(privList);
+    privadoGuardado = true;
+  }
+  window.currentPrivadoDraft = null;
+
+  showToast(
+    (isEdit ? '✓ Actualizado' : '✓ Agregado — Total: ' + movies.length) +
+    (privadoGuardado ? ' · 🔒 guardado en Noctis Privado' : ''),
+    'success'
+  );
   clearForm();
   renderList(true);
 }
@@ -2479,9 +2659,25 @@ function baseTituloSinCalidad(title) {
   return m ? m[1].trim() : (title || '').trim();
 }
 
+const MESES_ES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+function formatearFechaLarga(iso) {
+  if (!iso) return '';
+  const partes = String(iso).split('-');
+  if (partes.length < 2) return iso;
+  const y = parseInt(partes[0], 10);
+  const m = parseInt(partes[1], 10);
+  if (!y || !m || m < 1 || m > 12) return iso;
+  const mes = MESES_ES[m - 1] || '';
+  const mesCap = mes.charAt(0).toUpperCase() + mes.slice(1);
+  const d = partes[2] ? parseInt(partes[2], 10) : null;
+  return (d ? `${d} ${mesCap} ${y}` : `${mesCap} ${y}`);
+}
+
 function buscarGolden() {
   const q = document.getElementById('golden-search').value.trim().toLowerCase();
-  const n = Math.max(1, parseInt(document.getElementById('golden-count').value) || 3);
+  const countRaw = document.getElementById('golden-count').value.trim();
+  // Vacío = sin límite (todas las coincidencias). Con número, se respeta ese tope.
+  const n = countRaw ? Math.max(1, parseInt(countRaw) || 1) : Infinity;
   if (!q) { showToast('Escribí parte del título a buscar.', 'error'); return; }
 
   const movies = getMovies();
@@ -2496,6 +2692,7 @@ function buscarGolden() {
     document.getElementById('golden-matches').innerHTML = '<p style="color:var(--muted);font-size:0.8rem;">No se encontró ningún título con eso.</p>';
     goldenMatchesData = [];
     goldenTotalMatches = 0;
+    goldenSelectedMovieRef = null;
     document.getElementById('golden-title').value = '';
     document.getElementById('golden-datos').value = '';
     document.getElementById('golden-masinfo').value = '';
@@ -2505,6 +2702,7 @@ function buscarGolden() {
   // así que las primeras N que matchean son justo las últimas N subidas.
   goldenTotalMatches = matches.length;
   goldenMatchesData = matches.slice(0, n);
+  goldenSelectedMovieRef = null; // nueva búsqueda: hay que volver a elegir una portada
 
   renderGoldenMatches();
   construirGolden(goldenMatchesData);
@@ -2518,7 +2716,11 @@ function renderGoldenMatches() {
   if (!goldenMatchesData.length) { matchesBox.innerHTML = ''; return; }
 
   matchesBox.innerHTML =
-    '<p style="font-size:0.75rem;color:var(--gold2);margin-bottom:0.4rem;">' + goldenMatchesData.length + ' de ' + goldenTotalMatches + ' edición(es) encontradas — se usan las ' + goldenMatchesData.length + ' más recientes:</p>' +
+    '<p style="font-size:0.75rem;color:var(--gold2);margin-bottom:0.4rem;">' +
+      (goldenMatchesData.length === goldenTotalMatches
+        ? goldenTotalMatches + ' edición(es) encontradas — se usan todas:'
+        : goldenMatchesData.length + ' de ' + goldenTotalMatches + ' edición(es) encontradas — se usan las ' + goldenMatchesData.length + ' más recientes:'
+      ) + '</p>' +
     goldenMatchesData.map((m, i) =>
       '<div style="display:flex;align-items:center;gap:0.6rem;font-size:0.85rem;color:var(--white);padding:0.4rem 0;border-bottom:1px solid var(--border);">' +
         (m.image ? '<img src="' + m.image + '" style="width:44px;height:25px;object-fit:cover;border-radius:4px;flex-shrink:0;"/>' : '') +
@@ -2539,13 +2741,31 @@ function renderGoldenPosterPicks() {
   if (!box) return;
   const conImagen = goldenMatchesData.filter(m => m.image);
   if (!conImagen.length) { box.innerHTML = ''; return; }
-  box.innerHTML = conImagen.map(m =>
-    '<img src="' + m.image + '" title="Usar esta portada" onclick="usarPosterDeMatch(\'' + m.image.replace(/'/g, "\\'") + '\')" style="width:52px;height:30px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:pointer;"/>'
-  ).join('');
+  const pickFallback = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='108' height='62'%3E%3Crect fill='%23161b24' width='108' height='62'/%3E%3C/svg%3E`;
+  box.innerHTML = conImagen.map(m => {
+    const idx = goldenMatchesData.indexOf(m);
+    const peliBadges = m.legacyCover ? null : getPeliBadgeKeysFromMovie(m);
+    const tieneMarco = !!(peliBadges && (peliBadges.fuente || peliBadges.musica));
+    const badgeLayersHtml = peliBadges ? ['idioma','fuente','calidad','hdr','streaming','musica'].map(cat => {
+      const key = peliBadges[cat];
+      if (!key) return '';
+      const path = peliBadgePath(cat, key);
+      return path ? `<img class="movie-item-badge-overlay" src="${path}" alt="" onerror="this.style.display='none'"/>` : '';
+    }).join('') : '';
+    return `<div class="movie-item-poster-wrap golden-pick-thumb" title="Usar esta portada (${(m.title||'').replace(/"/g,'')})" onclick="usarPosterDeMatch('${m.image.replace(/'/g,"\\'")}', ${idx})">
+      <img class="movie-item-poster ${tieneMarco ? 'has-frame' : ''}" src="${m.image}" alt="" onerror="this.src='${pickFallback}'"/>
+      ${badgeLayersHtml}
+    </div>`;
+  }).join('');
 }
 
-function usarPosterDeMatch(url) {
+// goldenSelectedMovieRef guarda la película REAL (con su quality/audio/hdr/source) de la
+// edición que se clickeó, para poder dibujar sus propias cintas (ver golden-use-movie-badges).
+let goldenSelectedMovieRef = null;
+
+function usarPosterDeMatch(url, matchIdx) {
   goldenPosterDataUrl = null;
+  goldenSelectedMovieRef = (matchIdx != null && goldenMatchesData[matchIdx]) ? goldenMatchesData[matchIdx] : null;
   document.getElementById('golden-poster-url').value = url;
   showGoldenPosterPreview(url);
   showToast('Portada elegida ✓', 'success');
@@ -2629,6 +2849,7 @@ let goldenPosterDataUrl = null; // guarda base64 (archivo local, o URL remota ya
 
 function handleGoldenImageFile(file) {
   if (!file) return;
+  goldenSelectedMovieRef = null; // archivo manual: ya no corresponde a ninguna edición del catálogo
   const reader = new FileReader();
   reader.onload = function(e) {
     goldenPosterDataUrl = e.target.result;
@@ -2693,6 +2914,7 @@ function descargarGoldenPosterEnSegundoPlano(url) {
 }
 
 function previewGoldenPosterUrl(url) {
+  goldenSelectedMovieRef = null; // edición manual de la URL: ya no corresponde a la edición clickeada
   goldenPosterFetchToken++; // cancela cualquier descarga en curso de una URL anterior
   if (url && url.startsWith('http')) {
     goldenPosterDataUrl = null;
@@ -2773,6 +2995,7 @@ function hideGoldenPosterPreview() {
 
 function clearGoldenPoster() {
   goldenPosterDataUrl = null;
+  goldenSelectedMovieRef = null;
   document.getElementById('golden-poster-url').value = '';
   document.getElementById('golden-poster-file').value = '';
   hideGoldenPosterPreview();
@@ -2800,14 +3023,72 @@ function loadImageEl(src, tryCrossOrigin) {
 // porque ya no hace falta. Si el marco golden.png cambia de diseño, hay que volver a medir esto.
 const GOLDEN_INNER = { top: 0.112, left: 0.069, right: 0.013, bottom: 0.024, zoom: 0.81 };
 
-// ── Render del preview en vivo ──
-// Usa TAL CUAL drawImageCoverInGoldenWindow (la misma función que usa construirCanvasGolden
-// para la imagen final), así el preview deja de ser una aproximación en CSS y pasa a ser un
-// pixel a pixel de lo que se va a descargar/copiar. Cachea el sello dorado y las cintas de
-// audio (no hace falta re-descargarlas en cada movida de slider).
+// Hueco real de los marcos NORMALES de Fuente/Encode (BDRIP, REMUX, WEB-DL, etc.) — mismos
+// valores que ya usa la vista previa de "Agregar Película" (ver #img-preview.has-frame en el
+// CSS: top:9.9% left:6.8% right:1.3% bottom:1.4%). Golden tiene SU PROPIO hueco (arriba) porque
+// es un marco distinto con su propio diseño.
+const FUENTE_INNER = { top: 0.099, left: 0.068, right: 0.013, bottom: 0.014, zoom: 1 };
+
+function drawImageCoverInWindow(ctx, img, cw, ch, inner) {
+  const dx = inner.left * cw;
+  const dy = inner.top * ch;
+  const dw = cw - dx - inner.right * cw;
+  const dh = ch - dy - inner.bottom * ch;
+  const zoom = inner.zoom || 1;
+
+  const ir = img.width / img.height;
+  const dr = dw / dh;
+  let sx, sy, sw, sh;
+  if (ir > dr) {
+    sh = img.height;
+    sw = sh * dr;
+    sx = (img.width - sw) / 2;
+    sy = 0;
+  } else {
+    sw = img.width;
+    sh = sw / dr;
+    sx = 0;
+    sy = (img.height - sh) / 2;
+  }
+  if (zoom !== 1) {
+    const cx = sx + sw / 2, cy = sy + sh / 2;
+    let factor = 1 / zoom;
+    const maxFactor = Math.min(img.width / sw, img.height / sh);
+    factor = Math.min(factor, maxFactor);
+    const zsw = sw * factor;
+    const zsh = sh * factor;
+    sx = Math.max(0, Math.min(cx - zsw / 2, img.width - zsw));
+    sy = Math.max(0, Math.min(cy - zsh / 2, img.height - zsh));
+    sw = zsw; sh = zsh;
+  }
+  ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+}
+
+function drawImageCoverInGoldenWindow(ctx, img, cw, ch) {
+  drawImageCoverInWindow(ctx, img, cw, ch, GOLDEN_INNER);
+}
+function drawImageCoverInFuenteWindow(ctx, img, cw, ch) {
+  drawImageCoverInWindow(ctx, img, cw, ch, FUENTE_INNER);
+}
 let goldenFrameBadgeCache = null;
 let goldenFrameBadgeLoading = null;
 const goldenAudioBadgeCache = {}; // key -> Image ya cargada
+
+// Caché de cintas de "portada completa" (Calidad/Audio/HDR/Fuente de la edición elegida),
+// separada de goldenAudioBadgeCache/goldenFrameBadgeCache — mismo patrón: null = cargando.
+const goldenMovieBadgeCache = {};
+function getCachedMovieBadgeImg(cat, key) {
+  const cacheKey = cat + ':' + key;
+  const cached = goldenMovieBadgeCache[cacheKey];
+  if (cached === undefined) {
+    goldenMovieBadgeCache[cacheKey] = null;
+    loadImageEl(peliBadgePath(cat, key), false)
+      .then(im => { goldenMovieBadgeCache[cacheKey] = im; renderGoldenPreviewCanvas(); })
+      .catch(() => { goldenMovieBadgeCache[cacheKey] = null; });
+    return null;
+  }
+  return cached;
+}
 
 function renderGoldenPreviewCanvas() {
   const canvas = document.getElementById('golden-preview-canvas');
@@ -2817,6 +3098,24 @@ function renderGoldenPreviewCanvas() {
   ctx.clearRect(0, 0, CW, CH);
   ctx.fillStyle = '#080a0f';
   ctx.fillRect(0, 0, CW, CH);
+
+  const useMovieBadges = document.getElementById('golden-use-movie-badges')?.checked && goldenSelectedMovieRef;
+
+  if (useMovieBadges) {
+    // Portada COMPLETA de la edición elegida: la foto entera (sin recortar por un marco Golden)
+    // + sus propias cintas (Calidad/Audio/HDR/Fuente), igual que se ve en Agregar Película/Catálogo.
+    if (goldenPreviewPosterImg) drawImageCoverInFuenteWindow(ctx, goldenPreviewPosterImg, CW, CH);
+    const badges = getPeliBadgeKeysFromMovie(goldenSelectedMovieRef);
+    if (badges) {
+      ['idioma','fuente','calidad','hdr','streaming'].forEach(cat => {
+        const key = badges[cat];
+        if (!key) return;
+        const img = getCachedMovieBadgeImg(cat, key);
+        if (img) ctx.drawImage(img, 0, 0, CW, CH);
+      });
+    }
+    return; // en este modo NO se dibuja el sello Golden ni el audio-chip de esta sección
+  }
 
   if (goldenPreviewPosterImg) {
     drawImageCoverInGoldenWindow(ctx, goldenPreviewPosterImg, CW, CH);
@@ -2867,50 +3166,6 @@ function drawImageCover(ctx, img, cw, ch) {
   ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
 }
 
-// Dibuja la portada dentro del hueco transparente REAL del marco (GOLDEN_INNER), simulando
-// object-fit:cover pero acotado a ese rectángulo — así la portada queda alineada con lo que el
-// marco efectivamente deja ver, en vez de centrarse en el lienzo de 1280x740 completo (que
-// ignora que el marco ya tapa una franja grande arriba y a la izquierda).
-function drawImageCoverInGoldenWindow(ctx, img, cw, ch) {
-  const dx = GOLDEN_INNER.left * cw;
-  const dy = GOLDEN_INNER.top * ch;
-  const dw = cw - dx - GOLDEN_INNER.right * cw;
-  const dh = ch - dy - GOLDEN_INNER.bottom * ch;
-  const zoom = GOLDEN_INNER.zoom || 1;
-
-  const ir = img.width / img.height;
-  const dr = dw / dh;
-  let sx, sy, sw, sh;
-  if (ir > dr) {
-    sh = img.height;
-    sw = sh * dr;
-    sx = (img.width - sw) / 2;
-    sy = 0;
-  } else {
-    sw = img.width;
-    sh = sw / dr;
-    sx = 0;
-    sy = (img.height - sh) / 2;
-  }
-  // Zoom: recorta más (agranda) o menos (achica, revela más fondo) sobre el mismo centro,
-  // sin cambiar el recuadro destino. Con zoom<1 el crop pedido puede superar el tamaño real
-  // de la imagen fuente — hay que topar ANCHO y ALTO con el MISMO factor a la vez (no cada
-  // uno por separado), o el rectángulo recortado deja de tener la proporción del recuadro
-  // destino y drawImage lo estira/deforma para que entre igual.
-  if (zoom !== 1) {
-    const cx = sx + sw / 2, cy = sy + sh / 2;
-    let factor = 1 / zoom; // >1 agranda el recorte (aleja), <1 lo achica (acerca)
-    const maxFactor = Math.min(img.width / sw, img.height / sh); // tope real de la imagen fuente
-    factor = Math.min(factor, maxFactor);
-    const zsw = sw * factor;
-    const zsh = sh * factor;
-    sx = Math.max(0, Math.min(cx - zsw / 2, img.width - zsw));
-    sy = Math.max(0, Math.min(cy - zsh / 2, img.height - zsh));
-    sw = zsw; sh = zsh;
-  }
-  ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
-}
-
 // Arma el canvas 1280x740 con la portada elegida + el sello dorado encima, y el
 // sello de Audio de ESTA sección (si está activo) — nunca el Audio/HDR del formulario de arriba.
 // Lo usan tanto "descargar" como "copiar imagen" para no duplicar la lógica.
@@ -2923,16 +3178,11 @@ async function construirCanvasGolden(forcePosterDataUrl) {
 
   const CW = 1280, CH = 740; // misma proporción que .poster-preview-wrap (1280/740)
   const isRemote = posterSrc.startsWith('http');
-  let posterImg, badgeImg;
+  let posterImg;
   try {
     posterImg = await loadImageEl(posterSrc, isRemote);
   } catch (e) {
     throw new Error('No se pudo cargar la portada' + (isRemote ? ' (CORS/red)' : '') + ': ' + posterSrc);
-  }
-  try {
-    badgeImg = await loadImageEl(GOLDEN_BADGE_PATH, false);
-  } catch (e) {
-    throw new Error('No se encontró el sello local: ' + GOLDEN_BADGE_PATH);
   }
 
   const canvas = document.createElement('canvas');
@@ -2941,6 +3191,36 @@ async function construirCanvasGolden(forcePosterDataUrl) {
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#080a0f';
   ctx.fillRect(0, 0, CW, CH);
+
+  const useMovieBadges = document.getElementById('golden-use-movie-badges')?.checked && goldenSelectedMovieRef;
+
+  if (useMovieBadges) {
+    // Portada COMPLETA de la edición elegida: foto entera + sus propias cintas
+    // (Calidad/Audio/HDR/Fuente), tal como quedó configurada en Agregar Película.
+    drawImageCoverInFuenteWindow(ctx, posterImg, CW, CH);
+    const badges = getPeliBadgeKeysFromMovie(goldenSelectedMovieRef);
+    if (badges) {
+      for (const cat of ['idioma','fuente','calidad','hdr','streaming']) {
+        const key = badges[cat];
+        if (!key) continue;
+        try {
+          const img = await loadImageEl(peliBadgePath(cat, key), false);
+          ctx.drawImage(img, 0, 0, CW, CH);
+        } catch (e) {
+          // Si falta esa cinta puntual en badges/, seguimos sin ella en vez de romper todo.
+        }
+      }
+    }
+    return canvas;
+  }
+
+  let badgeImg;
+  try {
+    badgeImg = await loadImageEl(GOLDEN_BADGE_PATH, false);
+  } catch (e) {
+    throw new Error('No se encontró el sello local: ' + GOLDEN_BADGE_PATH);
+  }
+
   drawImageCoverInGoldenWindow(ctx, posterImg, CW, CH);
 
   // Sello de Audio propio de esta sección (chips "🎧 Audio" de acá abajo, no el de arriba).
@@ -3096,6 +3376,18 @@ function updatePeliBadgePreview() {
   const anyFuente = !isLegacyCover && (!!layers.fuente || !!musicaKey);
 
   imgPreview.classList.toggle('has-frame', anyFuente);
+  imgPreview.classList.toggle('img-contain-music', esMusica && !isLegacyCover);
+
+  // Fondo difuminado (misma imagen agrandada y borrosa), solo para música
+  // "pura" (no legacyCover) — mismo sistema que en index.html.
+  const sqBg = document.getElementById('poster-square-bg');
+  const sqBgImg = document.getElementById('poster-square-bg-img');
+  if (sqBg && sqBgImg) {
+    const showBg = esMusica && !isLegacyCover && !!imgPreview.src;
+    sqBg.style.display = showBg ? 'block' : 'none';
+    sqBg.classList.toggle('poster-square-bg-framed', showBg); // hueco medido a partir del PNG real de la cinta
+    if (showBg) sqBgImg.style.backgroundImage = `url("${imgPreview.src}")`;
+  }
 
   ['idioma','fuente','calidad','hdr','streaming'].forEach(cat => {
     const el = document.getElementById('peli-' + cat);
@@ -3296,6 +3588,7 @@ const SOURCE_COLORS = {
   'WEB-DL': '#0fb528',
   'WEB-RIP': '#ee4394',
   'BLU-RAY': '#6ac2eb',
+  'BLU-RAY-3D': '#a06ceb',
   'HDRIP': '#f8b800',
   'HDTS': '#3330ac',
   'DCP-RIP': '#b05a00'
@@ -3337,16 +3630,25 @@ function renderList(resetPage) {
     const ri = movies.indexOf(m);
     const views = viewsCache[viewKeyFor(m, ri)];
     const peliBadges = m.legacyCover ? null : getPeliBadgeKeysFromMovie(m);
-    const badgeLayersHtml = peliBadges ? ['idioma','fuente','calidad','hdr','streaming','musica'].map(cat => {
+    // getPeliBadgeKeysFromMovie() devuelve null para tipo Música (es solo para
+    // películas/series), así que la cinta de audio (FLAC, 16-BIT, etc.) para
+    // música se calcula aparte acá, igual que hace el preview del formulario.
+    const musicaKeyList = isPureMusicCoverAdmin(m) ? musicaBadgeKeyFromMovieData(m) : null;
+    const tieneMarco = !!(peliBadges && (peliBadges.fuente || peliBadges.musica)) || !!musicaKeyList;
+    const badgeLayersHtml = (peliBadges ? ['idioma','fuente','calidad','hdr','streaming','musica'].map(cat => {
       const key = peliBadges[cat];
       if (!key) return '';
       const path = peliBadgePath(cat, key);
       return path ? `<img class="movie-item-badge-overlay" src="${path}" alt="" onerror="this.style.display='none'"/>` : '';
-    }).join('') : '';
+    }).join('') : '') + (musicaKeyList ? (() => {
+      const path = peliBadgePath('musica', musicaKeyList);
+      return path ? `<img class="movie-item-badge-overlay" src="${path}" alt="" onerror="this.style.display='none'"/>` : '';
+    })() : '');
     return `
     <div class="movie-item">
       <div class="movie-item-poster-wrap">
-        <img class="movie-item-poster" src="${m.image||''}" alt="${m.title}" onerror="this.src='${fallback}'"/>
+        ${posterSquareBgHtmlAdmin(m, true)}
+        <img class="movie-item-poster ${tieneMarco ? 'has-frame' : ''}${isPureMusicCoverAdmin(m) ? ' img-contain-music' : ''}" src="${m.image||''}" alt="${m.title}" onerror="this.src='${fallback}'"/>
         ${badgeLayersHtml}
       </div>
       <div class="movie-item-info">
@@ -3466,6 +3768,8 @@ function editMovie(idx) {
   document.getElementById('f-desc').value = m.description||'';
   if (m.image) { posterDataUrl = null; showPosterPreview(m.image); }
   editingIndex = idx;
+  window.currentPrivadoDraft = null; // editar no re-pega el bloque; no arrastrar un borrador viejo
+  actualizarAvisoPrivadoAuto();
   document.getElementById('form-panel-title').innerHTML = 'Editando <span>Película</span>';
   document.getElementById('form-submit-btn').textContent = '✓ GUARDAR CAMBIOS';
   document.getElementById('form-submit-btn').classList.add('editing');
@@ -3721,7 +4025,18 @@ function splitNoctisPrivadoBloques(raw) {
 // Campos técnicos que forman el bloque "Más Info" (mismo criterio que camposDescarga del parser normal)
 const NP_CAMPOS_MASINFO = ['audio','calidad','resolución','resolucion','formato','tamaño','tamano','codec','códec','subtítulos','subtitulos','subtítulo','subtitulo'];
 
+function actualizarAvisoPrivadoAuto() {
+  const el = document.getElementById('aviso-privado-auto');
+  if (!el) return;
+  const d = window.currentPrivadoDraft;
+  el.textContent = d
+    ? '🔒 ' + d.enlaces.length + ' enlace(s) directo(s) detectado(s) — se guarda junto en Noctis Privado al agregar al catálogo.'
+    : '';
+  el.style.color = d ? 'var(--gold2)' : 'var(--muted)';
+}
+
 function parseNoctisPrivadoBloque(raw, shorteners, multiserver) {
+  raw = stripZonasExcluidas(raw);
   const lineas = raw.replace(/\r\n/g, '\n').split('\n').map(l => l.trim());
   const reUrl = /^https?:\/\//i;
 
@@ -3820,6 +4135,7 @@ function detectarChipsDesdePrivado(titulo, masInfo) {
   else if (combined.includes('WEBDL')||combined.includes('WEB-DL')||combined.includes('WEB DL')) source = 'WEB-DL';
   else if (combined.includes('WEBRIP')||combined.includes('WEB-RIP')) source = 'WEB-RIP';
   else if (combined.includes('WEBSCR')||combined.includes('WEB-SCR')||combined.includes('WEB SCR')) source = 'WEB-SCR';
+  else if (combined.includes('BLURAY3D')||combined.includes('BLU-RAY3D')||combined.includes('BLU-RAY 3D')||combined.includes('BLURAY 3D')||combined.includes('BLU RAY 3D')) source = 'BLU-RAY-3D';
   else if (combined.includes('BLURAY')||combined.includes('BLU-RAY')||combined.includes('BLU RAY')) source = 'BLU-RAY';
   else if (combined.includes('BDRIP')) source = 'BDRIP';
   else if (combined.includes('BRRIP')) source = 'BRRIP';
@@ -3854,6 +4170,7 @@ function getPrivadoBadgeKeys(item) {
 
 function privadoPosterHtml(item, sizeClass) {
   const badges = getPrivadoBadgeKeys(item);
+  const tieneMarco = !!(badges && badges.fuente);
   const badgeLayersHtml = badges ? ['idioma','fuente','calidad','hdr','streaming'].map(cat => {
     const key = badges[cat];
     if (!key) return '';
@@ -3863,7 +4180,7 @@ function privadoPosterHtml(item, sizeClass) {
   const npFallback = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='108' height='62'%3E%3Crect fill='%23161b24' width='108' height='62'/%3E%3C/svg%3E`;
   return `
     <div class="movie-item-poster-wrap ${sizeClass||''}">
-      <img class="movie-item-poster" src="${item.imagen||''}" alt="${(item.titulo||'').replace(/"/g,'')}" onerror="this.src='${npFallback}'"/>
+      <img class="movie-item-poster ${tieneMarco ? 'has-frame' : ''}" src="${item.imagen||''}" alt="${(item.titulo||'').replace(/"/g,'')}" onerror="this.src='${npFallback}'"/>
       ${badgeLayersHtml}
     </div>`;
 }
@@ -3890,6 +4207,7 @@ function procesarNoctisPrivadoBulk() {
       matched: !!match,
       masInfo: p.masInfo,
       enlaces: p.enlaces,
+      fecha: match ? formatearFechaLarga(match.uploadDate) : '',
     };
   }).filter(x => x.titulo); // descarta bloques vacíos/basura
 
@@ -3955,6 +4273,7 @@ function guardarNoctisPrivadoDraft() {
       imagen: item.imagen || '',
       masInfo: item.masInfo || '',
       enlaces: item.enlaces || [],
+      fecha: item.fecha || formatearFechaLarga(currentUploadDate()),
     });
   }
   npPage = 1;
@@ -4015,22 +4334,6 @@ function npGoPage(p) {
   renderPrivadoSavedList();
 }
 
-function repararIdsDuplicadosPrivado() {
-  const lista = getPrivado();
-  const vistos = new Set();
-  let reparados = 0;
-  lista.forEach(item => {
-    if (vistos.has(item.id)) {
-      item.id = slugify(item.titulo || 'item') + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
-      reparados++;
-    }
-    vistos.add(item.id);
-  });
-  if (!reparados) { showToast('No había IDs duplicados. ✓', 'info'); return; }
-  savePrivado(lista);
-  showToast(`🔧 ${reparados} ID(s) duplicado(s) corregido(s)`, 'success');
-}
-
 function borrarPrivadoItem(i) {
   const lista = getPrivado();
   const item = lista[i];
@@ -4038,6 +4341,46 @@ function borrarPrivadoItem(i) {
   if (!confirm('¿Borrar «' + item.titulo + '»?')) return;
   lista.splice(i, 1);
   savePrivado(lista);
+}
+
+// Recorre lo ya guardado en Noctis Privado y, para cada entrada a la que le falten
+// datos de ficha (Título Original/Año/País/Duración/Género/Sinopsis), busca la MISMA
+// película en el catálogo actual (matchMovieByTitle, mismo criterio que portada/streaming)
+// y completa SOLO los campos vacíos — nunca pisa un dato que la entrada ya tenga.
+function reemparejarPrivadoConCatalogo() {
+  const lista = getPrivado();
+  if (!lista.length) { showToast('No hay nada guardado en Noctis Privado.', 'info'); return; }
+
+  let actualizados = 0;
+  let sinMatch = 0;
+  let yaCompletos = 0;
+
+  const CAMPOS_FICHA = ['originalTitle', 'year', 'country', 'duration', 'genre', 'description'];
+
+  lista.forEach(item => {
+    const faltaFecha = !item.fecha || !String(item.fecha).trim();
+    const faltantes = CAMPOS_FICHA.filter(c => !item[c] || !String(item[c]).trim());
+    if (!faltantes.length && !faltaFecha) { yaCompletos++; return; }
+
+    const match = matchMovieByTitle(item.titulo, item.masInfo);
+    if (!match) { sinMatch++; return; }
+
+    let huboCambio = false;
+    faltantes.forEach(c => {
+      const val = match[c];
+      if (val && String(val).trim()) { item[c] = val; huboCambio = true; }
+    });
+    if (faltaFecha && match.uploadDate) { item.fecha = formatearFechaLarga(match.uploadDate); huboCambio = true; }
+    if (huboCambio) actualizados++;
+  });
+
+  savePrivado(lista);
+  showToast(
+    `🔁 ${actualizados} actualizada(s)` +
+    (sinMatch ? ` · ${sinMatch} sin match en el catálogo` : '') +
+    (yaCompletos ? ` · ${yaCompletos} ya estaban completas` : ''),
+    actualizados ? 'success' : 'info'
+  );
 }
 
 function downloadPrivadoJSON() {
