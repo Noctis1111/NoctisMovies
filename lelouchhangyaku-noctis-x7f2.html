@@ -4072,7 +4072,7 @@ function toggleDescargadoLocal(id) {
   if (set.has(id)) set.delete(id); else set.add(id);
   localStorage.setItem(descargadosKey(), JSON.stringify([...set]));
   subirDescargadosAGithub();
-  render();
+  renderGrid();
 }
 
 function getSyncConfig() {
@@ -4115,7 +4115,7 @@ async function cargarDescargadosDesdeGithub() {
     const ids = remote[NP_USER] || [];
     localStorage.setItem(descargadosKey(), JSON.stringify(ids));
     showSyncStatus(`✓ Sincronizado (${ids.length} marcado${ids.length===1?'':'s'} como descargado).`);
-    render();
+    renderGrid();
   } catch (e) {
     showSyncStatus('✗ ' + e.message, true);
   }
