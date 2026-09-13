@@ -3565,6 +3565,12 @@ loadMovies();
 /* ══════════ Noctis Privado: auth ══════════ */
 const NP_USER = '72941361';
 const NP_PASS = 'lelouch hangyaku123-';
+// Config de sincronización de "Descargado": reutiliza la MISMA clave de localStorage que
+// admin.html usa para su usuario/repo/token de GitHub (así con configurarlo una vez alcanza).
+// Nombre del archivo en el repo donde se guarda el mapa {usuario: [ids descargados]}.
+const SYNC_GH_KEY = 'noctis_gh_config';
+const DESCARGADOS_FILE = 'noctis-privado-descargados.json';
+let syncDebounceTimer = null;
 
 function doLogin() {
   const user = document.getElementById('login-user').value.trim();
