@@ -473,9 +473,9 @@
   line-height: 1.5 !important; 
 }
 
-/* Cajas de Info descarga / Enlaces públicos */
-#f-descarga-raw, #f-links {
-  min-height: 165px !important;
+/* Cajas de Info descarga / Enlaces públicos / Enlaces privados */
+#f-descarga-raw, #f-links, #f-links-privados {
+  min-height: 110px !important;
 }
 
 /* URLs Capturas (screenshots) */
@@ -1173,26 +1173,30 @@
               <input id="f-password" type="text" style="width:180px;padding:5px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.88rem;font-family:'Inter',sans-serif;letter-spacing:0.5px;outline:none;transition:border-color 0.2s;" placeholder="NoctisMovies o dejar vacío" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
             </div>
           </div>
-          <div class="enlaces-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;margin-bottom:0.6rem;align-items:start;">
+          <div class="enlaces-grid" style="display:grid;grid-template-columns:1.05fr 1fr 1fr 0.62fr;gap:0.55rem;margin-bottom:0.6rem;align-items:start;">
             <div class="form-group" style="margin-bottom:0;">
               <label>Info descarga <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(auto-rellenado o pega aquí)</span></label>
               <textarea id="f-descarga-raw" class="textarea-links" style="min-height:110px;font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;Audio: Español Latino&#10;Calidad: WEBDL&#10;Resolución: 1920×1080&#10;Formato: MKV&#10;Tamaño: 4.5 GB&#10;Codec: H264&#10;Subtítulos: ..." oninput="autoRellenarDescarga()" onpaste="setTimeout(autoRellenarDescarga,50)"></textarea>
             </div>
             <div class="form-group" style="margin-bottom:0;">
-              <label>Enlaces públicos <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(auto-rellenado o pega aquí)</span></label>
+              <label>Enlaces públicos <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(auto-rellenado — revisá antes de publicar)</span></label>
               <textarea class="textarea-links" id="f-links" style="min-height:110px;font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;Servidor 1&#10;https://enlace1.com&#10;&#10;Servidor 2&#10;https://enlace2.com"></textarea>
             </div>
             <div class="form-group" style="margin-bottom:0;">
-              <label>🔄 Sincronización GitHub <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(config única)</span></label>
-              <div style="display:flex;flex-direction:column;gap:0.4rem;">
-                <input type="text" id="gh-owner" placeholder="Usuario (ej: noctis1111)" style="width:100%;padding:0.5rem;background:#0a0c12;border:1px solid var(--border);border-radius:6px;color:#fff;font-size:0.85rem;"/>
-                <input type="text" id="gh-repo" placeholder="Repositorio (ej: NoctisMovies)" style="width:100%;padding:0.5rem;background:#0a0c12;border:1px solid var(--border);border-radius:6px;color:#fff;font-size:0.85rem;"/>
-                <input type="password" id="gh-token" placeholder="Token (ghp_...)" style="width:100%;padding:0.5rem;background:#0a0c12;border:1px solid var(--border);border-radius:6px;color:#fff;font-size:0.85rem;"/>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;margin-top:0.1rem;">
-                  <button class="export-btn" onclick="saveGhConfig()" style="margin:0;padding:0.4rem;font-size:0.75rem;">💾 Guardar</button>
-                  <button class="export-btn primary-export" onclick="publishToGithub()" style="margin:0;padding:0.4rem;font-size:0.75rem;background:var(--green);border-color:var(--green);color:#000;">🚀 Publicar</button>
+              <label>🔒 Enlaces privados <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(auto-rellenado — revisá antes de publicar)</span></label>
+              <textarea class="textarea-links" id="f-links-privados" style="min-height:110px;font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;1fichier&#10;https://1fichier.com/?xxxx&#10;&#10;Multiservidor 1&#10;https://pastelink.net/xxxx"></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="font-size:0.72rem;">🔄 Sync GitHub <span style="color:var(--muted);font-size:0.62rem;font-weight:400;letter-spacing:0;">(1 vez)</span></label>
+              <div style="display:flex;flex-direction:column;gap:0.3rem;">
+                <input type="text" id="gh-owner" placeholder="Usuario" style="width:100%;padding:0.35rem 0.45rem;background:#0a0c12;border:1px solid var(--border);border-radius:5px;color:#fff;font-size:0.72rem;"/>
+                <input type="text" id="gh-repo" placeholder="Repositorio" style="width:100%;padding:0.35rem 0.45rem;background:#0a0c12;border:1px solid var(--border);border-radius:5px;color:#fff;font-size:0.72rem;"/>
+                <input type="password" id="gh-token" placeholder="Token" style="width:100%;padding:0.35rem 0.45rem;background:#0a0c12;border:1px solid var(--border);border-radius:5px;color:#fff;font-size:0.72rem;"/>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.3rem;margin-top:0.05rem;">
+                  <button class="export-btn" onclick="saveGhConfig()" style="margin:0;padding:0.3rem;font-size:0.65rem;">💾</button>
+                  <button class="export-btn primary-export" onclick="publishToGithub()" style="margin:0;padding:0.3rem;font-size:0.65rem;background:var(--green);border-color:var(--green);color:#000;">🚀</button>
                 </div>
-                <p id="gh-status" style="font-size:0.7rem;color:var(--muted);margin:0.2rem 0 0;"></p>
+                <p id="gh-status" style="font-size:0.62rem;color:var(--muted);margin:0.15rem 0 0;"></p>
               </div>
             </div>
           </div>
@@ -1919,7 +1923,7 @@ function parseBloqueCompleto(raw, shorteners, multiserver) {
   //    la pusiste ahí a propósito para mostrarla en público. Si está sola, después de un espacio en
   //    blanco, sin nada que la describa, se toma como el link "de verdad" y se descarta (va solo a Privado).
   const reUrlPub = /^https?:\/\//i;
-  const dominiosSiempreExcluir = ['imgur.com', 'blogger.googleusercontent.com', 'blogspot.com', 'youtu.be', 'youtube.com'];
+  const dominiosSiempreExcluir = ['imgur.com', 'ibb.co', 'blogger.googleusercontent.com', 'blogspot.com', 'youtu.be', 'youtube.com'];
   const enlacesFiltrados = [];
   for (let i = 0; i < enlacesCombinadosConBlancos.length; i++) {
     const l = enlacesCombinadosConBlancos[i];
@@ -2051,9 +2055,16 @@ function autoRellenarTodo() {
     window.currentPrivadoDraft = (privadoParsed.titulo && privadoParsed.enlaces.length)
       ? { titulo: privadoParsed.titulo, masInfo: privadoParsed.masInfo, enlaces: privadoParsed.enlaces }
       : null;
+    // Enlaces privados: se auto-rellena el cuadro visible para que lo revises/corrijas vos
+    // mismo antes de publicar — no hace falta que el adivinador automático sea perfecto,
+    // esta caja es la última palabra.
+    const flp = document.getElementById('f-links-privados');
+    if (flp) flp.value = enlacesPrivadosArrayATexto(privadoParsed.enlaces);
     actualizarAvisoPrivadoAuto();
   } else {
     window.currentPrivadoDraft = null;
+    const flp = document.getElementById('f-links-privados');
+    if (flp) flp.value = '';
     actualizarAvisoPrivadoAuto();
   }
   // URLs Capturas (detectadas entre la sinopsis y "MAS INFO").
@@ -2577,7 +2588,7 @@ function copyLastScreenshots() {
 }
 
 function clearForm() {
-  ['f-title','f-datos-raw','f-desc','f-image','f-screenshot','f-trailer','f-links','f-descarga-raw','f-password'
+  ['f-title','f-datos-raw','f-desc','f-image','f-screenshot','f-trailer','f-links','f-links-privados','f-descarga-raw','f-password'
   ].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
   document.getElementById('f-type').value = 'Película';
   document.getElementById('f-year-filter').value = '';
@@ -2652,18 +2663,24 @@ function submitForm() {
 
   saveLastScreenshots(data.screenshot);
 
-  // ── Guarda también en Noctis Privado, si el bloque pegado arriba traía enlaces
-  // directos — mismo título, misma portada, ya con fecha y link a detalle.html.
+  // ── Guarda también en Noctis Privado, si quedó algo en el cuadro "🔒 Enlaces privados"
+  // (auto-rellenado, o corregido a mano) — mismo título, misma portada, ya con fecha y
+  // link a detalle.html. Se usa lo que esté ESCRITO EN EL CUADRO en este momento, no el
+  // borrador original del auto-relleno — así cualquier corrección manual que hayas hecho
+  // antes de tocar "Agregar al Catálogo" es la que realmente se guarda.
   let privadoGuardado = false;
-  if (window.currentPrivadoDraft && window.currentPrivadoDraft.enlaces.length) {
+  const enlacesPrivadosFinal = enlacesPrivadosTextoAArray(document.getElementById('f-links-privados')?.value || '');
+  if (enlacesPrivadosFinal.length) {
+    const tituloPrivado = (window.currentPrivadoDraft && window.currentPrivadoDraft.titulo) || data.title;
+    const masInfoPrivado = (window.currentPrivadoDraft && window.currentPrivadoDraft.masInfo) || '';
     const idxParaUrl = isEdit ? editingIndex : 0; // nuevo = unshift, queda en 0
     const privList = getPrivado();
     privList.push({
-      id: slugify(window.currentPrivadoDraft.titulo) + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8),
-      titulo: window.currentPrivadoDraft.titulo,
+      id: slugify(tituloPrivado) + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8),
+      titulo: tituloPrivado,
       imagen: data.image || '',
-      masInfo: window.currentPrivadoDraft.masInfo || '',
-      enlaces: window.currentPrivadoDraft.enlaces,
+      masInfo: masInfoPrivado,
+      enlaces: enlacesPrivadosFinal,
       fecha: formatearFechaLarga(data.uploadDate),
       detalleUrl: detailUrlFor(data, idxParaUrl),
       descargado: false,
@@ -2681,6 +2698,7 @@ function submitForm() {
     privadoGuardado = true;
   }
   window.currentPrivadoDraft = null;
+  { const flp = document.getElementById('f-links-privados'); if (flp) flp.value = ''; }
 
   showToast(
     (isEdit ? '✓ Actualizado' : '✓ Agregado — Total: ' + movies.length) +
@@ -3818,6 +3836,7 @@ function editMovie(idx) {
   if (m.image) { posterDataUrl = null; showPosterPreview(m.image); }
   editingIndex = idx;
   window.currentPrivadoDraft = null; // editar no re-pega el bloque; no arrastrar un borrador viejo
+  { const flp = document.getElementById('f-links-privados'); if (flp) flp.value = ''; }
   actualizarAvisoPrivadoAuto();
   document.getElementById('form-panel-title').innerHTML = 'Editando <span>Película</span>';
   document.getElementById('form-submit-btn').textContent = '✓ GUARDAR CAMBIOS';
@@ -4084,6 +4103,41 @@ function actualizarAvisoPrivadoAuto() {
   el.style.color = d ? 'var(--gold2)' : 'var(--muted)';
 }
 
+// Convierte el array de enlaces privados [{etiqueta,url}] al texto legible que se muestra
+// en el cuadro "🔒 Enlaces privados" del formulario.
+function enlacesPrivadosArrayATexto(enlaces) {
+  if (!enlaces || !enlaces.length) return '';
+  return enlaces.map(e => (e.etiqueta ? e.etiqueta + '\n' : '') + e.url).join('\n\n');
+}
+
+// Parsea de vuelta el texto del cuadro "🔒 Enlaces privados" (ya sea el auto-rellenado tal
+// cual, o editado a mano) al array [{etiqueta,url}] que espera noctis-privado.json. Como este
+// cuadro lo revisa/corrige la persona antes de publicar, alcanza con un parseo simple: cada
+// URL toma como etiqueta la línea de texto más cercana arriba (si hay alguna antes de la
+// URL anterior); si no hay ninguna, usa el dominio.
+function enlacesPrivadosTextoAArray(texto) {
+  if (!texto || !texto.trim()) return [];
+  const reUrl = /^https?:\/\//i;
+  const lineas = texto.replace(/\r\n/g, '\n').split('\n').map(l => l.trim());
+  const enlaces = [];
+  let etiquetaPendiente = '';
+  for (const l of lineas) {
+    if (!l) continue;
+    if (reUrl.test(l)) {
+      let etiqueta = etiquetaPendiente;
+      if (!etiqueta) {
+        try { etiqueta = new URL(l).hostname.replace(/^www\./i, '').replace(/\.(com|net|to|org|co|io|me|app)$/i, ''); }
+        catch { etiqueta = 'link'; }
+      }
+      enlaces.push({ etiqueta, url: l });
+      etiquetaPendiente = '';
+    } else {
+      etiquetaPendiente = l;
+    }
+  }
+  return enlaces;
+}
+
 function parseNoctisPrivadoBloque(raw, shorteners, multiserver) {
   raw = stripZonasExcluidas(raw);
   const lineas = raw.replace(/\r\n/g, '\n').split('\n').map(l => l.trim());
@@ -4117,7 +4171,7 @@ function parseNoctisPrivadoBloque(raw, shorteners, multiserver) {
   const enlaces = [];
   let multiCount = 0;
   const vistos = new Set();
-  const dominiosDescartar = ['gdrivelatinohd.net','youtu.be','youtube.com','imgur.com','blogger.googleusercontent.com','blogspot.com'];
+  const dominiosDescartar = ['gdrivelatinohd.net','youtu.be','youtube.com','imgur.com','ibb.co','blogger.googleusercontent.com','blogspot.com'];
   for (const l of lineas) {
     if (!l || !reUrl.test(l)) continue;
     let host;
