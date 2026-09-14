@@ -1735,12 +1735,14 @@ function stripZonasExcluidas(raw) {
   return out.join('\n');
 }
 
-function parseBloqueCompleto(raw, shorteners) {
+function parseBloqueCompleto(raw, shorteners, multiserver) {
   raw = stripZonasExcluidas(raw);
-  // Acortadores válidos para "Enlaces públicos" (movies.json / index-detalle). Cualquier URL
-  // directa (1fichier, akirabox, mega, drive, etc.) se descarta de acá — esas son SOLO para
-  // Noctis Privado. Mismo criterio/lista que ya se usa para el parser de Noctis Privado.
+  // Acortadores válidos para "Enlaces públicos" (movies.json / index-detalle): siempre público,
+  // tengan o no una etiqueta pegada arriba.
   if (!shorteners || !shorteners.length) shorteners = ['tpi.li'];
+  // "Multiservidor" (pastelink.net, jpst.it, etc.): son listas de enlaces para Noctis Privado,
+  // NUNCA van a público, tengan o no etiqueta.
+  if (!multiserver || !multiserver.length) multiserver = ['pastelink.net', 'jpst.it'];
   const r = {
     titulo:'', originalTitle:'', year:'', country:'', duration:'', genre:'', artista:'', sinopsis:'',
     infoDescarga:'', enlaces:'', screenshots:'', trailer:'',
@@ -1898,22 +1900,52 @@ function parseBloqueCompleto(raw, shorteners) {
   }
 
   // ── Zona enlaces: lo que detectó el parser + el sobrante después de Subtítulos ──
-  const enlacesBase = zonaEnlaces.filter(l => l);
-  const sobranteBase = sobrante.filter(l => l);
-  // Evitar duplicar: si zonaEnlaces ya contiene el sobrante, no concatenar
-  const enlacesCombinados = sobranteBase.length
-    ? [...sobranteBase, ...enlacesBase.filter(l => !sobranteBase.includes(l))]
-    : enlacesBase;
-  // Filtrar: las etiquetas/texto de contexto ("1fichier", "Multiserver:", etc.) se conservan
-  // tal cual, pero cualquier URL que NO sea de un acortador conocido se descarta — es un
-  // enlace directo y esos van solo a Noctis Privado, nunca al catálogo público.
+  // OJO: acá se preservan las líneas en blanco a propósito (no se filtran todavía), porque
+  // se usan como señal: "¿esta URL directa tiene una etiqueta pegada arriba, o está sola
+  // después de un espacio en blanco?" — eso es lo que decide si va a público o no.
+  const enlacesBaseConBlancos = zonaEnlaces;
+  const sobranteConBlancos = sobrante;
+  const sobranteBase = sobranteConBlancos.filter(l => l);
+  const enlacesCombinadosConBlancos = sobranteBase.length
+    ? [...sobranteConBlancos, ...enlacesBaseConBlancos.filter(l => !sobranteBase.includes(l))]
+    : enlacesBaseConBlancos;
+
+  // Filtrado para público:
+  //  · Acortador conocido (tpi.li, shrinkme.click, etc.) → SIEMPRE público.
+  //  · "Multiservidor" (pastelink.net, jpst.it, etc.) → NUNCA público (son listas para privado).
+  //  · Nunca es un link real (capturas/trailer que se colaron: imgur, blogger, youtube) → se descarta.
+  //  · Cualquier OTRA URL directa (1fichier, akirabox, mega, terabox...): depende de si tiene una
+  //    etiqueta pegada arriba (línea de texto justo antes, SIN blanco en el medio) — eso indica que
+  //    la pusiste ahí a propósito para mostrarla en público. Si está sola, después de un espacio en
+  //    blanco, sin nada que la describa, se toma como el link "de verdad" y se descarta (va solo a Privado).
   const reUrlPub = /^https?:\/\//i;
-  r.enlaces = enlacesCombinados.filter(l => {
-    if (!reUrlPub.test(l)) return true; // texto de contexto, no es URL: se conserva
+  const dominiosSiempreExcluir = ['imgur.com', 'blogger.googleusercontent.com', 'blogspot.com', 'youtu.be', 'youtube.com'];
+  const enlacesFiltrados = [];
+  for (let i = 0; i < enlacesCombinadosConBlancos.length; i++) {
+    const l = enlacesCombinadosConBlancos[i];
+    if (!reUrlPub.test(l)) { enlacesFiltrados.push(l); continue; } // texto de contexto (o línea en blanco): se conserva por ahora
     let host;
-    try { host = new URL(l).hostname.replace(/^www\./i, '').toLowerCase(); } catch { return false; }
-    return shorteners.some(d => host === d || host.endsWith('.' + d));
-  }).join('\n');
+    try { host = new URL(l).hostname.replace(/^www\./i, '').toLowerCase(); } catch { continue; }
+    if (dominiosSiempreExcluir.some(d => host === d || host.endsWith('.' + d))) continue;
+    if (multiserver.some(d => host === d || host.endsWith('.' + d))) continue;
+    if (shorteners.some(d => host === d || host.endsWith('.' + d))) { enlacesFiltrados.push(l); continue; }
+    // URL directa "genérica": la línea inmediatamente anterior (sin blanco en el medio) debe
+    // ser una etiqueta de texto real para considerarla pública a propósito.
+    const anterior = i > 0 ? enlacesCombinadosConBlancos[i - 1] : '';
+    const tieneEtiquetaPegada = !!(anterior && anterior.trim() && !reUrlPub.test(anterior));
+    if (tieneEtiquetaPegada) enlacesFiltrados.push(l);
+    // si no tiene etiqueta pegada arriba (línea en blanco o nada antes), se descarta: solo Privado.
+  }
+  // Limpiar etiquetas que quedaron huérfanas (su link directo se descartó y no les queda nada abajo)
+  const enlacesSinHuerfanos = [];
+  for (let i = 0; i < enlacesFiltrados.length; i++) {
+    const l = enlacesFiltrados[i];
+    if (reUrlPub.test(l) || !l.trim()) { enlacesSinHuerfanos.push(l); continue; }
+    const siguiente = i + 1 < enlacesFiltrados.length ? enlacesFiltrados[i + 1] : '';
+    if (siguiente && reUrlPub.test(siguiente)) enlacesSinHuerfanos.push(l); // etiqueta seguida de un link real
+    // si no, es una etiqueta huérfana (su link se descartó): se omite
+  }
+  r.enlaces = enlacesSinHuerfanos.filter(l => l).join('\n').replace(/\n{3,}/g, '\n\n').trim();
   return r;
 }
 
@@ -1992,8 +2024,10 @@ function parseDatosRaw(raw) {
 function autoRellenarTodo() {
   const raw = stripZonasExcluidas(document.getElementById('f-datos-raw').value);
   const shortenersEl0 = document.getElementById('np-shorteners');
+  const multiserverEl0 = document.getElementById('np-multiserver');
   const shorteners0 = shortenersEl0 ? shortenersEl0.value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean) : ['tpi.li'];
-  const p = parseBloqueCompleto(raw, shorteners0);
+  const multiserver0 = multiserverEl0 ? multiserverEl0.value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean) : ['pastelink.net', 'jpst.it'];
+  const p = parseBloqueCompleto(raw, shorteners0, multiserver0);
 
   // Título
   if (p.titulo) document.getElementById('f-title').value = p.titulo;
