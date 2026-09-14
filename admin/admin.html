@@ -1367,7 +1367,7 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.5rem;">
               <div class="form-group" style="margin-bottom:0;">
                 <label style="font-size:0.7rem;">Acortadores (se descartan) — separados por coma</label>
-                <input type="text" id="np-shorteners" value="tpi.li"/>
+                <input type="text" id="np-shorteners" value="tpi.li,shrinkme.click"/>
               </div>
               <div class="form-group" style="margin-bottom:0;">
                 <label style="font-size:0.7rem;">Multiservidor (se numeran) — separados por coma</label>
@@ -1735,8 +1735,12 @@ function stripZonasExcluidas(raw) {
   return out.join('\n');
 }
 
-function parseBloqueCompleto(raw) {
+function parseBloqueCompleto(raw, shorteners) {
   raw = stripZonasExcluidas(raw);
+  // Acortadores válidos para "Enlaces públicos" (movies.json / index-detalle). Cualquier URL
+  // directa (1fichier, akirabox, mega, drive, etc.) se descarta de acá — esas son SOLO para
+  // Noctis Privado. Mismo criterio/lista que ya se usa para el parser de Noctis Privado.
+  if (!shorteners || !shorteners.length) shorteners = ['tpi.li'];
   const r = {
     titulo:'', originalTitle:'', year:'', country:'', duration:'', genre:'', artista:'', sinopsis:'',
     infoDescarga:'', enlaces:'', screenshots:'', trailer:'',
@@ -1900,7 +1904,16 @@ function parseBloqueCompleto(raw) {
   const enlacesCombinados = sobranteBase.length
     ? [...sobranteBase, ...enlacesBase.filter(l => !sobranteBase.includes(l))]
     : enlacesBase;
-  r.enlaces = enlacesCombinados.join('\n');
+  // Filtrar: las etiquetas/texto de contexto ("1fichier", "Multiserver:", etc.) se conservan
+  // tal cual, pero cualquier URL que NO sea de un acortador conocido se descarta — es un
+  // enlace directo y esos van solo a Noctis Privado, nunca al catálogo público.
+  const reUrlPub = /^https?:\/\//i;
+  r.enlaces = enlacesCombinados.filter(l => {
+    if (!reUrlPub.test(l)) return true; // texto de contexto, no es URL: se conserva
+    let host;
+    try { host = new URL(l).hostname.replace(/^www\./i, '').toLowerCase(); } catch { return false; }
+    return shorteners.some(d => host === d || host.endsWith('.' + d));
+  }).join('\n');
   return r;
 }
 
@@ -1978,7 +1991,9 @@ function parseDatosRaw(raw) {
 
 function autoRellenarTodo() {
   const raw = stripZonasExcluidas(document.getElementById('f-datos-raw').value);
-  const p = parseBloqueCompleto(raw);
+  const shortenersEl0 = document.getElementById('np-shorteners');
+  const shorteners0 = shortenersEl0 ? shortenersEl0.value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean) : ['tpi.li'];
+  const p = parseBloqueCompleto(raw, shorteners0);
 
   // Título
   if (p.titulo) document.getElementById('f-title').value = p.titulo;
