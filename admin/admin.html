@@ -475,7 +475,7 @@
 
 /* Cajas de Info descarga / Enlaces públicos / Enlaces privados */
 #f-descarga-raw, #f-links, #f-links-privados {
-  min-height: 110px !important;
+  min-height: 180px !important;
 }
 
 /* URLs Capturas (screenshots) */
@@ -1176,15 +1176,15 @@
           <div class="enlaces-grid" style="display:grid;grid-template-columns:1.05fr 1fr 1fr 0.62fr;gap:0.55rem;margin-bottom:0.6rem;align-items:start;">
             <div class="form-group" style="margin-bottom:0;">
               <label>Info descarga <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(auto-rellenado o pega aquí)</span></label>
-              <textarea id="f-descarga-raw" class="textarea-links" style="min-height:110px;font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;Audio: Español Latino&#10;Calidad: WEBDL&#10;Resolución: 1920×1080&#10;Formato: MKV&#10;Tamaño: 4.5 GB&#10;Codec: H264&#10;Subtítulos: ..." oninput="autoRellenarDescarga()" onpaste="setTimeout(autoRellenarDescarga,50)"></textarea>
+              <textarea id="f-descarga-raw" class="textarea-links" style="font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;Audio: Español Latino&#10;Calidad: WEBDL&#10;Resolución: 1920×1080&#10;Formato: MKV&#10;Tamaño: 4.5 GB&#10;Codec: H264&#10;Subtítulos: ..." oninput="autoRellenarDescarga()" onpaste="setTimeout(autoRellenarDescarga,50)"></textarea>
             </div>
             <div class="form-group" style="margin-bottom:0;">
-              <label>Enlaces públicos <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(auto-rellenado — revisá antes de publicar)</span></label>
-              <textarea class="textarea-links" id="f-links" style="min-height:110px;font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;Servidor 1&#10;https://enlace1.com&#10;&#10;Servidor 2&#10;https://enlace2.com"></textarea>
+              <label>Enlaces públicos</label>
+              <textarea class="textarea-links" id="f-links" style="font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;Servidor 1&#10;https://enlace1.com&#10;&#10;Servidor 2&#10;https://enlace2.com"></textarea>
             </div>
             <div class="form-group" style="margin-bottom:0;">
-              <label>🔒 Enlaces privados <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(auto-rellenado — revisá antes de publicar)</span></label>
-              <textarea class="textarea-links" id="f-links-privados" style="min-height:110px;font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;1fichier&#10;https://1fichier.com/?xxxx&#10;&#10;Multiservidor 1&#10;https://pastelink.net/xxxx"></textarea>
+              <label>🔒 Enlaces privados</label>
+              <textarea class="textarea-links" id="f-links-privados" style="font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;1fichier&#10;https://1fichier.com/?xxxx&#10;&#10;Multiservidor 1&#10;https://pastelink.net/xxxx"></textarea>
             </div>
             <div class="form-group" style="margin-bottom:0;">
               <label style="font-size:0.72rem;">🔄 Sync GitHub <span style="color:var(--muted);font-size:0.62rem;font-weight:400;letter-spacing:0;">(1 vez)</span></label>
@@ -1349,61 +1349,25 @@
          y se ve solo en lelouchhangyaku-noctis-x7f2.html -->
     <div class="io-section" style="margin-top:0.75rem;">
       <div class="io-title">🔒 Noctis Privado</div>
+      <p style="font-size:0.75rem;color:var(--muted);margin-bottom:0.7rem;">
+        Los enlaces privados se cargan y editan arriba, en el cuadro <b>🔒 Enlaces privados</b> del formulario
+        (al pegar un bloque nuevo o al tocar ✏️ en cualquier título del catálogo). Acá abajo solo queda la lista
+        de lo ya guardado y las copias de seguridad.
+      </p>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start;">
 
-        <!-- COLUMNA 1: pegar lote + procesar -->
-        <div>
-          <p style="font-size:0.75rem;color:var(--muted);margin-bottom:0.7rem;">
-            Pegá el lote completo (uno o varios bloques separados por líneas de números repetidos, tipo <code>1111...</code> / <code>2222...</code>).
-            Por cada bloque se busca el título en tu catálogo ya subido (movies.json en memoria) y de ahí se hereda la portada,
-            año, país, duración, género y sinopsis automáticamente. Solo se extrae del texto pegado el bloque de "Más Info" y
-            los enlaces directos (se descartan los acortadores).
-          </p>
-
-          <div class="form-group">
-            <label>Pegar lote completo</label>
-            <textarea id="np-bulk" rows="10" style="width:100%;font-family:monospace;font-size:0.78rem;background:var(--surface3);border:1px solid var(--border);border-radius:6px;color:var(--white);padding:0.6rem;" placeholder="Pegá acá todo el lote (uno o varios bloques)..."></textarea>
-          </div>
-
-          <details style="margin-bottom:0.6rem;">
-            <summary style="cursor:pointer;font-size:0.75rem;color:var(--muted);">⚙ Dominios (acortadores / multiservidor) — editable</summary>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.5rem;">
-              <div class="form-group" style="margin-bottom:0;">
-                <label style="font-size:0.7rem;">Acortadores (se descartan) — separados por coma</label>
-                <input type="text" id="np-shorteners" value="tpi.li,shrinkme.click"/>
-              </div>
-              <div class="form-group" style="margin-bottom:0;">
-                <label style="font-size:0.7rem;">Multiservidor (se numeran) — separados por coma</label>
-                <input type="text" id="np-multiserver" value="pastelink.net, jpst.it"/>
-              </div>
-            </div>
-          </details>
-
-          <button class="export-btn" style="margin-bottom:0.7rem;" onclick="procesarNoctisPrivadoBulk()">⚙ Procesar bloques</button>
-
-          <div id="np-guardar-wrap-top" style="display:none;margin-bottom:0.7rem;">
-            <button class="export-btn primary-export" style="background:var(--gold);border-color:var(--gold);color:#000;" onclick="guardarNoctisPrivadoDraft()">💾 Guardar todo en Noctis Privado</button>
-          </div>
-
-          <div id="np-preview"></div>
-
-          <div id="np-guardar-wrap" style="display:none;margin-top:0.7rem;">
-            <button class="export-btn primary-export" style="background:var(--gold);border-color:var(--gold);color:#000;" onclick="guardarNoctisPrivadoDraft()">💾 Guardar todo en Noctis Privado</button>
-          </div>
-        </div>
-
-        <!-- COLUMNA 2: ya guardados + descargar/publicar -->
         <div>
           <div style="font-size:0.8rem;color:var(--white);font-weight:600;margin-bottom:0.5rem;">📦 Ya guardados (<span id="np-count">0</span>)</div>
           <div id="np-saved-list"></div>
           <div id="np-pagination" style="margin-top:0.5rem;"></div>
+        </div>
 
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:1rem;">
+        <div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
             <button class="export-btn" onclick="downloadPrivadoJSON()">⬇ Descargar noctis-privado.json</button>
             <button class="export-btn" onclick="copyPrivadoJSON()">📋 Copiar JSON</button>
           </div>
-          <button class="export-btn" style="margin-top:0.5rem;" onclick="publishPrivadoToGithub()">🚀 Publicar en GitHub</button>
           <button class="export-btn" style="margin-top:0.5rem;" onclick="reemparejarPrivadoConCatalogo()">🔁 Re-emparejar datos con catálogo</button>
           <div id="np-gh-status" style="font-size:0.75rem;margin-top:0.4rem;"></div>
 
@@ -2055,11 +2019,14 @@ function autoRellenarTodo() {
     window.currentPrivadoDraft = (privadoParsed.titulo && privadoParsed.enlaces.length)
       ? { titulo: privadoParsed.titulo, masInfo: privadoParsed.masInfo, enlaces: privadoParsed.enlaces }
       : null;
-    // Enlaces privados: se auto-rellena el cuadro visible para que lo revises/corrijas vos
-    // mismo antes de publicar — no hace falta que el adivinador automático sea perfecto,
-    // esta caja es la última palabra.
+    // Enlaces privados: se auto-rellena ESPEJANDO la estructura del cuadro "Enlaces públicos"
+    // (mismas etiquetas, mismos "Parte N:", mismo orden), cambiando solo las URLs acortadas por
+    // las directas. Si por algún motivo no se pudo espejar, cae a la lista plana de siempre.
     const flp = document.getElementById('f-links-privados');
-    if (flp) flp.value = enlacesPrivadosArrayATexto(privadoParsed.enlaces);
+    if (flp) {
+      const espejo = construirPrivadosEspejoDePublicos(raw, p.enlaces || '', shorteners);
+      flp.value = espejo || enlacesPrivadosArrayATexto(privadoParsed.enlaces);
+    }
     actualizarAvisoPrivadoAuto();
   } else {
     window.currentPrivadoDraft = null;
@@ -2670,20 +2637,28 @@ function submitForm() {
   // antes de tocar "Agregar al Catálogo" es la que realmente se guarda.
   let privadoGuardado = false;
   const enlacesPrivadosFinal = enlacesPrivadosTextoAArray(document.getElementById('f-links-privados')?.value || '');
+  const tituloPrivado = (window.currentPrivadoDraft && window.currentPrivadoDraft.titulo) || data.title;
+  const privList = getPrivado();
+  const idxPrivExistente = privList.findIndex(p => normTitulo(p.titulo) === normTitulo(tituloPrivado));
+
   if (enlacesPrivadosFinal.length) {
-    const tituloPrivado = (window.currentPrivadoDraft && window.currentPrivadoDraft.titulo) || data.title;
-    const masInfoPrivado = (window.currentPrivadoDraft && window.currentPrivadoDraft.masInfo) || '';
+    const masInfoPrivado = (window.currentPrivadoDraft && window.currentPrivadoDraft.masInfo)
+      || (idxPrivExistente >= 0 ? privList[idxPrivExistente].masInfo : '')
+      || '';
     const idxParaUrl = isEdit ? editingIndex : 0; // nuevo = unshift, queda en 0
-    const privList = getPrivado();
-    privList.push({
-      id: slugify(tituloPrivado) + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8),
+    const entrada = {
+      // Si ya existía, se conserva su id (así no se pierde la marca de "descargado" ni se
+      // duplica la entrada cada vez que editás el mismo título).
+      id: idxPrivExistente >= 0
+        ? privList[idxPrivExistente].id
+        : slugify(tituloPrivado) + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8),
       titulo: tituloPrivado,
       imagen: data.image || '',
       masInfo: masInfoPrivado,
       enlaces: enlacesPrivadosFinal,
       fecha: formatearFechaLarga(data.uploadDate),
       detalleUrl: detailUrlFor(data, idxParaUrl),
-      descargado: false,
+      descargado: idxPrivExistente >= 0 ? !!privList[idxPrivExistente].descargado : false,
       // Datos "de ficha" heredados de la película matcheada en el catálogo al momento
       // de guardar (mismos nombres de campo que movies.json, para poder reusar
       // matchMovieByTitle() al re-emparejar entradas viejas más adelante).
@@ -2693,9 +2668,15 @@ function submitForm() {
       duration: data.duration || '',
       genre: data.genre || '',
       description: data.description || '',
-    });
+    };
+    if (idxPrivExistente >= 0) privList[idxPrivExistente] = entrada;
+    else privList.push(entrada);
     savePrivado(privList);
     privadoGuardado = true;
+  } else if (idxPrivExistente >= 0) {
+    // Vaciaste el cuadro a propósito → se quita de Noctis Privado
+    privList.splice(idxPrivExistente, 1);
+    savePrivado(privList);
   }
   window.currentPrivadoDraft = null;
   { const flp = document.getElementById('f-links-privados'); if (flp) flp.value = ''; }
@@ -3836,7 +3817,15 @@ function editMovie(idx) {
   if (m.image) { posterDataUrl = null; showPosterPreview(m.image); }
   editingIndex = idx;
   window.currentPrivadoDraft = null; // editar no re-pega el bloque; no arrastrar un borrador viejo
-  { const flp = document.getElementById('f-links-privados'); if (flp) flp.value = ''; }
+  // Carga los enlaces privados YA GUARDADOS de este título (si los hay), para poder verlos
+  // y corregirlos al editar — antes este cuadro se vaciaba y parecía que no había nada.
+  {
+    const flp = document.getElementById('f-links-privados');
+    if (flp) {
+      const yaGuardado = getPrivado().find(p => normTitulo(p.titulo) === normTitulo(m.title));
+      flp.value = yaGuardado ? enlacesPrivadosArrayATexto(yaGuardado.enlaces) : '';
+    }
+  }
   actualizarAvisoPrivadoAuto();
   document.getElementById('form-panel-title').innerHTML = 'Editando <span>Película</span>';
   document.getElementById('form-submit-btn').textContent = '✓ GUARDAR CAMBIOS';
@@ -3986,9 +3975,34 @@ async function publishToGithub() {
       body: JSON.stringify({ message: 'Actualizar catálogo — ' + new Date().toLocaleString(), content: b64, ...(sha && { sha }) })
     });
     if (!putRes.ok) { const e = await putRes.json().catch(() => ({})); throw new Error(e.message || 'Error ' + putRes.status); }
-    statusEl.textContent = '✓ Publicado. Tarda ~1 min en reflejarse en el sitio.';
-    statusEl.style.color = 'var(--green)';
-    showToast('🚀 Catálogo publicado en GitHub', 'success');
+
+    // ── Publica también noctis-privado.json en la misma acción: un solo botón para todo.
+    // Si falla solo esta parte, el catálogo ya quedó publicado igual, y se avisa aparte.
+    let privadoOk = true, privadoMsg = '';
+    try {
+      const privApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/noctis-privado.json`;
+      let privSha = null;
+      const privGet = await fetch(privApiUrl, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' } });
+      if (privGet.ok) { const d = await privGet.json(); privSha = d.sha; }
+      else if (privGet.status !== 404) { const e = await privGet.json().catch(() => ({})); throw new Error(e.message || 'Error ' + privGet.status); }
+      const privJson = JSON.stringify(getPrivado(), null, 2);
+      const privB64 = btoa(Array.from(new TextEncoder().encode(privJson), b => String.fromCharCode(b)).join(''));
+      const privPut = await fetch(privApiUrl, {
+        method: 'PUT',
+        headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' },
+        body: JSON.stringify({ message: 'Actualizar noctis-privado — ' + new Date().toLocaleString(), content: privB64, ...(privSha && { sha: privSha }) })
+      });
+      if (!privPut.ok) { const e = await privPut.json().catch(() => ({})); throw new Error(e.message || 'Error ' + privPut.status); }
+    } catch (ep) {
+      privadoOk = false;
+      privadoMsg = ep.message;
+    }
+
+    statusEl.textContent = privadoOk
+      ? '✓ Publicado (catálogo + privado). Tarda ~1 min en reflejarse en el sitio.'
+      : '✓ Catálogo publicado · ✗ privado: ' + privadoMsg;
+    statusEl.style.color = privadoOk ? 'var(--green)' : '#e5b44b';
+    showToast(privadoOk ? '🚀 Catálogo + Noctis Privado publicados' : '🚀 Catálogo publicado · privado falló', privadoOk ? 'success' : 'error');
   } catch(e) {
     statusEl.textContent = '✗ ' + e.message;
     statusEl.style.color = '#e55';
@@ -4136,6 +4150,59 @@ function enlacesPrivadosTextoAArray(texto) {
     }
   }
   return enlaces;
+}
+
+// Arma el texto de "🔒 Enlaces privados" ESPEJANDO la estructura del cuadro "Enlaces públicos":
+// mismas etiquetas, mismos "Parte N:", mismo orden — y solo reemplaza cada URL acortada por
+// la URL directa que le corresponde (en el mismo orden en que las pegaste al final del bloque).
+// Una URL que YA es directa dentro de la zona pública (ej: pixeldrain) se deja tal cual y no
+// consume ninguna de la cola, así no se desalinea el resto.
+function construirPrivadosEspejoDePublicos(rawBlock, publicLinksText, shorteners) {
+  const reUrl = /^https?:\/\//i;
+  const esAcortador = (u) => {
+    try {
+      const host = new URL(u).hostname.replace(/^www\./i, '').toLowerCase();
+      return shorteners.some(d => host === d || host.endsWith('.' + d));
+    } catch { return false; }
+  };
+  const dominiosDescartar = ['gdrivelatinohd.net','youtu.be','youtube.com','imgur.com','ibb.co','blogger.googleusercontent.com','blogspot.com','themoviedb.org'];
+  const esDescartable = (u) => {
+    try {
+      const host = new URL(u).hostname.replace(/^www\./i, '').toLowerCase();
+      return dominiosDescartar.some(d => host === d || host.endsWith('.' + d));
+    } catch { return true; }
+  };
+
+  const publicas = (publicLinksText || '').replace(/\r\n/g, '\n').split('\n');
+  const urlsEnPublicas = new Set(publicas.filter(l => reUrl.test(l.trim())).map(l => l.trim()));
+
+  // Cola de URLs directas: las del bloque pegado que no son acortadores, no son basura, y no
+  // están ya en la zona pública (esas no se repiten, se dejan donde están).
+  const cola = [];
+  const vistos = new Set();
+  for (const l0 of stripZonasExcluidas(rawBlock).replace(/\r\n/g, '\n').split('\n')) {
+    const l = l0.trim();
+    if (!l || !reUrl.test(l)) continue;
+    if (vistos.has(l)) continue;
+    vistos.add(l);
+    if (esDescartable(l) || esAcortador(l) || urlsEnPublicas.has(l)) continue;
+    cola.push(l);
+  }
+
+  const salida = [];
+  for (const l0 of publicas) {
+    const l = l0.trim();
+    if (!l) { salida.push(''); continue; }
+    if (!reUrl.test(l)) { salida.push(l0); continue; } // etiqueta / "Parte N:" → tal cual
+    if (esAcortador(l)) {
+      const directa = cola.shift();
+      if (directa) salida.push(directa); // si no quedan directas, se omite esa línea
+    } else {
+      salida.push(l0); // ya era directa dentro de la zona pública (ej: pixeldrain)
+    }
+  }
+  // Limpia líneas en blanco repetidas del principio/final
+  return salida.join('\n').replace(/\n{3,}/g, '\n\n').trim();
 }
 
 function parseNoctisPrivadoBloque(raw, shorteners, multiserver) {
@@ -4294,98 +4361,11 @@ function slugify(s) {
     .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
-function procesarNoctisPrivadoBulk() {
-  const raw = document.getElementById('np-bulk').value;
-  if (!raw || !raw.trim()) { showToast('Pegá el lote primero.', 'error'); return; }
-  const shorteners  = document.getElementById('np-shorteners').value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
-  const multiserver = document.getElementById('np-multiserver').value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
 
-  const bloques = splitNoctisPrivadoBloques(raw);
-  noctisPrivadoDraft = bloques.map(b => {
-    const p = parseNoctisPrivadoBloque(b, shorteners, multiserver);
-    const match = matchMovieByTitle(p.titulo, p.masInfo);
-    return {
-      titulo: p.titulo,
-      imagen: match ? match.image : '',
-      matched: !!match,
-      masInfo: p.masInfo,
-      enlaces: p.enlaces,
-      fecha: match ? formatearFechaLarga(match.uploadDate) : '',
-    };
-  }).filter(x => x.titulo); // descarta bloques vacíos/basura
 
-  renderNoctisPrivadoPreview();
-  showToast(`✓ ${noctisPrivadoDraft.length} bloque(s) procesado(s)`, 'success');
-}
 
-function renderNoctisPrivadoPreview() {
-  const wrap = document.getElementById('np-preview');
-  const guardarWrap = document.getElementById('np-guardar-wrap');
-  const guardarWrapTop = document.getElementById('np-guardar-wrap-top');
-  if (!noctisPrivadoDraft.length) { wrap.innerHTML = ''; guardarWrap.style.display = 'none'; guardarWrapTop.style.display = 'none'; return; }
-  guardarWrap.style.display = 'block';
-  guardarWrapTop.style.display = 'block';
 
-  wrap.innerHTML = noctisPrivadoDraft.map((item, i) => `
-    <div style="border:1px solid var(--border);border-radius:8px;padding:0.7rem;margin-bottom:0.6rem;background:var(--surface3);">
-      <div style="display:flex;gap:0.6rem;align-items:flex-start;">
-        ${privadoPosterHtml(item)}
-        <div style="flex:1;min-width:0;">
-          <input type="text" value="${(item.titulo||'').replace(/"/g,'&quot;')}" oninput="noctisPrivadoDraft[${i}].titulo=this.value" style="margin-bottom:0.35rem;font-weight:600;"/>
-          ${item.matched
-            ? `<div style="font-size:0.68rem;color:var(--green);">✓ Coincide con el catálogo — portada/datos heredados</div>`
-            : `<div style="font-size:0.68rem;color:#e5b44b;">⚠️ Sin coincidencia en el catálogo — pegá una URL de portada abajo</div>
-               <input type="url" placeholder="URL de portada (manual)" value="${item.imagen||''}" oninput="noctisPrivadoDraft[${i}].imagen=this.value" style="margin-top:0.3rem;font-size:0.72rem;"/>`
-          }
-        </div>
-        <button class="export-btn" style="width:auto;padding:0.3rem 0.6rem;margin:0;flex-shrink:0;" onclick="noctisPrivadoDraft.splice(${i},1);renderNoctisPrivadoPreview();">🗑</button>
-      </div>
 
-      <div style="margin-top:0.5rem;">
-        <label style="font-size:0.68rem;color:var(--muted);">Más Info</label>
-        <textarea rows="4" style="width:100%;font-family:monospace;font-size:0.72rem;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--white);padding:0.4rem;" oninput="noctisPrivadoDraft[${i}].masInfo=this.value">${item.masInfo||''}</textarea>
-      </div>
-      ${(() => { const m = matchMovieByTitle(item.titulo, item.masInfo); return m && m.streaming
-        ? `<div style="margin-top:0.35rem;font-size:0.68rem;color:var(--muted);">📺 Streaming: <span style="color:var(--white);">${m.streaming}</span> (heredado de esta edición en el Catálogo)</div>`
-        : `<div style="margin-top:0.35rem;font-size:0.68rem;color:var(--muted);">📺 Streaming: sin match en el Catálogo todavía — no se muestra cinta hasta que subas esta edición en "Agregar Película".</div>`; })()}
-
-      <div style="margin-top:0.5rem;">
-        <label style="font-size:0.68rem;color:var(--muted);">Enlaces directos (${item.enlaces.length})</label>
-        ${item.enlaces.map((e, j) => `
-          <div style="display:flex;gap:0.35rem;margin-top:0.3rem;">
-            <input type="text" value="${(e.etiqueta||'').replace(/"/g,'&quot;')}" oninput="noctisPrivadoDraft[${i}].enlaces[${j}].etiqueta=this.value" style="width:130px;flex-shrink:0;font-size:0.72rem;margin-bottom:0;"/>
-            <input type="url" value="${(e.url||'').replace(/"/g,'&quot;')}" oninput="noctisPrivadoDraft[${i}].enlaces[${j}].url=this.value" style="flex:1;font-size:0.72rem;margin-bottom:0;"/>
-            <button class="export-btn" style="width:auto;padding:0.3rem 0.5rem;margin:0;flex-shrink:0;" onclick="noctisPrivadoDraft[${i}].enlaces.splice(${j},1);renderNoctisPrivadoPreview();">🗑</button>
-          </div>
-        `).join('') || `<div style="font-size:0.7rem;color:var(--muted);margin-top:0.3rem;">Sin enlaces detectados.</div>`}
-      </div>
-    </div>
-  `).join('');
-}
-
-function guardarNoctisPrivadoDraft() {
-  if (!noctisPrivadoDraft.length) return;
-  const lista = getPrivado();
-  for (const item of noctisPrivadoDraft) {
-    lista.push({
-      // Random() además de Date.now() — si guardás 2 bloques con el MISMO título en la misma
-      // tanda, Date.now() puede repetirse (corre en el mismo milisegundo) y quedaban con el
-      // mismo id, haciendo que marcar "descargado" en uno marcara el otro también.
-      id: slugify(item.titulo) + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8),
-      titulo: item.titulo,
-      imagen: item.imagen || '',
-      masInfo: item.masInfo || '',
-      enlaces: item.enlaces || [],
-      fecha: item.fecha || formatearFechaLarga(currentUploadDate()),
-    });
-  }
-  npPage = 1;
-  savePrivado(lista);
-  noctisPrivadoDraft = [];
-  document.getElementById('np-bulk').value = '';
-  renderNoctisPrivadoPreview();
-  showToast(`💾 ${lista.length} título(s) en Noctis Privado`, 'success');
-}
 
 const NP_PAGE_SIZE = 6;
 let npPage = 1;
