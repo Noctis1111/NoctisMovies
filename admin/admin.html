@@ -1173,6 +1173,19 @@
               <input id="f-password" type="text" style="width:180px;padding:5px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.88rem;font-family:'Inter',sans-serif;letter-spacing:0.5px;outline:none;transition:border-color 0.2s;" placeholder="NoctisMovies o dejar vacío" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
             </div>
           </div>
+          <details style="margin:0.25rem 0 0.5rem;">
+            <summary style="cursor:pointer;font-size:0.68rem;color:var(--muted);user-select:none;">⚙ Dominios (acortadores / multiservidor) — se guarda solo, una vez</summary>
+            <div style="display:flex;gap:0.5rem;margin-top:0.35rem;flex-wrap:wrap;">
+              <div style="flex:1;min-width:220px;">
+                <label style="font-size:0.62rem;color:var(--muted);display:block;margin-bottom:0.1rem;">Acortadores (van a público) — separados por coma</label>
+                <input type="text" id="np-shorteners" style="width:100%;padding:0.3rem 0.4rem;background:#0a0c12;border:1px solid var(--border);border-radius:5px;color:#fff;font-size:0.7rem;" oninput="guardarDominiosConfig()"/>
+              </div>
+              <div style="flex:1;min-width:220px;">
+                <label style="font-size:0.62rem;color:var(--muted);display:block;margin-bottom:0.1rem;">Multiservidor (numerados, van a privado) — separados por coma</label>
+                <input type="text" id="np-multiserver" style="width:100%;padding:0.3rem 0.4rem;background:#0a0c12;border:1px solid var(--border);border-radius:5px;color:#fff;font-size:0.7rem;" oninput="guardarDominiosConfig()"/>
+              </div>
+            </div>
+          </details>
           <div class="enlaces-grid" style="display:grid;grid-template-columns:1.05fr 1fr 1fr 0.62fr;gap:0.55rem;margin-bottom:0.6rem;align-items:start;">
             <div class="form-group" style="margin-bottom:0;">
               <label>Info descarga <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(auto-rellenado o pega aquí)</span></label>
@@ -1904,14 +1917,30 @@ function parseBloqueCompleto(raw, shorteners, multiserver) {
     if (tieneEtiquetaPegada) enlacesFiltrados.push(l);
     // si no tiene etiqueta pegada arriba (línea en blanco o nada antes), se descarta: solo Privado.
   }
-  // Limpiar etiquetas que quedaron huérfanas (su link directo se descartó y no les queda nada abajo)
-  const enlacesSinHuerfanos = [];
-  for (let i = 0; i < enlacesFiltrados.length; i++) {
-    const l = enlacesFiltrados[i];
-    if (reUrlPub.test(l) || !l.trim()) { enlacesSinHuerfanos.push(l); continue; }
-    const siguiente = i + 1 < enlacesFiltrados.length ? enlacesFiltrados[i + 1] : '';
-    if (siguiente && reUrlPub.test(siguiente)) enlacesSinHuerfanos.push(l); // etiqueta seguida de un link real
-    // si no, es una etiqueta huérfana (su link se descartó): se omite
+  // Limpiar etiquetas que quedaron huérfanas (su link directo se descartó y no les queda nada
+  // abajo). OJO: los encabezados anidados tipo "1Cloudfile + AkiraBox" → "Parte 1:" → URL se
+  // tienen que conservar los dos — por eso no alcanza con mirar solo la línea siguiente, hay
+  // que mirar hacia adelante hasta la primera línea en blanco (o el final) buscando si en ese
+  // tramo aparece algún link real. Se repite hasta que no haya más cambios (por si sacar una
+  // etiqueta deja huérfana a la que tenía arriba).
+  let enlacesSinHuerfanos = enlacesFiltrados;
+  let huboCambioHuerfanos = true;
+  while (huboCambioHuerfanos) {
+    huboCambioHuerfanos = false;
+    const resultado = [];
+    for (let i = 0; i < enlacesSinHuerfanos.length; i++) {
+      const l = enlacesSinHuerfanos[i];
+      if (reUrlPub.test(l) || !l.trim()) { resultado.push(l); continue; }
+      let tieneLinkAdelante = false;
+      for (let j = i + 1; j < enlacesSinHuerfanos.length; j++) {
+        const sig = enlacesSinHuerfanos[j];
+        if (!sig.trim()) break; // línea en blanco: corta la búsqueda, no hay link para esta etiqueta
+        if (reUrlPub.test(sig)) { tieneLinkAdelante = true; break; }
+      }
+      if (tieneLinkAdelante) resultado.push(l);
+      else huboCambioHuerfanos = true; // etiqueta huérfana: se omite
+    }
+    enlacesSinHuerfanos = resultado;
   }
   r.enlaces = enlacesSinHuerfanos.filter(l => l).join('\n').replace(/\n{3,}/g, '\n\n').trim();
   return r;
@@ -1989,7 +2018,58 @@ function parseDatosRaw(raw) {
   return result;
 }
 
+// Memoria de sesión (no depende de haber guardado en el catálogo): cada vez que se pega un
+// bloque nuevo, ANTES de tocar nada se guarda una "foto" de lo que había en portada/capturas/
+// trailer para el título que estaba cargado hasta ese momento. Así, si pegás dos calidades de
+// la MISMA película seguidas SIN darle a "Agregar al Catálogo" en el medio, la segunda igual
+// hereda lo que tenías puesto (incluso si lo pegaste/escribiste a mano) — no hace falta guardar
+// primero para que funcione la herencia.
+window.__cacheSesionPorTitulo = window.__cacheSesionPorTitulo || {};
+function guardarEnCacheSesion(tituloActual) {
+  if (!tituloActual) return;
+  const key = baseTituloSinCalidad(tituloActual);
+  if (!key) return;
+  const img = document.getElementById('f-image').value.trim();
+  const ss = document.getElementById('f-screenshot').value.trim();
+  const tr = document.getElementById('f-trailer').value.trim();
+  if (!img && !ss && !tr) return;
+  const prev = window.__cacheSesionPorTitulo[key] || {};
+  window.__cacheSesionPorTitulo[key] = {
+    title: tituloActual,
+    image: img || prev.image || '',
+    screenshot: ss || prev.screenshot || '',
+    trailer: tr || prev.trailer || '',
+  };
+}
+
+// Config de dominios (acortadores / multiservidor) — persiste en localStorage, así no hay
+// que volver a escribirla cada vez que abrís el panel. Si nunca se configuró, arranca con la
+// lista conocida de acortadores/multiservidor ya vistos en el catálogo.
+const DOMINIOS_CONFIG_KEY = 'noctis_dominios_config';
+const DOMINIOS_DEFAULT = {
+  shorteners: 'tpi.li,shrinkme.click,shrinkme.ink,icutlink.com,mayas.travel,en.mrproblogger.com,fc-lc.xyz,uii.io,srnky.com',
+  multiserver: 'pastelink.net,jpst.it',
+};
+function cargarDominiosConfig() {
+  let cfg = {};
+  try { cfg = JSON.parse(localStorage.getItem(DOMINIOS_CONFIG_KEY) || '{}'); } catch { cfg = {}; }
+  const elS = document.getElementById('np-shorteners');
+  const elM = document.getElementById('np-multiserver');
+  if (elS) elS.value = cfg.shorteners || DOMINIOS_DEFAULT.shorteners;
+  if (elM) elM.value = cfg.multiserver || DOMINIOS_DEFAULT.multiserver;
+}
+function guardarDominiosConfig() {
+  const shorteners = document.getElementById('np-shorteners')?.value || '';
+  const multiserver = document.getElementById('np-multiserver')?.value || '';
+  localStorage.setItem(DOMINIOS_CONFIG_KEY, JSON.stringify({ shorteners, multiserver }));
+}
+document.addEventListener('DOMContentLoaded', cargarDominiosConfig);
+if (document.readyState !== 'loading') cargarDominiosConfig();
+
 function autoRellenarTodo() {
+  // Guardar en la memoria de sesión lo que había cargado ANTES de este pegado (del título
+  // anterior), por si es la misma película y hay que heredarle algo más abajo.
+  guardarEnCacheSesion(document.getElementById('f-title').value.trim());
   const raw = stripZonasExcluidas(document.getElementById('f-datos-raw').value);
   const shortenersEl0 = document.getElementById('np-shorteners');
   const multiserverEl0 = document.getElementById('np-multiserver');
@@ -2035,45 +2115,61 @@ function autoRellenarTodo() {
     actualizarAvisoPrivadoAuto();
   }
   // URLs Capturas (detectadas entre la sinopsis y "MAS INFO").
-  // Si esta pasada NO trae capturas, se busca si ya existe otra edición de la
-  // MISMA película ("Título (Año)" igual) con capturas guardadas, y se copian
-  // de ahí — mismo criterio que el trailer.
+  // Si esta pasada NO trae capturas, primero se busca en la memoria de sesión (lo que tenías
+  // puesto en la pasada anterior de la MISMA película, aunque no la hayas guardado todavía),
+  // y si no hay nada ahí, se busca en el catálogo ya guardado — mismo criterio que el trailer.
   if (p.screenshots) {
     document.getElementById('f-screenshot').value = p.screenshots;
     updateScreenshotCount();
   } else if (p.titulo && !document.getElementById('f-screenshot').value.trim()) {
     const baseNuevoSs = baseTituloSinCalidad(p.titulo);
-    const hermanoSs = getMovies().find(m => m.screenshot && baseTituloSinCalidad(m.title || '') === baseNuevoSs);
-    if (hermanoSs) {
-      document.getElementById('f-screenshot').value = hermanoSs.screenshot;
+    const cacheSs = window.__cacheSesionPorTitulo[baseNuevoSs];
+    if (cacheSs && cacheSs.screenshot) {
+      document.getElementById('f-screenshot').value = cacheSs.screenshot;
       updateScreenshotCount();
-      showToast('🖼 Capturas copiadas automáticamente de "' + hermanoSs.title + '"', 'info');
+      showToast('🖼 Capturas copiadas automáticamente de "' + cacheSs.title + '"', 'info');
+    } else {
+      const hermanoSs = getMovies().find(m => m.screenshot && baseTituloSinCalidad(m.title || '') === baseNuevoSs);
+      if (hermanoSs) {
+        document.getElementById('f-screenshot').value = hermanoSs.screenshot;
+        updateScreenshotCount();
+        showToast('🖼 Capturas copiadas automáticamente de "' + hermanoSs.title + '"', 'info');
+      }
     }
   }
   // Trailer YouTube (detectado en cualquier posición del bloque pegado).
-  // Si esta pasada NO trae trailer, se busca automáticamente si ya existe otra
-  // edición de la MISMA película ("Título (Año)" igual) con trailer guardado en
-  // el catálogo, y se copia de ahí — así no hay que pegarlo de nuevo en cada calidad.
+  // Mismo criterio: primero memoria de sesión, después catálogo guardado.
   if (p.trailer) {
     document.getElementById('f-trailer').value = p.trailer;
   } else if (p.titulo && !document.getElementById('f-trailer').value.trim()) {
     const baseNuevo = baseTituloSinCalidad(p.titulo);
-    const hermano = getMovies().find(m => m.trailer && baseTituloSinCalidad(m.title || '') === baseNuevo);
-    if (hermano) {
-      document.getElementById('f-trailer').value = hermano.trailer;
-      showToast('🎬 Trailer copiado automáticamente de "' + hermano.title + '"', 'info');
+    const cacheTr = window.__cacheSesionPorTitulo[baseNuevo];
+    if (cacheTr && cacheTr.trailer) {
+      document.getElementById('f-trailer').value = cacheTr.trailer;
+      showToast('🎬 Trailer copiado automáticamente de "' + cacheTr.title + '"', 'info');
+    } else {
+      const hermano = getMovies().find(m => m.trailer && baseTituloSinCalidad(m.title || '') === baseNuevo);
+      if (hermano) {
+        document.getElementById('f-trailer').value = hermano.trailer;
+        showToast('🎬 Trailer copiado automáticamente de "' + hermano.title + '"', 'info');
+      }
     }
   }
-  // Portada (poster): mismo criterio — casi siempre se usa la misma portada para
-  // todas las ediciones de una película, así que si el campo está vacío se toma
-  // la de otra edición ya guardada con el mismo "Título (Año)".
+  // Portada (poster): mismo criterio — primero memoria de sesión, después catálogo guardado.
   if (p.titulo && !document.getElementById('f-image').value.trim()) {
     const baseImg = baseTituloSinCalidad(p.titulo);
-    const hermanoImg = getMovies().find(m => m.image && baseTituloSinCalidad(m.title || '') === baseImg);
-    if (hermanoImg) {
-      document.getElementById('f-image').value = hermanoImg.image;
-      previewImgUrl(hermanoImg.image);
-      showToast('🖼 Portada copiada automáticamente de "' + hermanoImg.title + '"', 'info');
+    const cacheImg = window.__cacheSesionPorTitulo[baseImg];
+    if (cacheImg && cacheImg.image) {
+      document.getElementById('f-image').value = cacheImg.image;
+      previewImgUrl(cacheImg.image);
+      showToast('🖼 Portada copiada automáticamente de "' + cacheImg.title + '"', 'info');
+    } else {
+      const hermanoImg = getMovies().find(m => m.image && baseTituloSinCalidad(m.title || '') === baseImg);
+      if (hermanoImg) {
+        document.getElementById('f-image').value = hermanoImg.image;
+        previewImgUrl(hermanoImg.image);
+        showToast('🖼 Portada copiada automáticamente de "' + hermanoImg.title + '"', 'info');
+      }
     }
   }
 
@@ -2703,7 +2799,10 @@ let goldenTotalMatches = 0;
 // Corta el título justo después del "(AÑO)" para quedarse con el nombre base,
 // sin la parte de calidad/fuente/audio que viene después (ej: "WEB-DL 4K DV HDR10 Latino-Inglés").
 function baseTituloSinCalidad(title) {
-  const m = (title || '').match(/^(.*?\(\d{4}\))/);
+  // Admite tanto año simple "(2026)" como rango "(1999-2012)" — si no, colecciones con rango
+  // de años (ej. "American Pie – Colección (1999-2012)") nunca matchean entre ediciones y no
+  // heredan portada/trailer/capturas ni Noctis Privado entre sí.
+  const m = (title || '').match(/^(.*?\(\d{4}(?:-\d{4})?\))/);
   return m ? m[1].trim() : (title || '').trim();
 }
 
@@ -3864,8 +3963,8 @@ function copyDetailUrl(idx) {
 
 function baseTitleFor(title) {
   const t = (title || '').trim();
-  // Cortamos justo antes del primer "(AÑO)" — ej: "Girl's Blood (2014) BDRip..." -> "Girl's Blood"
-  const match = t.match(/^(.*?)\s*\(\d{4}\)/);
+  // Cortamos justo antes del primer "(AÑO)" o "(AÑO-AÑO)" — ej: "Girl's Blood (2014) BDRip..." -> "Girl's Blood"
+  const match = t.match(/^(.*?)\s*\(\d{4}(?:-\d{4})?\)/);
   if (match) return match[1].trim();
   return t;
 }
@@ -4496,37 +4595,7 @@ function importPrivadoJSON() {
   }
 }
 
-async function publishPrivadoToGithub() {
-  const owner = document.getElementById('gh-owner').value.trim();
-  const repo = document.getElementById('gh-repo').value.trim();
-  const token = document.getElementById('gh-token').value.trim();
-  const statusEl = document.getElementById('np-gh-status');
-  if (!owner || !repo || !token) { showToast('Configura usuario, repositorio y token primero (arriba, en Sincronización GitHub).', 'error'); return; }
-  statusEl.textContent = 'Publicando...';
-  statusEl.style.color = 'var(--muted)';
-  try {
-    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/noctis-privado.json`;
-    let sha = null;
-    const getRes = await fetch(apiUrl, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' } });
-    if (getRes.ok) { const d = await getRes.json(); sha = d.sha; }
-    else if (getRes.status !== 404) { const e = await getRes.json().catch(() => ({})); throw new Error(e.message || 'Error ' + getRes.status); }
-    const json = JSON.stringify(getPrivado(), null, 2);
-    const b64 = btoa(Array.from(new TextEncoder().encode(json), b => String.fromCharCode(b)).join(''));
-    const putRes = await fetch(apiUrl, {
-      method: 'PUT',
-      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' },
-      body: JSON.stringify({ message: 'Actualizar noctis-privado — ' + new Date().toLocaleString(), content: b64, ...(sha && { sha }) })
-    });
-    if (!putRes.ok) { const e = await putRes.json().catch(() => ({})); throw new Error(e.message || 'Error ' + putRes.status); }
-    statusEl.textContent = '✓ Publicado.';
-    statusEl.style.color = 'var(--green)';
-    showToast('🚀 Noctis Privado publicado en GitHub', 'success');
-  } catch(e) {
-    statusEl.textContent = '✗ ' + e.message;
-    statusEl.style.color = '#e55';
-    showToast('Error: ' + e.message, 'error');
-  }
-}
+
 
 document.addEventListener('DOMContentLoaded', renderPrivadoSavedList);
 
