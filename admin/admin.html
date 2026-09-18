@@ -1186,18 +1186,18 @@
               </div>
             </div>
           </details>
-          <div class="enlaces-grid" style="display:grid;grid-template-columns:1.05fr 1fr 1fr 0.62fr;gap:0.55rem;margin-bottom:0.6rem;align-items:start;">
+          <div class="enlaces-grid" style="display:grid;grid-template-columns:0.85fr 1fr 1fr 0.5fr;gap:0.55rem;margin-bottom:0.6rem;align-items:start;">
             <div class="form-group" style="margin-bottom:0;">
               <label>Info descarga <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(auto-rellenado o pega aquí)</span></label>
               <textarea id="f-descarga-raw" class="textarea-links" style="font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;Audio: Español Latino&#10;Calidad: WEBDL&#10;Resolución: 1920×1080&#10;Formato: MKV&#10;Tamaño: 4.5 GB&#10;Codec: H264&#10;Subtítulos: ..." oninput="autoRellenarDescarga()" onpaste="setTimeout(autoRellenarDescarga,50)"></textarea>
             </div>
             <div class="form-group" style="margin-bottom:0;">
-              <label>Enlaces públicos</label>
-              <textarea class="textarea-links" id="f-links" style="font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;Servidor 1&#10;https://enlace1.com&#10;&#10;Servidor 2&#10;https://enlace2.com"></textarea>
+              <label>Enlaces públicos <span id="count-links-pub" style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(0 links)</span></label>
+              <textarea class="textarea-links" id="f-links" style="font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;Servidor 1&#10;https://enlace1.com&#10;&#10;Servidor 2&#10;https://enlace2.com" oninput="actualizarContadorLinks()"></textarea>
             </div>
             <div class="form-group" style="margin-bottom:0;">
-              <label>🔒 Enlaces privados</label>
-              <textarea class="textarea-links" id="f-links-privados" style="font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;1fichier&#10;https://1fichier.com/?xxxx&#10;&#10;Multiservidor 1&#10;https://pastelink.net/xxxx"></textarea>
+              <label>🔒 Enlaces privados <span id="count-links-priv" style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(0 links)</span></label>
+              <textarea class="textarea-links" id="f-links-privados" style="font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;1fichier&#10;https://1fichier.com/?xxxx&#10;&#10;Multiservidor 1&#10;https://pastelink.net/xxxx" oninput="actualizarContadorLinks()"></textarea>
             </div>
             <div class="form-group" style="margin-bottom:0;">
               <label style="font-size:0.72rem;">🔄 Sync GitHub <span style="color:var(--muted);font-size:0.62rem;font-weight:400;letter-spacing:0;">(1 vez)</span></label>
@@ -1206,8 +1206,8 @@
                 <input type="text" id="gh-repo" placeholder="Repositorio" style="width:100%;padding:0.35rem 0.45rem;background:#0a0c12;border:1px solid var(--border);border-radius:5px;color:#fff;font-size:0.72rem;"/>
                 <input type="password" id="gh-token" placeholder="Token" style="width:100%;padding:0.35rem 0.45rem;background:#0a0c12;border:1px solid var(--border);border-radius:5px;color:#fff;font-size:0.72rem;"/>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.3rem;margin-top:0.05rem;">
-                  <button class="export-btn" onclick="saveGhConfig()" style="margin:0;padding:0.3rem;font-size:0.65rem;">💾</button>
-                  <button class="export-btn primary-export" onclick="publishToGithub()" style="margin:0;padding:0.3rem;font-size:0.65rem;background:var(--green);border-color:var(--green);color:#000;">🚀</button>
+                  <button class="export-btn" onclick="saveGhConfig()" style="margin:0;padding:0.6rem 0.3rem;font-size:0.65rem;">💾</button>
+                  <button class="export-btn primary-export" onclick="publishToGithub()" style="margin:0;padding:0.6rem 0.3rem;font-size:0.65rem;background:var(--green);border-color:var(--green);color:#000;">🚀</button>
                 </div>
                 <p id="gh-status" style="font-size:0.62rem;color:var(--muted);margin:0.15rem 0 0;"></p>
               </div>
@@ -2063,8 +2063,32 @@ function guardarDominiosConfig() {
   const multiserver = document.getElementById('np-multiserver')?.value || '';
   localStorage.setItem(DOMINIOS_CONFIG_KEY, JSON.stringify({ shorteners, multiserver }));
 }
-document.addEventListener('DOMContentLoaded', cargarDominiosConfig);
-if (document.readyState !== 'loading') cargarDominiosConfig();
+document.addEventListener('DOMContentLoaded', () => { cargarDominiosConfig(); actualizarContadorLinks(); });
+if (document.readyState !== 'loading') { cargarDominiosConfig(); actualizarContadorLinks(); }
+
+// Cuenta cuántos links hay en "Enlaces públicos" y "Enlaces privados" y lo muestra al lado
+// de cada etiqueta — si el número no coincide, se pinta en rojo para que salte a la vista
+// (salvo que sea privados > públicos, que puede pasar a propósito si agregaste enlaces
+// directos de más ahí).
+function contarLinks(texto) {
+  if (!texto) return 0;
+  return (texto.match(/^https?:\/\//gim) || []).length;
+}
+function actualizarContadorLinks() {
+  const pub = contarLinks(document.getElementById('f-links')?.value || '');
+  const priv = contarLinks(document.getElementById('f-links-privados')?.value || '');
+  const elPub = document.getElementById('count-links-pub');
+  const elPriv = document.getElementById('count-links-priv');
+  const coincide = pub === priv;
+  if (elPub) {
+    elPub.textContent = '(' + pub + (pub === 1 ? ' link)' : ' links)');
+    elPub.style.color = coincide ? 'var(--muted)' : '#e55';
+  }
+  if (elPriv) {
+    elPriv.textContent = '(' + priv + (priv === 1 ? ' link)' : ' links)');
+    elPriv.style.color = coincide ? 'var(--muted)' : '#e55';
+  }
+}
 
 function autoRellenarTodo() {
   // Guardar en la memoria de sesión lo que había cargado ANTES de este pegado (del título
@@ -2114,6 +2138,7 @@ function autoRellenarTodo() {
     if (flp) flp.value = '';
     actualizarAvisoPrivadoAuto();
   }
+  actualizarContadorLinks();
   // URLs Capturas (detectadas entre la sinopsis y "MAS INFO").
   // Si esta pasada NO trae capturas, primero se busca en la memoria de sesión (lo que tenías
   // puesto en la pasada anterior de la MISMA película, aunque no la hayas guardado todavía),
@@ -2776,6 +2801,7 @@ function submitForm() {
   }
   window.currentPrivadoDraft = null;
   { const flp = document.getElementById('f-links-privados'); if (flp) flp.value = ''; }
+  actualizarContadorLinks();
 
   showToast(
     (isEdit ? '✓ Actualizado' : '✓ Agregado — Total: ' + movies.length) +
@@ -3925,6 +3951,7 @@ function editMovie(idx) {
       flp.value = yaGuardado ? enlacesPrivadosArrayATexto(yaGuardado.enlaces) : '';
     }
   }
+  actualizarContadorLinks();
   actualizarAvisoPrivadoAuto();
   document.getElementById('form-panel-title').innerHTML = 'Editando <span>Película</span>';
   document.getElementById('form-submit-btn').textContent = '✓ GUARDAR CAMBIOS';
