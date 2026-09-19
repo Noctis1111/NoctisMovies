@@ -1698,12 +1698,36 @@ function currentUploadDate() {
     2. Info descarga   (MAS INFO, Temporadas, Audio:, Calidad:, Resolución:, ...)
     3. Enlaces         (nombres de servidor + URLs)
 */
+// Normaliza líneas donde la etiqueta y la URL están pegadas en el mismo renglón
+// (ej. "Parte 1: https://srnky.com/oEQp") separándolas en dos líneas — el resto del
+// parser (público, privado, espejo) solo reconoce URLs que arrancan la línea, así que
+// sin esto esas URLs quedaban invisibles: no iban ni a público ni a privado.
+function separarEtiquetaYUrlPegadas(raw) {
+  if (!raw) return raw;
+  const reUrlInline = /(https?:\/\/\S+)/i;
+  return raw.split('\n').map(line => {
+    const trimmed = line.trim();
+    if (!trimmed || /^https?:\/\//i.test(trimmed)) return line; // vacía o ya es URL sola: no tocar
+    const m = trimmed.match(reUrlInline);
+    if (!m) return line; // no hay ninguna URL en esta línea
+    const antes = trimmed.slice(0, m.index).trim();
+    const url = m[1];
+    const despues = trimmed.slice(m.index + url.length).trim();
+    const partes = [];
+    if (antes) partes.push(antes);
+    partes.push(url);
+    if (despues) partes.push(despues);
+    return partes.join('\n');
+  }).join('\n');
+}
+
 // Quita bloques completos delimitados por líneas de puros guiones (----------), 3 o más,
 // línea completa (un solo "-" suelto NO cuenta como separador). Todo lo que esté ENTRE dos
 // de esas líneas se descarta antes de parsear nada más — no se toma en cuenta para enlaces
 // públicos NI privados. Sirve para "esconder" un lote de enlaces sin tener que borrarlos.
 function stripZonasExcluidas(raw) {
   if (!raw) return raw;
+  raw = separarEtiquetaYUrlPegadas(raw);
   const reDash = /^-{3,}$/;
   const lineas = raw.split('\n');
   const out = [];
@@ -2128,7 +2152,7 @@ function autoRellenarTodo() {
     // las directas. Si por algún motivo no se pudo espejar, cae a la lista plana de siempre.
     const flp = document.getElementById('f-links-privados');
     if (flp) {
-      const espejo = construirPrivadosEspejoDePublicos(raw, p.enlaces || '', shorteners);
+      const espejo = construirPrivadosEspejoDePublicos(raw, p.enlaces || '', shorteners, multiserver);
       flp.value = espejo || enlacesPrivadosArrayATexto(privadoParsed.enlaces);
     }
     actualizarAvisoPrivadoAuto();
@@ -4283,12 +4307,18 @@ function enlacesPrivadosTextoAArray(texto) {
 // la URL directa que le corresponde (en el mismo orden en que las pegaste al final del bloque).
 // Una URL que YA es directa dentro de la zona pública (ej: pixeldrain) se deja tal cual y no
 // consume ninguna de la cola, así no se desalinea el resto.
-function construirPrivadosEspejoDePublicos(rawBlock, publicLinksText, shorteners) {
+function construirPrivadosEspejoDePublicos(rawBlock, publicLinksText, shorteners, multiserver) {
   const reUrl = /^https?:\/\//i;
   const esAcortador = (u) => {
     try {
       const host = new URL(u).hostname.replace(/^www\./i, '').toLowerCase();
       return shorteners.some(d => host === d || host.endsWith('.' + d));
+    } catch { return false; }
+  };
+  const esMultiserver = (u) => {
+    try {
+      const host = new URL(u).hostname.replace(/^www\./i, '').toLowerCase();
+      return (multiserver || []).some(d => host === d || host.endsWith('.' + d));
     } catch { return false; }
   };
   const dominiosDescartar = ['gdrivelatinohd.net','youtu.be','youtube.com','imgur.com','ibb.co','blogger.googleusercontent.com','blogspot.com','themoviedb.org'];
@@ -4327,6 +4357,28 @@ function construirPrivadosEspejoDePublicos(rawBlock, publicLinksText, shorteners
       salida.push(l0); // ya era directa dentro de la zona pública (ej: pixeldrain)
     }
   }
+
+  // Lo que sobró en la cola (links directos/multiservidor que no correspondían a ningún
+  // acortador de la zona pública — ej. una tanda extra de pastelink.net al final del bloque)
+  // NO se descarta: se agrega al final, con la misma etiqueta "Multiservidor N" que usa
+  // Noctis Privado para que quede prolijo, o el dominio si no es multiservidor.
+  if (cola.length) {
+    if (salida.length && salida[salida.length - 1] !== '') salida.push('');
+    let multiCount = 0;
+    for (const url of cola) {
+      if (esMultiserver(url)) {
+        multiCount++;
+        salida.push('Multiservidor ' + multiCount);
+        salida.push(url);
+      } else {
+        let host = '';
+        try { host = new URL(url).hostname.replace(/^www\./i, '').replace(/\.(com|net|to|org|co|io|me|app)$/i, ''); } catch {}
+        if (host) salida.push(host.charAt(0).toUpperCase() + host.slice(1));
+        salida.push(url);
+      }
+    }
+  }
+
   // Limpia líneas en blanco repetidas del principio/final
   return salida.join('\n').replace(/\n{3,}/g, '\n\n').trim();
 }
