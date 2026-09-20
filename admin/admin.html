@@ -1773,6 +1773,29 @@ function parseBloqueCompleto(raw, shorteners, multiserver) {
   const reSepDecor  = /^[▬─═]{3,}/;
   const reEncabezado = /^(datos|sinopsis|descarga|info\s+descarga)\s*$/i;
 
+  // Hosts de imágenes conocidos (capturas de pantalla) — si una URL es de uno de estos
+  // dominios, SIEMPRE se toma como captura, sin importar en qué posición del bloque
+  // apareció. Antes la detección de capturas era solo por posición (antes de "MAS INFO"),
+  // así que una captura fuera de lugar (ej. pegada después de los enlaces) terminaba
+  // clasificada como link de descarga y se colaba en Enlaces privados.
+  const HOSTS_IMAGEN = ['imgur.com','ibb.co','postimg.cc','imgfz.com','media.themoviedb.org','themoviedb.org','blogger.googleusercontent.com','blogspot.com'];
+  function esHostDeImagen(url) {
+    try {
+      const host = new URL(url).hostname.replace(/^www\./i, '').toLowerCase();
+      return HOSTS_IMAGEN.some(d => host === d || host.endsWith('.' + d));
+    } catch { return false; }
+  }
+  // Dominios que NUNCA son nada útil (ni captura, ni enlace de descarga) — páginas de origen,
+  // foros, etc. que a veces quedan pegadas dentro del bloque. Se ignoran directamente, igual
+  // que el contenido entre líneas de guiones.
+  const HOSTS_SIEMPRE_OMITIR = ['gdrivelatinohd.net', 'identi.io'];
+  function esHostAOmitir(url) {
+    try {
+      const host = new URL(url).hostname.replace(/^www\./i, '').toLowerCase();
+      return HOSTS_SIEMPRE_OMITIR.some(d => host === d || host.endsWith('.' + d));
+    } catch { return false; }
+  }
+
   // ── Detectar índice de inicio de zona descarga y zona enlaces ──
   let idxDescarga = -1;
   let idxEnlaces  = -1;
@@ -1794,6 +1817,14 @@ function parseBloqueCompleto(raw, shorteners, multiserver) {
       if (idxDescarga < 0) idxDescarga = i; continue;
     }
     if (/^https?:\/\//i.test(l)) {
+      // Dominio a omitir del todo (ni captura ni enlace) → se ignora, sea cual sea su posición.
+      if (esHostAOmitir(l)) continue;
+      // Host de imagen conocido (imgur/ibb/postimg/blogger) → siempre captura, sin importar
+      // la posición en el bloque.
+      if (esHostDeImagen(l)) {
+        screenshotsArr.push(l);
+        continue;
+      }
       // URL que aparece ANTES de "MAS INFO" / los campos de descarga, ya con
       // datos (Título Original/Año/...) iniciados → es una captura de
       // pantalla (screenshot), no un enlace de descarga.
@@ -1925,7 +1956,7 @@ function parseBloqueCompleto(raw, shorteners, multiserver) {
   //    la pusiste ahí a propósito para mostrarla en público. Si está sola, después de un espacio en
   //    blanco, sin nada que la describa, se toma como el link "de verdad" y se descarta (va solo a Privado).
   const reUrlPub = /^https?:\/\//i;
-  const dominiosSiempreExcluir = ['imgur.com', 'ibb.co', 'blogger.googleusercontent.com', 'blogspot.com', 'youtu.be', 'youtube.com'];
+  const dominiosSiempreExcluir = ['imgur.com', 'ibb.co', 'postimg.cc', 'imgfz.com', 'media.themoviedb.org', 'themoviedb.org', 'gdrivelatinohd.net', 'identi.io', 'blogger.googleusercontent.com', 'blogspot.com', 'youtu.be', 'youtube.com'];
   const enlacesFiltrados = [];
   for (let i = 0; i < enlacesCombinadosConBlancos.length; i++) {
     const l = enlacesCombinadosConBlancos[i];
@@ -4322,7 +4353,7 @@ function construirPrivadosEspejoDePublicos(rawBlock, publicLinksText, shorteners
       return (multiserver || []).some(d => host === d || host.endsWith('.' + d));
     } catch { return false; }
   };
-  const dominiosDescartar = ['gdrivelatinohd.net','youtu.be','youtube.com','imgur.com','ibb.co','blogger.googleusercontent.com','blogspot.com','themoviedb.org'];
+  const dominiosDescartar = ['gdrivelatinohd.net','identi.io','youtu.be','youtube.com','imgur.com','ibb.co','postimg.cc','imgfz.com','blogger.googleusercontent.com','blogspot.com','themoviedb.org'];
   const esDescartable = (u) => {
     try {
       const host = new URL(u).hostname.replace(/^www\./i, '').toLowerCase();
@@ -4417,7 +4448,7 @@ function parseNoctisPrivadoBloque(raw, shorteners, multiserver) {
   const enlaces = [];
   let multiCount = 0;
   const vistos = new Set();
-  const dominiosDescartar = ['gdrivelatinohd.net','youtu.be','youtube.com','imgur.com','ibb.co','blogger.googleusercontent.com','blogspot.com'];
+  const dominiosDescartar = ['gdrivelatinohd.net','identi.io','youtu.be','youtube.com','imgur.com','ibb.co','postimg.cc','imgfz.com','themoviedb.org','blogger.googleusercontent.com','blogspot.com'];
   for (const l of lineas) {
     if (!l || !reUrl.test(l)) continue;
     let host;
