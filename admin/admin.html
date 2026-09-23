@@ -2368,7 +2368,7 @@ function autoRellenarTodo() {
     setActiveChip('chips-source','BDRIP');
   else if (combined.includes('BRRIP'))
     setActiveChip('chips-source','BRRIP');
-  else if (combined.includes('HDTS'))
+  else if (combined.includes('HDTS') || combined.includes('TELESYNC'))
     setActiveChip('chips-source','HDTS');
   else if (combined.includes('HDRIP'))
     setActiveChip('chips-source','HDRIP');
@@ -2379,21 +2379,34 @@ function autoRellenarTodo() {
   else if (combined.includes('60FPS'))
     setActiveChip('chips-source','60FPS');
 
+  // BLU-RAY y BLU-RAY 3D ya traen el logo impreso en la plantilla de portada (donde iría
+  // la cinta de Calidad) — se desmarca Calidad para que no haya conflicto visual entre las dos.
+  {
+    const fuenteDetectada = document.getElementById('f-source')?.value || '';
+    if (fuenteDetectada === 'BLU-RAY' || fuenteDetectada === 'BLU-RAY-3D') {
+      setActiveChip('chips-quality', '');
+    }
+  }
+
   // HDR / DOLBY VISION — Prioridad: HDR10+ DV > HDR10 DV > HDR10+ > HDR10 > SDR
   // "DV" = Dolby Vision. Se busca en el mismo texto (Calidad + Título) que usa Fuente.
+  // También se reconoce "HDR" solo (sin el "10", ej. título con "DV HDR" en vez de "HDR10 DV")
+  // como HDR10 — es la opción más cercana que hay en la lista, ya que "HDR" a secas casi
+  // siempre implica HDR10 en la práctica.
   const hdrHasDV        = /\bDV\b/.test(combined);
   const hdrHasHDR10Plus = /HDR\s*10\s*\+/.test(combined);
   const hdrHasHDR10     = /HDR\s*10\b/.test(combined);
+  const hdrHasHDRSolo   = /\bHDR\b(?!\s*10)(?!\+)/.test(combined);
   const hdrHasSDR       = /\bSDR\b/.test(combined);
   if (isMusicFormat)
     setActiveChip('chips-hdr','');
   else if (hdrHasHDR10Plus && hdrHasDV)
     setActiveChip('chips-hdr','hdr10-plus-dv');
-  else if (hdrHasHDR10 && hdrHasDV)
+  else if ((hdrHasHDR10 || hdrHasHDRSolo) && hdrHasDV)
     setActiveChip('chips-hdr','hdr10-dv');
   else if (hdrHasHDR10Plus)
     setActiveChip('chips-hdr','hdr10-plus');
-  else if (hdrHasHDR10)
+  else if (hdrHasHDR10 || hdrHasHDRSolo)
     setActiveChip('chips-hdr','hdr10');
   else if (hdrHasSDR)
     setActiveChip('chips-hdr','sdr');
@@ -2504,6 +2517,15 @@ function initChips() {
         }
 
         hiddenInput.value = chip.dataset.value;
+
+        // BLU-RAY y BLU-RAY 3D tienen su propia plantilla de portada con el logo ya
+        // impreso arriba (donde iría la cinta de Calidad) — no hay lugar para las dos a
+        // la vez, así que al elegir cualquiera de estas dos fuentes se desmarca Calidad
+        // para que no quede un conflicto visual entre ambas cintas.
+        if (isSource && (chip.dataset.value === 'BLU-RAY' || chip.dataset.value === 'BLU-RAY-3D')) {
+          setActiveChip('chips-quality', '');
+        }
+
         updatePeliBadgePreview();
       });
     });
@@ -2623,12 +2645,18 @@ function autoRellenarDescarga() {
   }
 
   // ── Auto-seleccionar AUDIO / idioma (no aplica si el tipo es Música) ──
+  // Si el audio no menciona ningún idioma reconocible (ej. "MULTi", que no dice cuál es cuál),
+  // se deja SIN seleccionar en vez de quedarse pegado en lo que hubiera antes (por defecto
+  // "Latino" al abrir el formulario) — así no parece que detectó Latino cuando en realidad
+  // no detectó nada.
   if (!esMusica && dp.audio2) {
     const aud = dp.audio2.toLowerCase();
     if (aud.includes('latino') || aud.includes('español')) setActiveChip('chips-audio', 'Latino');
     else if (aud.includes('ingles') || aud.includes('inglés') || aud.includes('english')) setActiveChip('chips-audio', 'Inglés');
     else if (aud.includes('japón') || aud.includes('japon') || aud.includes('japanese')) setActiveChip('chips-audio', 'Japonés');
     else if (aud.includes('korean') || aud.includes('coreano') || aud.includes('koreano')) setActiveChip('chips-audio', 'Koreano');
+    else if (aud.includes('chino') || aud.includes('chinese') || aud.includes('mandarin')) setActiveChip('chips-audio', 'Chino');
+    else setActiveChip('chips-audio', '');
   }
 
   // ── Auto-seleccionar FUENTE / ENCODE ──
@@ -2654,12 +2682,21 @@ function autoRellenarDescarga() {
     setActiveChip('chips-source', 'BDRIP');
   else if (combined2.includes('BRRIP'))
     setActiveChip('chips-source', 'BRRIP');
-  else if (combined2.includes('HDTS'))
+  else if (combined2.includes('HDTS') || combined2.includes('TELESYNC'))
     setActiveChip('chips-source', 'HDTS');
   else if (combined2.includes('HDRIP'))
     setActiveChip('chips-source', 'HDRIP');
   else if (combined2.includes('60FPS'))
     setActiveChip('chips-source', '60FPS');
+
+  // BLU-RAY y BLU-RAY 3D: mismo criterio, desmarcar Calidad para que no choque con el logo
+  // ya impreso en su plantilla de portada.
+  {
+    const fuenteDetectada2 = document.getElementById('f-source')?.value || '';
+    if (fuenteDetectada2 === 'BLU-RAY' || fuenteDetectada2 === 'BLU-RAY-3D') {
+      setActiveChip('chips-quality', '');
+    }
+  }
 
   updatePeliBadgePreview();
 }
@@ -4519,7 +4556,7 @@ function detectarChipsDesdePrivado(titulo, masInfo) {
   else if (combined.includes('BLURAY')||combined.includes('BLU-RAY')||combined.includes('BLU RAY')) source = 'BLU-RAY';
   else if (combined.includes('BDRIP')) source = 'BDRIP';
   else if (combined.includes('BRRIP')) source = 'BRRIP';
-  else if (combined.includes('HDTS')) source = 'HDTS';
+  else if (combined.includes('HDTS')||combined.includes('TELESYNC')) source = 'HDTS';
   else if (combined.includes('HDRIP')) source = 'HDRIP';
   else if (combined.includes('DVDRIP')) source = 'HDRIP';
   else if (/DCP/i.test(combined)) source = 'DCP-RIP';
