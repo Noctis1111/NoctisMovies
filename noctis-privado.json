@@ -4732,24 +4732,49 @@
     "description": "Gira en torno a un viudo que, tras la desaparición de su hijo, recurre a la ayuda de su padre ausente: un detective retirado que, años atrás, encarceló al asesino serial vinculado con este caso."
   },
   {
-    "id": "alpha-2026-webrip-1080p-hindi-sub-espanol-muessi2g-dqmac8",
-    "titulo": "Alpha (2026) WEBRip 1080p Hindi Sub-Español",
-    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/cWtUUTuDCrhqoHzEKRSA02ivjpC.jpg",
-    "masInfo": "Audio: Hindi\nCalidad: WEBRip\nResolución: 1920x1080\nFormato: MP4\nTamaño: 2.3 GB\nCodec: x265 / HEVC\nSubtítulos: Sí (Español)",
+    "id": "better-call-saul-2015-t1-t6-serie-completa-web-dl-1080p-x265-10-bit-espanol-latino-ingles-muh7fdxg-vvnrir",
+    "titulo": "Better Call Saul (2015) T1-T6 Serie Completa WEB-DL 1080p x265 10-bit Español Latino-Inglés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/lXTqx01NAYvJShBOqZOXjVRo3EM.jpg",
+    "masInfo": "Audio: Español Latino – Inglés\nCalidad: WEB-DL Rip (Archivo WEB-DL re-codificado/comprimido para reducir peso)\nResolución: 1920x1080\nFormato: MKV (comprimido en 7z)\nTamaño: 58.64 GB (Total)\nCodec: x265 / HEVC | 10 bits (Procesado con Handbrake: perfil slow, rf23)\nSubtítulos: Sí (Español Latino, Inglés)",
+    "enlaces": [
+      {
+        "etiqueta": "Fireload",
+        "url": "https://www.fireload.com/folder/FgwWs0tEQ1LcSdl02YyUhbQRSYFa1F8e/1"
+      },
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1egEuOrlLFhlRRDJP2MC3jQ"
+      }
+    ],
+    "fecha": "25 Septiembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=better-call-saul-2015-t1-t6-serie-completa-web-dl-1080p-x265-10-bit-espanol-latino-ingles",
+    "descargado": false,
+    "originalTitle": "Better Call Saul",
+    "year": "2015",
+    "country": "United States",
+    "duration": "± 45 min (por episodio)",
+    "genre": "Crimen, Drama",
+    "description": "Gira en torno a Jimmy McGill antes de convertirse en el abogado de Saul Goodman, mostrando su evolución a través de dilemas morales, estafas y su relación con su hermano Chuck y la abogada Kim Wexler."
+  },
+  {
+    "id": "better-call-saul-2015-2022-serie-completa-web-dl-1080p-espanol-latino-ingles-muh7g8jz-0qxlqd",
+    "titulo": "Better Call Saul (2015-2022) Serie Completa WEB-DL 1080p Español Latino-Inglés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/lXTqx01NAYvJShBOqZOXjVRo3EM.jpg",
+    "masInfo": "Audio: Español Latino – Inglés\nCalidad: WEB-DL\nResolución: 1920x1080\nFormato: MKV\nTamaño: 103 GB (Total)\nCodec: AVC / H.264 | 8 bits\nSubtítulos: Sí (Español Latino, Inglés)",
     "enlaces": [
       {
         "etiqueta": "mediafire",
-        "url": "https://www.mediafire.com/folder/p4uk0w2hgorjx/4LPH4"
+        "url": "https://www.mediafire.com/folder/snn20rk1iyz11/BCS"
       }
     ],
-    "fecha": "23 Septiembre 2026",
-    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=alpha-2026-webrip-1080p-hindi-sub-espanol",
+    "fecha": "25 Septiembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=better-call-saul-2015-2022-serie-completa-web-dl-1080p-espanol-latino-ingles",
     "descargado": false,
-    "originalTitle": "Alpha",
-    "year": "2026",
-    "country": "India",
-    "duration": "2 h 20 min",
-    "genre": "Acción, Suspenso",
-    "description": "Gira en torno a una asesina de élite que, tras ser víctima de experimentos militares en la infancia, busca a los responsables de su tortura, encontrando en su lugar un pasado que no conocía."
+    "originalTitle": "Better Call Saul",
+    "year": "2015-2022",
+    "country": "United States",
+    "duration": "± 45 min (por episodio)",
+    "genre": "Crimen, Drama",
+    "description": "Gira en torno a Jimmy McGill antes de convertirse en el abogado de Saul Goodman, mostrando su evolución a través de dilemas morales, estafas y su relación con su hermano Chuck y la abogada Kim Wexler."
   }
 ]
