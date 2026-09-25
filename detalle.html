@@ -2054,7 +2054,12 @@ function renderDescargaRawHtml(raw) {
   }
 
   const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const sizeRe = /(\d[\d.,]*\s?(?:GiB|MiB|KiB|TiB|GB|MB|KB|TB))(?!.*\d[\d.,]*\s?(?:GiB|MiB|KiB|TiB|GB|MB|KB|TB))/i;
+  // Resalta el tamaño real del archivo (GB/MB/etc). El \b después de la unidad evita
+  // que "muerda" bitrates pegados como "25850 kbps" o "42,82 Mbps" (sin límite de
+  // palabra, "kb"/"Mb" hacían match parcial ahí, cortando la "ps" a la mitad),
+  // pero sigue reconociendo bien casos como "2.40 GB por capítulo" (con espacio
+  // antes de la palabra siguiente, ya hay un límite de palabra natural).
+  const sizeRe = /(\d[\d.,]*\s?(?:GiB|MiB|KiB|TiB|GB|MB|KB|TB))\b(?!.*\d[\d.,]*\s?(?:GiB|MiB|KiB|TiB|GB|MB|KB|TB)\b)/i;
   const trackRe = /^(\d{1,3})\.\s*(.+?)\s*\(\s*(\d{1,3}:\s*\d{1,2})\s*\)\s*$/;
   const bulletRe = /^[•◽▪●\-]\s*/;
   // Encabezado de un CD dentro de una coleccion: "CD 06 — 511.28 MiB", "CD BALLADS — 542.63 MiB"
@@ -2357,9 +2362,9 @@ function copyText(text) {
 
 // =============================================
 // ÍCONOS DE SERVIDOR: se detectan por el NOMBRE que escribís
-// (mega, mediafire, 1fichier, terabox, akirabox, pixeldrain, pixelcloud,
-// 1cloudfile, filemirage, transfer.it, google drive...) — no por la URL,
-// porque tus links siempre son acortadores tpi.li y ahí no hay pista.
+// (mega, megaup, mediafire, 1fichier, terabox, akirabox, pixeldrain, pixelcloud,
+// 1cloudfile, filemirage, transfer.it, google drive, gofile, fireload, imagenetz...)
+// — no por la URL, porque tus links siempre son acortadores tpi.li y ahí no hay pista.
 // Si combinás dos servidores en una fila (ej "1Cloudfile + AkiraBox")
 // muestra los dos íconos. Si no reconoce nada (Multiserver, texto libre,
 // servidor nuevo que no agregué), muestra un ícono genérico 🔗 en vez de
@@ -2378,6 +2383,9 @@ const SERVER_MAP = [
   { re: /megaup/i,                  domain: 'megaup.net' },
   { re: /\bmega\b/i,                domain: 'mega.nz' },
   { re: /drive\.google|google\s*drive|\bgdrive\b/i, domain: 'drive.google.com' },
+  { re: /gofile/i,                  domain: 'gofile.io' },
+  { re: /fireload/i,                domain: 'fireload.com' },
+  { re: /imagenetz/i,               domain: 'imagenetz.de' },
 ];
 const MULTI_RE = /multi\s*server|multiservidor/i;
 
