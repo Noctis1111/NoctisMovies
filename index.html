@@ -1157,7 +1157,7 @@ header::after {
       <button class="filter-tab" data-filter="dorama">🌸 Doramas</button>
       <button class="filter-tab" data-filter="hentai">🔞 Adult/Hentai</button>
       <button class="filter-tab" data-filter="erotico">🔥 Erótico</button>
-      <button class="filter-tab" data-filter="musica">🎵 Música</button>
+      <button class="filter-tab" data-filter="musica" data-go="musica.html">🎵 Música</button>
       <button class="filter-tab" data-filter="4k">4K</button>
       <button class="filter-tab" data-filter="1080p">1080p</button>
       <button class="filter-tab" data-filter="latino">Latino</button>
@@ -1199,7 +1199,7 @@ header::after {
           <a class="side-tag" href="index.html?filter=dorama">🌸 DORAMAS</a>
           <a class="side-tag" href="index.html?filter=hentai">🔞 ADULT/HENTAI</a>
           <a class="side-tag" href="index.html?filter=erotico">🔥 ERÓTICO</a>
-          <a class="side-tag" href="index.html?filter=musica">🎵 MÚSICA</a>
+          <a class="side-tag" href="musica.html">🎵 MÚSICA</a>
         </div>
       </div>
     </div>
@@ -1398,10 +1398,15 @@ function getPeliBadgeKeysFromMovie(m) {
   else if (/CRUNCHYROLL/.test(text)) streaming = 'crunchyroll';
   else if (/\bFLOW\b/.test(text)) streaming = 'flow';
   else if (/\bVIX\b/.test(text)) streaming = 'vix';
+  const fuenteKey = (m.source||'').toLowerCase() && PELI_FILE_FOR.fuente[(m.source||'').toLowerCase()] ? (m.source||'').toLowerCase() : null;
+  // BLU-RAY / BLU-RAY 3D traen su logo impreso justo donde va la cinta de Calidad:
+  // la Calidad queda ACTIVA (m.quality sigue guardado y el filtro 4K/1080p la encuentra)
+  // pero su cinta no se dibuja. (idéntico a admin.html)
+  const ocultaCalidad = (fuenteKey === 'blu-ray' || fuenteKey === 'blu-ray-3d');
   return {
-    fuente: (m.source||'').toLowerCase() && PELI_FILE_FOR.fuente[(m.source||'').toLowerCase()] ? (m.source||'').toLowerCase() : null,
+    fuente: fuenteKey,
     idioma: audioMap[m.audio] || null,
-    calidad: map[m.quality] || null,
+    calidad: ocultaCalidad ? null : (map[m.quality] || null),
     hdr: (m.hdr || hdr),
     streaming: (m.streaming || streaming),
     musica: null,
@@ -1473,7 +1478,8 @@ async function loadMovies() {
     }
     // Marcar en sidebar
     document.querySelectorAll('.side-tag').forEach(a => {
-      if (a.getAttribute('href') === `index.html?filter=${filterParam}`) a.classList.add('active');
+      const q = (a.getAttribute('href') || '').split('?')[1] || '';
+      if (new URLSearchParams(q).get('filter') === filterParam) a.classList.add('active');
     });
   }
 
@@ -1485,7 +1491,7 @@ async function loadMovies() {
   // Si llegamos con una búsqueda ya cargada en la URL (ej. desde detalle.html
   // al presionar Enter en el buscador), replicamos el mismo scroll automático
   // hacia los resultados que ocurre cuando se escribe directamente acá.
-  if (searchParam) {
+  if (searchParam || filterParam || sourceParam || yearParam) {
     const tabsEl = document.querySelector('.filter-tabs');
     if (tabsEl) {
       setTimeout(() => tabsEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
@@ -1690,6 +1696,7 @@ function goPage(p) {
 
 document.querySelectorAll('.filter-tab').forEach(btn => {
   btn.addEventListener('click', () => {
+    if (btn.dataset.go) { window.location.href = btn.dataset.go; return; }
     document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     activeFilter = btn.dataset.filter;
