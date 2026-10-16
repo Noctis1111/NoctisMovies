@@ -721,7 +721,49 @@
 }
 
     /* TEXTAREA ENLACES */
-    .textarea-links { min-height: 120px; font-family: monospace; font-size: 0.9rem; color: #7dd3fc; }
+    .textarea-links { min-height: 120px; font-family: monospace; font-size: 0.9rem; color: #fff; }
+
+    /* ── Resaltado de URLs en Info descarga / Enlaces públicos / Enlaces privados ──
+       Un <textarea> no puede mostrar varios colores a la vez, así que el texto visible lo pinta
+       un <div> de atrás (con las URLs en otro color) y el textarea de encima queda con el texto
+       invisible (solo se ve el cursor). */
+    .url-highlight-wrap {
+      position: relative;
+      background: #050609;
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 8px;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.7);
+      transition: all 0.2s ease;
+    }
+    .url-highlight-wrap:focus-within {
+      border-color: #e5bc4b;
+      background: #090c12;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.7), 0 0 10px rgba(229,188,75,0.3);
+    }
+    .url-highlight-overlay {
+      position: absolute; inset: 0;
+      box-sizing: border-box;
+      margin: 0; padding: 0.65rem 1rem;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      font-family: monospace; font-size: 0.92rem; line-height: 1.5;
+      white-space: pre-wrap; word-break: break-all;
+      overflow: hidden;
+      color: #fff;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .url-highlight-overlay .url-hl { color: #7dd3fc; }
+    .url-highlight-wrap textarea.textarea-links {
+      display: block; width: 100%; box-sizing: border-box; margin: 0;
+      position: relative; z-index: 2;
+      background: transparent !important;
+      border: 1px solid transparent !important;
+      box-shadow: none !important;
+      color: transparent !important;
+      caret-color: #fff;
+    }
+    .url-highlight-wrap textarea.textarea-links::placeholder { color: rgba(255,255,255,0.3) !important; }
 
     /* TOAST */
     .toast { position: fixed; bottom: 2rem; right: 2rem; padding: 0.9rem 1.5rem; border-radius: 10px; font-weight: 600; font-size: 0.9rem; z-index: 999; opacity: 0; transform: translateY(20px); transition: all 0.3s; pointer-events: none; }
@@ -1107,7 +1149,7 @@
                 <button type="button" class="chip" data-value="star-plus" style="border-color:#ffb400;color:#ffb400;">Star+</button>
                 <button type="button" class="chip" data-value="apple-tv-plus" style="border-color:#a8a8a8;color:#a8a8a8;">Apple TV+</button>
                 <button type="button" class="chip" data-value="vix" style="border-color:#00e6b8;color:#00e6b8;">ViX</button>
-                <button type="button" class="chip" data-value="movies-anywhere" style="border-color:#c8102e;color:#c8102e;">Movies Anywhere</button>
+                <button type="button" class="chip" data-value="movies-anywhere" style="border-color:#4d7be0;color:#4d7be0;">Movies Anywhere</button>
               </div>
               <input type="hidden" id="f-streaming" value=""/>
               </div>
@@ -1170,6 +1212,7 @@
           <div class="form-section" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
             <span>🔗 Enlaces de Descarga</span>
             <div style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;">
+              <button type="button" onclick="document.getElementById('f-password').value='NoctisMovies';" style="padding:5px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--gold);font-size:0.78rem;font-family:'Inter',sans-serif;letter-spacing:0.3px;cursor:pointer;white-space:nowrap;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">NoctisMovies</button>
               <span style="font-family:'Inter',sans-serif;font-size:0.8rem;letter-spacing:0.5px;color:var(--muted);font-weight:500;white-space:nowrap;">🔒 PASSWORD</span>
               <input id="f-password" type="text" style="width:180px;padding:5px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.88rem;font-family:'Inter',sans-serif;letter-spacing:0.5px;outline:none;transition:border-color 0.2s;" placeholder="NoctisMovies o dejar vacío" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
             </div>
@@ -1187,18 +1230,18 @@
               </div>
             </div>
           </details>
-          <div class="enlaces-grid" style="display:grid;grid-template-columns:0.85fr 1fr 1fr 0.5fr;gap:0.55rem;margin-bottom:0.6rem;align-items:start;">
+          <div class="enlaces-grid" style="display:grid;grid-template-columns:0.8fr 1.15fr 1.15fr 0.35fr;gap:0.55rem;margin-bottom:0.6rem;align-items:start;">
             <div class="form-group" style="margin-bottom:0;">
               <label>Info descarga <span style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(auto-rellenado o pega aquí)</span></label>
-              <textarea id="f-descarga-raw" class="textarea-links" style="font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;Audio: Español Latino&#10;Calidad: WEBDL&#10;Resolución: 1920×1080&#10;Formato: MKV&#10;Tamaño: 4.5 GB&#10;Codec: H264&#10;Subtítulos: ..." oninput="autoRellenarDescarga()" onpaste="setTimeout(autoRellenarDescarga,50)"></textarea>
+              <div class="url-highlight-wrap"><div class="url-highlight-overlay" id="hl-f-descarga-raw"></div><textarea id="f-descarga-raw" class="textarea-links" style="font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;Audio: Español Latino&#10;Calidad: WEBDL&#10;Resolución: 1920×1080&#10;Formato: MKV&#10;Tamaño: 4.5 GB&#10;Codec: H264&#10;Subtítulos: ..." oninput="autoRellenarDescarga()" onpaste="setTimeout(autoRellenarDescarga,50)"></textarea></div>
             </div>
             <div class="form-group" style="margin-bottom:0;">
               <label>Enlaces públicos <span id="count-links-pub" style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(0 links)</span></label>
-              <textarea class="textarea-links" id="f-links" style="font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;Servidor 1&#10;https://enlace1.com&#10;&#10;Servidor 2&#10;https://enlace2.com" oninput="actualizarContadorLinks()"></textarea>
+              <div class="url-highlight-wrap"><div class="url-highlight-overlay" id="hl-f-links"></div><textarea class="textarea-links" id="f-links" style="font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;Servidor 1&#10;https://enlace1.com&#10;&#10;Servidor 2&#10;https://enlace2.com" oninput="actualizarContadorLinks()"></textarea></div>
             </div>
             <div class="form-group" style="margin-bottom:0;">
               <label>🔒 Enlaces privados <span id="count-links-priv" style="color:var(--muted);font-size:0.68rem;font-weight:400;letter-spacing:0;">(0 links)</span></label>
-              <textarea class="textarea-links" id="f-links-privados" style="font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;1fichier&#10;https://1fichier.com/?xxxx&#10;&#10;Multiservidor 1&#10;https://pastelink.net/xxxx" oninput="actualizarContadorLinks()"></textarea>
+              <div class="url-highlight-wrap"><div class="url-highlight-overlay" id="hl-f-links-privados"></div><textarea class="textarea-links" id="f-links-privados" style="font-size:0.92rem;" placeholder="Se llena automáticamente al pegar arriba.&#10;&#10;1fichier&#10;https://1fichier.com/?xxxx&#10;&#10;Multiservidor 1&#10;https://pastelink.net/xxxx" oninput="actualizarContadorLinks()"></textarea></div>
             </div>
             <div class="form-group" style="margin-bottom:0;">
               <label style="font-size:0.72rem;">🔄 Sync GitHub <span style="color:var(--muted);font-size:0.62rem;font-weight:400;letter-spacing:0;">(1 vez)</span></label>
@@ -2126,6 +2169,46 @@ if (document.readyState !== 'loading') { cargarDominiosConfig(); actualizarConta
 // de cada etiqueta — si el número no coincide, se pinta en rojo para que salte a la vista
 // (salvo que sea privados > públicos, que puede pasar a propósito si agregaste enlaces
 // directos de más ahí).
+function escapeHtmlResaltado(t) {
+  return (t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function actualizarResaltado(id) {
+  const ta = document.getElementById(id);
+  const ov = document.getElementById('hl-' + id);
+  if (!ta || !ov) return;
+  let html = escapeHtmlResaltado(ta.value).replace(/(https?:\/\/[^\s&]+)/g, '<span class="url-hl">$1</span>');
+  if (ta.value.endsWith('\n')) html += '\n';
+  // Copiar las medidas REALES de la caja (fuente, interlineado, relleno) para que el texto
+  // de la capa coincida exactamente con el de la caja de escritura, gane el CSS que gane.
+  const cs = getComputedStyle(ta);
+  ov.style.fontFamily = cs.fontFamily;
+  ov.style.fontSize = cs.fontSize;
+  ov.style.lineHeight = cs.lineHeight;
+  ov.style.letterSpacing = cs.letterSpacing;
+  ov.style.paddingTop = cs.paddingTop;
+  ov.style.paddingBottom = cs.paddingBottom;
+  ov.style.paddingLeft = cs.paddingLeft;
+  // Si la caja tiene barra de scroll, le quita ancho al texto: la capa debe reservar lo mismo.
+  const barra = ta.offsetWidth - ta.clientWidth - (parseFloat(cs.borderLeftWidth) || 0) - (parseFloat(cs.borderRightWidth) || 0);
+  ov.style.paddingRight = ((parseFloat(cs.paddingRight) || 0) + Math.max(0, barra)) + 'px';
+  ov.innerHTML = html;
+  ov.scrollTop = ta.scrollTop;
+  ov.scrollLeft = ta.scrollLeft;
+}
+function inicializarResaltadoUrls(id) {
+  const ta = document.getElementById(id);
+  if (!ta) return;
+  ta.addEventListener('scroll', () => actualizarResaltado(id));
+  ta.addEventListener('input', () => actualizarResaltado(id));
+  actualizarResaltado(id);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  ['f-descarga-raw', 'f-links', 'f-links-privados'].forEach(inicializarResaltadoUrls);
+});
+if (document.readyState !== 'loading') {
+  ['f-descarga-raw', 'f-links', 'f-links-privados'].forEach(inicializarResaltadoUrls);
+}
+
 function contarLinks(texto) {
   if (!texto) return 0;
   return (texto.match(/^https?:\/\//gim) || []).length;
@@ -2144,6 +2227,8 @@ function actualizarContadorLinks() {
     elPriv.textContent = '(' + priv + (priv === 1 ? ' link)' : ' links)');
     elPriv.style.color = coincide ? 'var(--muted)' : '#e55';
   }
+  actualizarResaltado('f-links');
+  actualizarResaltado('f-links-privados');
 }
 
 function autoRellenarTodo() {
@@ -2163,6 +2248,7 @@ function autoRellenarTodo() {
   if (p.sinopsis) document.getElementById('f-desc').value = p.sinopsis;
   // Info descarga
   if (p.infoDescarga) document.getElementById('f-descarga-raw').value = p.infoDescarga;
+  actualizarResaltado('f-descarga-raw');
   // Enlaces
   if (p.enlaces) document.getElementById('f-links').value = p.enlaces;
 
@@ -2342,6 +2428,12 @@ function autoRellenarTodo() {
       setActiveChip('chips-audio','Japonés');
     else if (audLow.includes('korean')||audLow.includes('coreano')||audLow.includes('koreano'))
       setActiveChip('chips-audio','Koreano');
+    else if (audLow.includes('chino')||audLow.includes('chinese')||audLow.includes('mandarin'))
+      setActiveChip('chips-audio','Chino');
+    else
+      // Sin ninguna pista de idioma (ej. "Audio: MULTi") → se deja SIN seleccionar, en vez de
+      // quedar pegado en "Latino" (el valor por defecto al abrir el formulario).
+      setActiveChip('chips-audio','');
   }
 
 
@@ -2621,6 +2713,7 @@ function parseDescargaRaw(raw) {
 
 function autoRellenarDescarga() {
   const raw = document.getElementById('f-descarga-raw').value;
+  actualizarResaltado('f-descarga-raw');
   const dp = parseDescargaRaw(raw);
   const tipoActual = (document.getElementById('f-type')?.value || '');
   const esMusica = tipoActual.includes('Música');
@@ -2771,6 +2864,7 @@ function copyLastScreenshots() {
 function clearForm() {
   ['f-title','f-datos-raw','f-desc','f-image','f-screenshot','f-trailer','f-links','f-links-privados','f-descarga-raw','f-password'
   ].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  ['f-descarga-raw','f-links','f-links-privados'].forEach(actualizarResaltado);
   document.getElementById('f-type').value = 'Película';
   document.getElementById('f-year-filter').value = '';
   setActiveTypeChips('Película');
@@ -4008,6 +4102,7 @@ function editMovie(idx) {
     if (m.uploader) descLines.push('por: ' + m.uploader);
     document.getElementById('f-descarga-raw').value = descLines.join('\n');
   }
+  actualizarResaltado('f-descarga-raw');
   document.getElementById('f-type').value = m.type||'Película';
   document.getElementById('f-year-filter').value = m.yearFilter||m.year||'';
   const esMusicaEdit = (m.type||'').includes('Música');
