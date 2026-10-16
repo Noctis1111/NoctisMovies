@@ -811,6 +811,15 @@
     .type-filter-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.3rem; margin-bottom: 0.4rem; }
     .tf-btn { font-size: 0.75rem; padding: 0.22rem 0.55rem; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.18s; white-space: nowrap; font-family: 'Barlow', sans-serif; letter-spacing: 0.3px; }
     .tf-btn:hover { border-color: var(--gold); color: var(--gold); }
+    /* Selector de catálogo: Películas/Series vs Música pura */
+    .cv-row { display:flex; gap:0.4rem; padding:0.9rem 1.5rem 0; }
+    .cv-btn { flex:1; font-size:0.82rem; padding:0.5rem 0.6rem; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; transition:all 0.18s; font-family:'Barlow',sans-serif; font-weight:600; letter-spacing:0.3px; }
+    .cv-btn:hover { border-color:var(--gold); color:var(--gold); }
+    .cv-btn.cv-active { background:var(--gold); border-color:var(--gold); color:#000; }
+    .cv-btn.cv-music.cv-active { background:#1db954; border-color:#1db954; color:#000; }
+    .cv-btn .cv-n { opacity:0.75; font-weight:500; margin-left:0.25rem; }
+    .destino-aviso { font-size:0.72rem; margin-top:0.5rem; min-height:1em; text-align:center; color:var(--muted); }
+    .destino-aviso.music { color:#1db954; font-weight:600; }
     .tf-btn.tf-active { background: var(--gold); border-color: var(--gold); color: #000; font-weight: 600; }
     .stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 0.55rem; text-align: center; }
     .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--gold); line-height: 1; }
@@ -819,6 +828,13 @@
     /* EXPORT / IMPORT */
     .io-section { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-top: 1rem; }
     .io-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 2px; margin-bottom: 0.75rem; color: var(--gold); }
+    /* Secciones plegables (cerradas por defecto). Abiertas se ven igual que antes. */
+    details.io-collapse > summary.io-title { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; margin-bottom: 0; user-select: none; }
+    details.io-collapse > summary.io-title::-webkit-details-marker { display: none; }
+    details.io-collapse > summary.io-title::after { content: '▸'; font-size: 0.95rem; opacity: 0.8; }
+    details.io-collapse[open] > summary.io-title { margin-bottom: 0.75rem; }
+    details.io-collapse[open] > summary.io-title::after { content: '▾'; }
+    details.io-collapse:not([open]) { padding-top: 0.75rem; padding-bottom: 0.75rem; }
     .export-code { background: #0a0c10; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; font-family: monospace; font-size: 0.75rem; color: #7dd3fc; max-height: 160px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; margin-bottom: 0.75rem; }
     .export-btn { width: 100%; padding: 0.75rem; background: var(--surface3); color: var(--white); border: 1px solid var(--border); border-radius: 8px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.95rem; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; margin-bottom: 0.5rem; }
     .export-btn:hover { border-color: var(--gold); color: var(--gold); }
@@ -1265,28 +1281,51 @@
           <input type="hidden" id="f-subtitles"/>
           <input type="hidden" id="f-uploader"/>
 
+          <div class="destino-aviso" id="destino-aviso"></div>
           <button class="form-submit" id="form-submit-btn" onclick="submitForm()">+ AGREGAR AL CATÁLOGO</button>
           <button class="cancel-btn" id="cancel-btn" onclick="cancelEdit()">Cancelar edición</button>
         </div>
       </div>
 
       <!-- EXPORT + IMPORT lado a lado -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.75rem;">
-        <div class="io-section" style="margin-top:0;">
-          <div class="io-title">📋 Exportar movies.json</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.75rem;align-items:start;">
+        <details class="io-section io-collapse" style="margin-top:0;">
+          <summary class="io-title">📋 Exportar movies.json</summary>
           <p style="font-size:0.75rem;color:var(--muted);margin-bottom:0.5rem;">Descarga y sube a GitHub para actualizar el sitio.</p>
           <div class="export-code" id="export-preview" style="max-height:100px;margin-bottom:0.5rem;">[]</div>
           <button class="export-btn" onclick="downloadJSON()" style="margin-bottom:0.4rem;">⬇ Descargar movies.json</button>
           <button class="export-btn" onclick="copyJSON()" style="margin-bottom:0;">📋 Copiar JSON</button>
-        </div>
-        <div class="io-section" style="margin-top:0;">
-          <div class="io-title">📥 Importar movies.json</div>
+        </details>
+        <details class="io-section io-collapse" style="margin-top:0;">
+          <summary class="io-title">📥 Importar movies.json</summary>
           <p style="font-size:0.75rem;color:var(--muted);margin-bottom:0.5rem;">Pega el contenido del movies.json para cargar tu catálogo guardado.</p>
           <textarea class="import-area" id="import-area" placeholder='[{"title":"..."}]' style="min-height:100px;"></textarea>
           <button class="export-btn" onclick="importJSON()" style="margin-bottom:0.3rem;">✓ Importar y cargar</button>
           <p style="font-size:0.7rem;color:var(--muted);">⚠ Esto reemplazará el catálogo actual en memoria.</p>
-        </div>
+        </details>
       </div>
+
+      <!-- 🎵 MÚSICA PURA — catálogo aparte (musica.json). Solo tipo "Música" a secas; el híbrido "Película | Música" sigue en movies.json -->
+      <details class="io-section io-collapse" style="margin-top:0.75rem;border-color:#1db954;">
+        <summary class="io-title" style="color:#1db954;">🎵 Catálogo de Música pura (musica.json)</summary>
+        <p style="font-size:0.75rem;color:var(--muted);margin-bottom:0.6rem;">
+          Todo título con tipo <b>solo "Música"</b> se guarda aquí, aparte de movies.json. Si el tipo es combinado (ej. <i>Película | Música</i>) sigue en el catálogo normal.
+          Se publica junto con el botón 🚀 (movies.json + noctis-privado.json + musica.json).
+        </p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+          <div>
+            <div class="export-code" id="export-preview-music" style="max-height:100px;margin-bottom:0.5rem;">[]</div>
+            <button class="export-btn" onclick="downloadMusicJSON()" style="margin-bottom:0.4rem;">⬇ Descargar musica.json</button>
+            <button class="export-btn" onclick="copyMusicJSON()" style="margin-bottom:0.4rem;">📋 Copiar JSON</button>
+            <button class="export-btn" onclick="migrarMusicaPura()" style="margin-bottom:0;">🔀 Mover música pura de movies.json → musica.json</button>
+          </div>
+          <div>
+            <textarea class="import-area" id="import-area-music" placeholder='[{"title":"...","type":"Música"}]' style="min-height:100px;"></textarea>
+            <button class="export-btn" onclick="importMusicJSON()" style="margin-bottom:0.3rem;">✓ Importar musica.json</button>
+            <p style="font-size:0.7rem;color:var(--muted);">⚠ Reemplaza el catálogo de música en memoria.</p>
+          </div>
+        </div>
+      </details>
 
       <!-- ✨ EDICIÓN GOLDEN QUALITY — junta varias ediciones de calidad de un mismo título en una sola -->
       <div class="io-section" style="margin-top:0.75rem;">
@@ -1445,7 +1484,7 @@
     <div>
       <div class="panel">
         <div class="panel-header" id="catalog-panel-header">
-          <div class="panel-title">Catálogo <span id="count-badge">0</span></div>
+          <div class="panel-title"><span id="catalog-title-text">Catálogo</span> <span id="count-badge">0</span></div>
           <div class="sort-row-inline" id="sort-row-inline">
             <button class="sort-btn sort-btn-sm active" id="sort-btn-default" onclick="setSortMode('default')">Orden de subida</button>
             <button class="sort-btn sort-btn-sm" id="sort-btn-views_desc" onclick="setSortMode('views_desc')">Más vistas</button>
@@ -1453,6 +1492,10 @@
             <button class="views-refresh-btn sort-btn-sm" id="views-refresh-btn" onclick="refreshViews(true)" title="Actualizar vistas">🔄 Vistas</button>
           </div>
           <button class="export-btn" style="width:auto;padding:0.3rem 0.8rem;margin:0;font-size:0.75rem;" onclick="clearAll()">🗑 Limpiar todo</button>
+        </div>
+        <div class="cv-row">
+          <button type="button" class="cv-btn cv-active" id="cv-btn-movies" onclick="setCatalogView('movies')">🎬 Películas / Series <span class="cv-n" id="cv-count-movies">0</span></button>
+          <button type="button" class="cv-btn cv-music" id="cv-btn-music" onclick="setCatalogView('music')">🎵 Música pura <span class="cv-n" id="cv-count-music">0</span></button>
         </div>
         <div style="padding:1rem 1.5rem 0;">
           <div class="stats-row">
@@ -1566,6 +1609,51 @@ function saveMovies(arr) {
       showToast('⚠ Error al guardar: ' + e.message, 'error');
     }
     return false;
+  }
+}
+
+/* ── 🎵 Catálogo de MÚSICA PURA (separado de movies.json) ──
+   "Música pura" = tipo exactamente "Música". Los híbridos ("Película | Música", etc.)
+   NO entran aquí: siguen en noctis_movies / movies.json igual que antes. */
+var MUSIC_INDEX_FILE = 'musica.html'; // index 2 (aún por crear) — se usa para el botón "copiar URL de búsqueda"
+var catalogView = 'movies';           // qué catálogo se ve en la lista: 'movies' | 'music'
+var editingStore = 'movies';          // de cuál catálogo viene el título que se está editando
+function isPureMusicType(t) {
+  const parts = (t || '').split(/[|,]/).map(x => x.trim()).filter(Boolean);
+  return parts.length === 1 && parts[0] === 'Música';
+}
+function getMusic() { try { return JSON.parse(localStorage.getItem('noctis_music') || '[]'); } catch { return []; } }
+function saveMusic(arr) {
+  try {
+    localStorage.setItem('noctis_music', JSON.stringify(arr));
+    updateExport();
+    updateStats();
+    return true;
+  } catch(e) {
+    showToast('⚠ Error al guardar música: ' + e.message, 'error');
+    return false;
+  }
+}
+function getAllItems() { return getMovies().concat(getMusic()); }
+function getCatalog() { return catalogView === 'music' ? getMusic() : getMovies(); }
+function setCatalogView(v) {
+  catalogView = (v === 'music') ? 'music' : 'movies';
+  document.getElementById('cv-btn-movies')?.classList.toggle('cv-active', catalogView === 'movies');
+  document.getElementById('cv-btn-music')?.classList.toggle('cv-active', catalogView === 'music');
+  const t = document.getElementById('catalog-title-text');
+  if (t) t.textContent = catalogView === 'music' ? 'Catálogo de Música' : 'Catálogo';
+  renderList(true);
+}
+function actualizarAvisoDestino() {
+  const el = document.getElementById('destino-aviso');
+  if (!el) return;
+  const tipo = document.getElementById('f-type')?.value || '';
+  if (isPureMusicType(tipo)) {
+    el.className = 'destino-aviso music';
+    el.textContent = '🎵 Se guardará en el catálogo de Música (musica.json)';
+  } else {
+    el.className = 'destino-aviso';
+    el.textContent = '';
   }
 }
 
@@ -1714,10 +1802,14 @@ function getPeliBadgeKeysFromMovie(m) {
   else if (/CRUNCHYROLL/.test(text)) streaming = 'crunchyroll';
   else if (/\bFLOW\b/.test(text)) streaming = 'flow';
   else if (/\bVIX\b/.test(text)) streaming = 'vix';
+  const fuenteKey = (m.source||'').toLowerCase() && PELI_FILE_FOR.fuente[(m.source||'').toLowerCase()] ? (m.source||'').toLowerCase() : null;
+  // BLU-RAY / BLU-RAY 3D traen su logo impreso justo donde va la cinta de Calidad:
+  // la Calidad queda ACTIVA (m.quality se guarda y el filtro la encuentra) pero su cinta no se dibuja.
+  const ocultaCalidad = (fuenteKey === 'blu-ray' || fuenteKey === 'blu-ray-3d');
   return {
-    fuente: (m.source||'').toLowerCase() && PELI_FILE_FOR.fuente[(m.source||'').toLowerCase()] ? (m.source||'').toLowerCase() : null,
+    fuente: fuenteKey,
     idioma: audioMap[m.audio] || null,
-    calidad: map[m.quality] || null,
+    calidad: ocultaCalidad ? null : (map[m.quality] || null),
     hdr: (m.hdr || hdr),
     streaming: (m.streaming || streaming),
     musica: (m.type||'').includes('Música') ? musicaBadgeKeyFromFormats((m.audioFormat||'').split(',').map(s=>s.trim()).filter(Boolean)) : null,
@@ -2296,7 +2388,7 @@ function autoRellenarTodo() {
       updateScreenshotCount();
       showToast('🖼 Capturas copiadas automáticamente de "' + cacheSs.title + '"', 'info');
     } else {
-      const hermanoSs = getMovies().find(m => m.screenshot && baseTituloSinCalidad(m.title || '') === baseNuevoSs);
+      const hermanoSs = getAllItems().find(m => m.screenshot && baseTituloSinCalidad(m.title || '') === baseNuevoSs);
       if (hermanoSs) {
         document.getElementById('f-screenshot').value = hermanoSs.screenshot;
         updateScreenshotCount();
@@ -2315,7 +2407,7 @@ function autoRellenarTodo() {
       document.getElementById('f-trailer').value = cacheTr.trailer;
       showToast('🎬 Trailer copiado automáticamente de "' + cacheTr.title + '"', 'info');
     } else {
-      const hermano = getMovies().find(m => m.trailer && baseTituloSinCalidad(m.title || '') === baseNuevo);
+      const hermano = getAllItems().find(m => m.trailer && baseTituloSinCalidad(m.title || '') === baseNuevo);
       if (hermano) {
         document.getElementById('f-trailer').value = hermano.trailer;
         showToast('🎬 Trailer copiado automáticamente de "' + hermano.title + '"', 'info');
@@ -2331,7 +2423,7 @@ function autoRellenarTodo() {
       previewImgUrl(cacheImg.image);
       showToast('🖼 Portada copiada automáticamente de "' + cacheImg.title + '"', 'info');
     } else {
-      const hermanoImg = getMovies().find(m => m.image && baseTituloSinCalidad(m.title || '') === baseImg);
+      const hermanoImg = getAllItems().find(m => m.image && baseTituloSinCalidad(m.title || '') === baseImg);
       if (hermanoImg) {
         document.getElementById('f-image').value = hermanoImg.image;
         previewImgUrl(hermanoImg.image);
@@ -2361,11 +2453,21 @@ function autoRellenarTodo() {
   // video (p.ej. "Coreano AAC 2.0" en una serie normal), no si la publicación ES música.
   // Si no se excluye, cualquier serie/película con audio AAC (algo muy común) se detecta
   // por error como "Música".
-  const rawSinLineaAudio = (raw || '').replace(/^[ \t]*audio[ \t]*:.*$/gim, '');
+  // También se ignoran las líneas "Pista N: ..." (códec de cada pista de audio del video, ej. "AAC LC").
+  const rawSinLineaAudio = (raw || '')
+    .replace(/^[ \t]*audio[ \t]*:.*$/gim, '')
+    .replace(/^[ \t]*pista[ \t]*\d+[ \t]*:.*$/gim, '');
   const rawUp      = rawSinLineaAudio.toUpperCase();
   const formatoUp  = (p.formato2 || '').toUpperCase();
   const musicaUp   = rawUp + ' ' + formatoUp;
-  const isMusicFormat = /\.MP3\b|\.FLAC\b|\.WAV\b|\.M4A\b|\bMP3\b|\bFLAC\b|\bWAV\b|\bAAC\b/.test(musicaUp);
+  // Señales de que es VIDEO (película/serie): resolución, códec de video, fuente de video, FPS,
+  // contenedor MKV/MP4... Si hay alguna, NUNCA es música aunque aparezca AAC/MP3/FLAC en el audio.
+  const hayVideoSignals =
+    /\d{3,4}\s*[x×]\s*\d{3,4}/.test(p.resolucion2 || '') ||
+    /\b(HEVC|H\.?26[45]|X26[45]|AVC|BLU-?RAY|BLURAY|REMUX|WEB-?DL|WEB-?RIP|WEB-?SCR|BDRIP|BRRIP|HDRIP|DVDRIP|UHD|2160P|1080P|720P|HDR10\+?|FPS)\b/.test(rawUp) ||
+    /BITRATE\s+DE\s+VIDEO/.test(rawUp) ||
+    /\b(MKV|MP4|AVI)\b/.test(formatoUp);
+  const isMusicFormat = !hayVideoSignals && /\.MP3\b|\.FLAC\b|\.WAV\b|\.M4A\b|\bMP3\b|\bFLAC\b|\bWAV\b|\bAAC\b/.test(musicaUp);
 
   // CALIDAD — revisa resolución, calidad, y título
   const resUp = (p.resolucion2 || '').toUpperCase();
@@ -2440,8 +2542,20 @@ function autoRellenarTodo() {
   // FUENTE — Prioridad: X265 > REMUX > WEB-DL > WEB-RIP > WEB-SCR > BLU-RAY > BDRIP > BRRIP > HDTS > HDRIP > DVDRIP > 60FPS
   // Solo se detecta por el texto explícito del título/calidad (NO por el codec, ya que casi todo viene en H265 hoy en día)
   const combined = calUp + ' ' + tituloUp; // buscar en título y calidad, sin el codec
+  // 3D BLU-RAY: se confirma cruzando título + "Calidad:" + todo el bloque pegado. Cuenta como 3D si:
+  //  · dice "3D Blu-ray" / "Blu-ray 3D" / "Bluray3D" (en título o Calidad), o
+  //  · el título lleva "3D" y además Blu-ray o Remux (ej. "Blu-ray Remux 3D 1080p"), o
+  //  · el Info descarga trae señales de disco 3D (MVC / Multiview / Frame-packed / "(3D)").
+  // Esto manda sobre REMUX: un "Blu-ray Remux 3D" sigue siendo un BLU-RAY 3D.
+  const rawUpTodo = (raw || '').toUpperCase();
+  const es3DBluray =
+    /3D[\s\-]*BLU[\s\-]?RAY|BLU[\s\-]?RAY[\s\-]*3D|BLURAY3D/.test(combined) ||
+    (/(^|[^A-Z0-9])3D([^A-Z0-9]|$)/.test(tituloUp) && /BLU[\s\-]?RAY|REMUX/.test(combined)) ||
+    (/\bMVC\b|MULTIVIEW|FRAME[\s\-]?PACKED|\(3D\)/.test(rawUpTodo) && /BLU[\s\-]?RAY|REMUX|\bISO\b/.test(rawUpTodo));
   if (combined.includes('X265') || combined.includes('X 265') || combined.includes('HEVC'))
     setActiveChip('chips-source','X265');
+  else if (es3DBluray)
+    setActiveChip('chips-source','BLU-RAY-3D');
   else if (combined.includes('REMUX'))
     setActiveChip('chips-source','REMUX');
   else if (combined.includes('WEBDL')||combined.includes('WEB-DL')||combined.includes('WEB DL'))
@@ -2473,12 +2587,7 @@ function autoRellenarTodo() {
 
   // BLU-RAY y BLU-RAY 3D ya traen el logo impreso en la plantilla de portada (donde iría
   // la cinta de Calidad) — se desmarca Calidad para que no haya conflicto visual entre las dos.
-  {
-    const fuenteDetectada = document.getElementById('f-source')?.value || '';
-    if (fuenteDetectada === 'BLU-RAY' || fuenteDetectada === 'BLU-RAY-3D') {
-      setActiveChip('chips-quality', '');
-    }
-  }
+  // (Blu-ray ya NO desmarca Calidad: queda activa para el filtro; solo se oculta su cinta en la portada.)
 
   // HDR / DOLBY VISION — Prioridad: HDR10+ DV > HDR10 DV > HDR10+ > HDR10 > SDR
   // "DV" = Dolby Vision. Se busca en el mismo texto (Calidad + Título) que usa Fuente.
@@ -2614,9 +2723,7 @@ function initChips() {
         // impreso arriba (donde iría la cinta de Calidad) — no hay lugar para las dos a
         // la vez, así que al elegir cualquiera de estas dos fuentes se desmarca Calidad
         // para que no quede un conflicto visual entre ambas cintas.
-        if (isSource && (chip.dataset.value === 'BLU-RAY' || chip.dataset.value === 'BLU-RAY-3D')) {
-          setActiveChip('chips-quality', '');
-        }
+        // (Blu-ray ya NO desmarca Calidad: la cinta se oculta por código, el chip sigue activo.)
 
         updatePeliBadgePreview();
       });
@@ -2660,6 +2767,7 @@ function setActiveTypeChips(value) {
   });
   const hiddenInput = document.getElementById('f-type');
   if (hiddenInput) hiddenInput.value = parts.join(' | ');
+  actualizarAvisoDestino();
 }
 
 // Activa varios chips a la vez (usado por Formato de Audio, que es multi-selección)
@@ -2886,6 +2994,7 @@ function clearForm() {
   actualizarAvisoPrivadoAuto();
   const legacyEl = document.getElementById('f-legacy-cover'); if (legacyEl) legacyEl.checked = false;
   editingIndex = -1;
+  editingStore = 'movies';
   document.getElementById('form-panel-title').innerHTML = 'Agregar <span>Película</span>';
   document.getElementById('form-submit-btn').textContent = '+ AGREGAR AL CATÁLOGO';
   document.getElementById('form-submit-btn').classList.remove('editing');
@@ -2914,11 +3023,18 @@ function submitForm() {
   }
 
   const movies = getMovies();
+  const music = getMusic();
   const isEdit = editingIndex >= 0;
+  // Destino: "Música" a secas → musica.json. Cualquier otro tipo (incl. híbridos) → movies.json
+  const toMusic = isPureMusicType(data.type);
+  const origList = editingStore === 'music' ? music : movies;
+  const targetList = toMusic ? music : movies;
+  const existing = isEdit ? origList[editingIndex] : null;
+  const sameStore = isEdit && ((editingStore === 'music') === toMusic);
 
   // Generar slug: conservar el existente si ya tiene uno (al editar)
-  if (isEdit && movies[editingIndex] && movies[editingIndex].slug) {
-    data.slug = movies[editingIndex].slug;
+  if (existing && existing.slug) {
+    data.slug = existing.slug;
   } else {
     data.slug = generateSlug(data.title);
   }
@@ -2927,14 +3043,22 @@ function submitForm() {
     // Si el título editado ya tenía fecha de subida, se conserva tal cual
     // (editar no debe "resetear" cuándo se subió). Si no tenía (catálogo
     // viejo importado sin este campo), se le asigna ahora.
-    data.uploadDate = (movies[editingIndex] && movies[editingIndex].uploadDate) || currentUploadDate();
-    movies[editingIndex] = data;
+    data.uploadDate = (existing && existing.uploadDate) || currentUploadDate();
+    if (sameStore) {
+      targetList[editingIndex] = data;
+    } else {
+      // Cambió el tipo (ej. de Película a Música pura): sale de un catálogo y entra al otro
+      origList.splice(editingIndex, 1);
+      targetList.unshift(data);
+    }
   } else {
     data.uploadDate = currentUploadDate();
-    movies.unshift(data);
+    targetList.unshift(data);
   }
-  const ok = saveMovies(movies);
-  if (!ok) return; // saveMovies mostró el error
+  let ok = true;
+  if (isEdit && !sameStore) ok = (editingStore === 'music') ? saveMusic(music) : saveMovies(movies);
+  if (ok) ok = toMusic ? saveMusic(music) : saveMovies(movies);
+  if (!ok) return; // el guardado mostró el error
 
   saveLastScreenshots(data.screenshot);
 
@@ -2991,12 +3115,13 @@ function submitForm() {
   actualizarContadorLinks();
 
   showToast(
-    (isEdit ? '✓ Actualizado' : '✓ Agregado — Total: ' + movies.length) +
+    (isEdit ? '✓ Actualizado' : '✓ Agregado — Total: ' + targetList.length) +
+    (toMusic ? ' · 🎵 en catálogo de Música' : '') +
     (privadoGuardado ? ' · 🔒 guardado en Noctis Privado' : ''),
     'success'
   );
   clearForm();
-  renderList(true);
+  setCatalogView(toMusic ? 'music' : 'movies'); // muestra el catálogo donde quedó guardado
 }
 
 function previewImg(url) {
@@ -3716,6 +3841,7 @@ function previewImgUrl(url) {
 
 // Arma las 5 capas de peliculas/series sobre el preview en vivo del formulario
 function updatePeliBadgePreview() {
+  actualizarAvisoDestino();
   const imgPreview = document.getElementById('img-preview');
   if (!imgPreview) return;
 
@@ -3729,7 +3855,7 @@ function updatePeliBadgePreview() {
   // Si no hay chip activo, recién ahí se cae al autodetector por texto.
   const hdrManual = document.getElementById('f-hdr')?.value || '';
   const streamingManual = document.getElementById('f-streaming')?.value || '';
-  const layers = { idioma: peliIdiomaKey(), fuente: peliFuenteKey(), calidad: peliCalidadKey(), hdr: hdrManual || peliHdrKey(), streaming: streamingManual || peliStreamingKey() };
+  const layers = { idioma: peliIdiomaKey(), fuente: peliFuenteKey(), calidad: (['blu-ray','blu-ray-3d'].includes(peliFuenteKey())) ? null : peliCalidadKey(), hdr: hdrManual || peliHdrKey(), streaming: streamingManual || peliStreamingKey() };
   const musicaKey = (esMusica && !isLegacyCover) ? musicaBadgeKey() : null;
   // El marco de "fuente" (películas/series) y el de "música" recortan la foto al mismo
   // hueco real del marco → misma clase has-frame para ambos casos.
@@ -3896,7 +4022,7 @@ async function fetchHomeVisits() {
 }
 
 async function refreshViews(showFeedback) {
-  const movies = getMovies();
+  const movies = getAllItems();
   const btn = document.getElementById('views-refresh-btn');
   if (!movies.length) { if (showFeedback) showToast('No hay títulos en el catálogo.', 'info'); return; }
   if (btn) btn.classList.add('loading');
@@ -3956,7 +4082,7 @@ const SOURCE_COLORS = {
 
 function renderList(resetPage) {
   if (resetPage) currentPage = 1;
-  const movies = getMovies();
+  const movies = getCatalog();
   const q = (document.getElementById('admin-search')?.value || '').toLowerCase();
   const list = document.getElementById('movie-list');
   const empty = document.getElementById('list-empty');
@@ -4073,8 +4199,9 @@ function goPage(p) {
 }
 
 function editMovie(idx) {
-  const m = getMovies()[idx];
+  const m = getCatalog()[idx];
   if (!m) return;
+  editingStore = catalogView;
   document.getElementById('f-title').value = m.title||'';
   // Rebuild datos-raw (datos + sinopsis juntos)
   const datosLines = [];
@@ -4155,7 +4282,7 @@ function detailUrlFor(m, idx) {
 }
 
 function copyDetailUrl(idx) {
-  const movies = getMovies();
+  const movies = getCatalog();
   const m = movies[idx];
   if (!m) return;
   const url = detailUrlFor(m, idx);
@@ -4186,11 +4313,13 @@ function baseTitleFor(title) {
 
 function searchUrlFor(m) {
   // index.html vive en la raíz → subimos un nivel igual que con detalle.html
-  return new URL('../index.html?search=' + encodeURIComponent(baseTitleFor(m.title)), window.location.href).href;
+  // Música pura apunta al index 2 (MUSIC_INDEX_FILE)
+  const page = isPureMusicType(m.type) ? MUSIC_INDEX_FILE : 'index.html';
+  return new URL('../' + page + '?search=' + encodeURIComponent(baseTitleFor(m.title)), window.location.href).href;
 }
 
 function copySearchUrl(idx) {
-  const movies = getMovies();
+  const movies = getCatalog();
   const m = movies[idx];
   if (!m) return;
   const url = searchUrlFor(m);
@@ -4229,24 +4358,35 @@ function fallbackCopy(text, onSuccess) {
 
 function deleteMovie(idx) {
   if (!confirm('¿Eliminar este título?')) return;
-  const movies = getMovies(); movies.splice(idx, 1); saveMovies(movies); renderList(true); showToast('Eliminado.','info');
+  const lista = getCatalog(); lista.splice(idx, 1);
+  if (catalogView === 'music') saveMusic(lista); else saveMovies(lista);
+  renderList(true); showToast('Eliminado.','info');
 }
 
 function clearAll() {
-  if (!confirm('¿Eliminar TODO el catálogo del almacenamiento local?')) return;
-  localStorage.removeItem('noctis_movies'); renderList(true); updateExport(); showToast('Catálogo vaciado.','info');
+  const esMusica = catalogView === 'music';
+  if (!confirm(esMusica ? '¿Eliminar TODO el catálogo de MÚSICA del almacenamiento local?' : '¿Eliminar TODO el catálogo del almacenamiento local?')) return;
+  localStorage.removeItem(esMusica ? 'noctis_music' : 'noctis_movies');
+  renderList(true); updateExport(); updateStats(); showToast(esMusica ? 'Catálogo de música vaciado.' : 'Catálogo vaciado.','info');
 }
 
 /* ======================== STATS ======================== */
 function updateStats() {
   const m = getMovies();
-  document.getElementById('stat-total').textContent = m.length;
+  const nMusic = getMusic().length;
+  const cm = document.getElementById('cv-count-movies'); if (cm) cm.textContent = m.length;
+  const cu = document.getElementById('cv-count-music');  if (cu) cu.textContent = nMusic;
+  document.getElementById('stat-total').textContent = m.length + nMusic;
   document.getElementById('stat-movies').textContent = m.filter(x=>(x.type||'').includes('Película')).length;
   document.getElementById('stat-series').textContent = m.filter(x=>['Serie','Anime','Dorama','Documental'].some(t=>(x.type||'').includes(t))).length;
 }
 
 /* ======================== EXPORT ======================== */
-function updateExport() { document.getElementById('export-preview').textContent = JSON.stringify(getMovies(),null,2); }
+function updateExport() {
+  document.getElementById('export-preview').textContent = JSON.stringify(getMovies(),null,2);
+  const pm = document.getElementById('export-preview-music');
+  if (pm) pm.textContent = JSON.stringify(getMusic(),null,2);
+}
 
 // ===== SINCRONIZACIÓN GITHUB =====
 function loadGhConfig() {
@@ -4312,11 +4452,33 @@ async function publishToGithub() {
       privadoMsg = ep.message;
     }
 
-    statusEl.textContent = privadoOk
-      ? '✓ Publicado (catálogo + privado). Tarda ~1 min en reflejarse en el sitio.'
-      : '✓ Catálogo publicado · ✗ privado: ' + privadoMsg;
-    statusEl.style.color = privadoOk ? 'var(--green)' : '#e5b44b';
-    showToast(privadoOk ? '🚀 Catálogo + Noctis Privado publicados' : '🚀 Catálogo publicado · privado falló', privadoOk ? 'success' : 'error');
+    // ── Publica también musica.json (catálogo de música pura), mismo patrón que el privado.
+    let musicaOk = true, musicaMsg = '';
+    try {
+      const muApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/musica.json`;
+      let muSha = null;
+      const muGet = await fetch(muApiUrl, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' } });
+      if (muGet.ok) { const d = await muGet.json(); muSha = d.sha; }
+      else if (muGet.status !== 404) { const e = await muGet.json().catch(() => ({})); throw new Error(e.message || 'Error ' + muGet.status); }
+      const muJson = JSON.stringify(getMusic(), null, 2);
+      const muB64 = btoa(Array.from(new TextEncoder().encode(muJson), b => String.fromCharCode(b)).join(''));
+      const muPut = await fetch(muApiUrl, {
+        method: 'PUT',
+        headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' },
+        body: JSON.stringify({ message: 'Actualizar musica — ' + new Date().toLocaleString(), content: muB64, ...(muSha && { sha: muSha }) })
+      });
+      if (!muPut.ok) { const e = await muPut.json().catch(() => ({})); throw new Error(e.message || 'Error ' + muPut.status); }
+    } catch (em) {
+      musicaOk = false;
+      musicaMsg = em.message;
+    }
+
+    const todoOk = privadoOk && musicaOk;
+    statusEl.textContent = todoOk
+      ? '✓ Publicado (catálogo + privado + música). Tarda ~1 min en reflejarse en el sitio.'
+      : '✓ Catálogo publicado' + (privadoOk ? '' : ' · ✗ privado: ' + privadoMsg) + (musicaOk ? '' : ' · ✗ música: ' + musicaMsg);
+    statusEl.style.color = todoOk ? 'var(--green)' : '#e5b44b';
+    showToast(todoOk ? '🚀 Catálogo + Privado + Música publicados' : '🚀 Catálogo publicado · algo falló (ver estado)', todoOk ? 'success' : 'error');
   } catch(e) {
     statusEl.textContent = '✗ ' + e.message;
     statusEl.style.color = '#e55';
@@ -4333,6 +4495,46 @@ function downloadJSON() {
 }
 
 function copyJSON() { navigator.clipboard.writeText(JSON.stringify(getMovies(),null,2)).then(()=>showToast('JSON copiado ✓','success')); }
+
+/* ── Exportar / importar / migrar MÚSICA PURA (musica.json) ── */
+function downloadMusicJSON() {
+  const json = JSON.stringify(getMusic(),null,2);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([json],{type:'application/json'}));
+  a.download = 'musica.json'; a.click();
+  showToast('musica.json descargado ✓','success');
+}
+function copyMusicJSON() { navigator.clipboard.writeText(JSON.stringify(getMusic(),null,2)).then(()=>showToast('JSON de música copiado ✓','success')); }
+function importMusicJSON() {
+  const raw = document.getElementById('import-area-music').value.trim();
+  if (!raw) { showToast('Pega el JSON de música primero.','error'); return; }
+  try {
+    const data = JSON.parse(raw);
+    if (!Array.isArray(data)) throw new Error('No es un array');
+    if (!confirm(`¿Importar ${data.length} títulos de música? Esto reemplazará el catálogo de música actual.`)) return;
+    saveMusic(data);
+    document.getElementById('import-area-music').value = '';
+    setCatalogView('music');
+    showToast(`✓ ${data.length} títulos de música importados`,'success');
+  } catch(e) {
+    showToast('JSON inválido. Revisa el formato.','error');
+  }
+}
+// Pasa los títulos que ya estaban en movies.json con tipo "Música" (a secas) al catálogo de música.
+function migrarMusicaPura() {
+  const movies = getMovies();
+  const puros = movies.filter(m => isPureMusicType(m.type));
+  if (!puros.length) { showToast('No hay música pura en movies.json para mover.', 'info'); return; }
+  if (!confirm(`Se moverán ${puros.length} título(s) de música pura de movies.json a musica.json.\n\nOJO: al publicar, el index principal dejará de mostrarlos hasta que exista el index de música. ¿Continuar?`)) return;
+  const music = getMusic();
+  const slugs = new Set(music.map(m => m.slug));
+  puros.forEach(m => { if (!slugs.has(m.slug)) music.push(m); });
+  const resto = movies.filter(m => !isPureMusicType(m.type));
+  if (!saveMusic(music)) return;
+  if (!saveMovies(resto)) return;
+  setCatalogView('music');
+  showToast(`✓ ${puros.length} título(s) movidos a Música`, 'success');
+}
 
 /* ======================== IMPORT ======================== */
 function importJSON() {
@@ -4384,7 +4586,7 @@ function resolucionDesdeMasInfo(masInfo) {
 function matchMovieByTitle(titulo, masInfo) {
   const target = baseTituloSinCalidad(titulo || '');
   if (!target) return null;
-  const movies = getMovies();
+  const movies = getAllItems();
   const candidatos = movies.filter(m => baseTituloSinCalidad(m.title || '') === target);
   if (!candidatos.length) return null;
   const resBuscada = normalizarResolucion(resolucionDesdeMasInfo(masInfo));
@@ -4668,19 +4870,24 @@ function detectarChipsDesdePrivado(titulo, masInfo) {
 function getPrivadoBadgeKeys(item) {
   const det = detectarChipsDesdePrivado(item.titulo, item.masInfo);
   const catalogMatch = matchMovieByTitle(item.titulo, item.masInfo);
+  // Hereda del catálogo público (misma edición): si existe, sus datos mandan sobre lo detectado.
+  const cm = catalogMatch || {};
   return getPeliBadgeKeysFromMovie({
     title: item.titulo,
     descargaRaw: item.masInfo,
-    quality: det.quality,
-    audio: det.audio,
-    source: det.source,
-    hdr: '',
-    streaming: (catalogMatch && catalogMatch.streaming) || '',
+    quality: cm.quality || det.quality,
+    audio: cm.audio || det.audio,
+    source: cm.source || det.source,
+    hdr: cm.hdr || '',
+    streaming: cm.streaming || '',
     type: 'Película',
   });
 }
 
 function privadoPosterHtml(item, sizeClass) {
+  // Portada heredada del catálogo público (la que se guardó primero); si no hay match, la propia.
+  const _cm = matchMovieByTitle(item.titulo, item.masInfo);
+  if (_cm && _cm.image) item = Object.assign({}, item, { imagen: _cm.image });
   const badges = getPrivadoBadgeKeys(item);
   const tieneMarco = !!(badges && badges.fuente);
   const badgeLayersHtml = badges ? ['idioma','fuente','calidad','hdr','streaming'].map(cat => {
@@ -4783,6 +4990,8 @@ function reemparejarPrivadoConCatalogo() {
   const CAMPOS_FICHA = ['originalTitle', 'year', 'country', 'duration', 'genre', 'description'];
 
   lista.forEach(item => {
+    { const _m = matchMovieByTitle(item.titulo, item.masInfo);
+      if (_m && _m.image && item.imagen !== _m.image) { item.imagen = _m.image; actualizados++; } }
     const faltaFecha = !item.fecha || !String(item.fecha).trim();
     const faltantes = CAMPOS_FICHA.filter(c => !item[c] || !String(item[c]).trim());
     if (!faltantes.length && !faltaFecha) { yaCompletos++; return; }
