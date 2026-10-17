@@ -5312,5 +5312,67 @@
     "audioFormat": "Lossless 16-bit",
     "legacyCover": false,
     "catalogSlug": "sir-simon-rattle-perfume-the-story-of-a-murderer-ost-2006-banda-sonora-flac-16-bits-441-khz"
+  },
+  {
+    "id": "zona-cero-2026-webrip-1080p-coreano-sub-espanol-mvcmtlxs-ihoxvt",
+    "titulo": "Zona Cero (2026) WEBRip 1080p Coreano Sub-Español",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/bNMhnSxtVeJuoRDrFoBZId87kGX.jpg",
+    "masInfo": "Audio: Coreano (ACC 2.1)\nCalidad: WEBRip\nResolución: 1920x1080\nFormato: N/A\nTamaño: 3.23 GB\nCodec: H.264\nSubtítulos: Sí (Español) Incrustados al video",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1GrItZ-WkvH6cvYPxu5sUlg"
+      }
+    ],
+    "fecha": "17 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=zona-cero-2026-webrip-1080p-coreano-sub-espanol",
+    "descargado": false,
+    "originalTitle": "Gangchae (Colony)",
+    "year": "2026",
+    "country": "Corea del Sur",
+    "duration": "123 minutos",
+    "genre": "Terror, Ciencia ficción, Zombis, Suspenso",
+    "description": "Gira en torno a una conferencia de biotecnología donde un virus de mutación rápida se libera accidentalmente, obligando a las autoridades a sellar el edificio de inmediato y dejando a un grupo de supervivientes atrapados mientras el contagio se descontrola.",
+    "type": "Película",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "zona-cero-2026-webrip-1080p-coreano-sub-espanol"
+  },
+  {
+    "id": "zona-cero-2026-web-dl-1080p-coreano-sub-espanol-v-o-s-e-mvcmw7a4-5557ac",
+    "titulo": "Zona Cero (2026) WEB-DL 1080p Coreano Sub-Español V.O.S.E.",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/pzyIh9dTRr6nCzZ6fPvjiMr1dem.jpg",
+    "masInfo": "Audio: Coreano (AAC 2.0)\nCalidad: WEB-DL\nResolución: 1920x1080\nFormato: MKV\nTamaño: 4.23 GB\nCodec: AVC / H.264 | 8 bits\nSubtítulos: Sí (Español - Inglés)",
+    "enlaces": [
+      {
+        "etiqueta": "Jcorebox",
+        "url": "https://jcorebox.com/c/KXFPG3OZip7jg8"
+      },
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1HON3jUt5ucySNC-mTEnkJg"
+      },
+      {
+        "etiqueta": "Mega.nz",
+        "url": "https://mega.nz/folder/NqgAmYyJ#GxrxZ1bJq2kRK7mWBipCCw"
+      },
+      {
+        "etiqueta": "Akirabox",
+        "url": "https://akirabox.to/Z9dzBKAdMGk1/folder"
+      }
+    ],
+    "fecha": "17 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=zona-cero-2026-web-dl-1080p-coreano-sub-espanol-vose",
+    "descargado": false,
+    "originalTitle": "Colony",
+    "year": "2026",
+    "country": "Corea del Sur",
+    "duration": "2 h 2 min (123 minutos)",
+    "genre": "Acción, Ciencia ficción, Terror",
+    "description": "Gira en torno a una conferencia de biotecnología donde un virus de mutación rápida se libera accidentalmente, obligando a las autoridades a sellar el edificio de inmediato y dejando a un grupo de supervivientes atrapados mientras el contagio se descontrola.",
+    "type": "Película",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "zona-cero-2026-web-dl-1080p-coreano-sub-espanol-vose"
   }
 ]
