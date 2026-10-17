@@ -74,7 +74,7 @@
 <script>
   (function() {
     var start = Date.now();
-    var MIN = 1700; /* doble de la duración de detalle.html (1250ms) */
+    var MIN = 950; /* doble de la duración de detalle.html (1250ms) */
     function hideSplash() {
       var s = document.getElementById('splash');
       if (!s) return;
@@ -981,7 +981,7 @@ header::after {
     .s2026-poster .m-badge img {
       width: 65%;
       height: auto;
-      opacity: 1;
+      opacity: 0.19;
       filter: drop-shadow(0 2px 10px rgba(0,0,0,0.7));
       transition: opacity 0.3s ease-in-out;
     }
@@ -1093,6 +1093,34 @@ header::after {
   <style>
      50%{opacity:1} }
   </style>
+<style id="ripple-style">
+/* ── EFECTO "GOTAS DE AGUA" de fondo (mismo efecto que detalle.html para música) ──
+   Ondas concéntricas doradas que nacen en puntos aleatorios de la pantalla.
+   Va detrás de todo el contenido (z-index -1, igual que el humo). ── */
+#ripple-container {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ripple-ring {
+  position: absolute;
+  border-radius: 50%;
+  border-style: solid;
+  border-color: rgba(201,168,76,0.55);
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  animation-name: ripple-expand;
+  animation-timing-function: cubic-bezier(.25,.7,.4,1);
+  animation-fill-mode: forwards;
+}
+@keyframes ripple-expand {
+  0%   { width: 0;              height: 0;              border-width: 3px;   opacity: 0.55; }
+  100% { width: var(--rp-size); height: var(--rp-size); border-width: 0.4px; opacity: 0; }
+}
+</style>
 </head>
 <body>
 <!-- Fondo Cinemático de Humo -->
@@ -1104,6 +1132,7 @@ header::after {
   <div class="smoke-particle p5"></div>
   <div class="smoke-particle p6"></div>
 </div>
+<div id="ripple-container"></div>
 <div class="film-grain"></div>
 <div class="old-film-fx"></div>
 <div class="old-film-scratches"></div>
@@ -1946,6 +1975,45 @@ function build2026(movies) {
 
   init();
 }
+
+// ── Efecto "gotas de agua" (ondas concéntricas) de fondo — igual que detalle.html ──
+let rippleTimer = null;
+function spawnRipple() {
+  const container = document.getElementById('ripple-container');
+  if (!container) return;
+  const el = document.createElement('div');
+  el.className = 'ripple-ring';
+  const w = container.clientWidth  || window.innerWidth;
+  const h = container.clientHeight || window.innerHeight;
+  const size = 140 + Math.random() * 420;                   // diámetro final: 140–560px
+  const duration = (3.5 + Math.random() * 4.5).toFixed(2);  // 3.5s–8s
+  el.style.left = (Math.random() * w) + 'px';
+  el.style.top  = (Math.random() * h) + 'px';
+  el.style.setProperty('--rp-size', size + 'px');
+  el.style.animationDuration = duration + 's';
+  container.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
+function startRippleEffect() {
+  if (rippleTimer) return; // ya está corriendo
+  const loop = () => {
+    if (!document.hidden) { // pausa si la pestaña no está visible (ahorra batería)
+      spawnRipple();
+      if (Math.random() < 0.85) setTimeout(spawnRipple, 80 + Math.random() * 180);
+      if (Math.random() < 0.55) setTimeout(spawnRipple, 200 + Math.random() * 250);
+      if (Math.random() < 0.3)  setTimeout(spawnRipple, 400 + Math.random() * 300);
+    }
+    rippleTimer = setTimeout(loop, 150 + Math.random() * 400);
+  };
+  loop();
+}
+function stopRippleEffect() {
+  clearTimeout(rippleTimer);
+  rippleTimer = null;
+  const container = document.getElementById('ripple-container');
+  if (container) container.innerHTML = '';
+}
+startRippleEffect();
 
 loadMovies();
 
