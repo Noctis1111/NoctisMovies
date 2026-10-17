@@ -4088,6 +4088,25 @@ function privadoToMovie(item) {
 
 /* ======================== "Descargado" — sincronizado entre dispositivos vía GitHub ======================== */
 function descargadosKey() { return 'np_descargados_' + NP_USER; }
+// "Pendiente": hay marcas hechas aquí que todavía NO llegaron a GitHub (sin config, sin internet, error).
+// Mientras esté pendiente, al abrir la página gana lo local (se sube) en vez de pisarlo con lo de GitHub.
+function descargadosPendKey() { return 'np_descargados_pendiente_' + NP_USER; }
+
+// Aviso flotante abajo a la derecha (el estado del panel ⚙️ solo se ve con el panel abierto).
+function npToast(msg, tipo) {
+  let el = document.getElementById('np-sync-toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'np-sync-toast';
+    el.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:99999;max-width:min(360px,90vw);padding:0.55rem 0.9rem;border-radius:10px;font:600 0.8rem Barlow,sans-serif;background:#10141b;border:1px solid var(--border);color:var(--white);box-shadow:0 8px 24px rgba(0,0,0,0.6);opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;pointer-events:none;';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.borderColor = tipo === 'error' ? '#e55' : tipo === 'warn' ? '#c9a84c' : tipo === 'ok' ? '#4caf7d' : 'var(--border)';
+  el.style.opacity = '1'; el.style.transform = 'translateY(0)';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(8px)'; }, tipo === 'error' ? 5000 : 2600);
+}
 
 function getDescargadosSet() {
   try { return new Set(JSON.parse(localStorage.getItem(descargadosKey()) || '[]')); }
@@ -4101,6 +4120,7 @@ function toggleDescargadoLocal(id) {
   const set = getDescargadosSet();
   if (set.has(id)) set.delete(id); else set.add(id);
   localStorage.setItem(descargadosKey(), JSON.stringify([...set]));
+  localStorage.setItem(descargadosPendKey(), '1'); // se limpia solo cuando GitHub confirma el guardado
   subirDescargadosAGithub();
   renderGrid();
 }
@@ -4132,55 +4152,148 @@ function encodeGithubB64(str) {
   return btoa(Array.from(new TextEncoder().encode(str), b => String.fromCharCode(b)).join(''));
 }
 
+// ── Mezcla de "descargados" entre dispositivos ──
+// Se guarda una "base" = la última lista que se sabe sincronizada con GitHub. Comparando
+// local vs base se sabe QUÉ marcó/desmarcó este dispositivo, y eso se aplica encima de lo que
+// haya en GitHub. Así lo marcado en el dispositivo 1 no se pisa cuando el dispositivo 2 sube lo suyo.
+function descargadosBaseKey() { return 'np_descargados_base_' + NP_USER; }
+function getBaseSet(localSet) {
+  try {
+    const raw = localStorage.getItem(descargadosBaseKey());
+    if (raw !== null) return new Set(JSON.parse(raw));
+  } catch {}
+  // Sin base (primera vez con esta versión): con marcas pendientes todo lo local cuenta como nuevo; si no, se asume sincronizado.
+  return localStorage.getItem(descargadosPendKey()) ? new Set() : new Set(localSet);
+}
+function saveBaseSet(set) { localStorage.setItem(descargadosBaseKey(), JSON.stringify([...set])); }
+function guardarDescargadosLocal(set) { localStorage.setItem(descargadosKey(), JSON.stringify([...set])); }
+function setsIguales(a, b) { if (a.size !== b.size) return false; for (const x of a) if (!b.has(x)) return false; return true; }
+function mergeDescargados(remoteSet, localSet, baseSet) {
+  const out = new Set(remoteSet);
+  localSet.forEach(x => { if (!baseSet.has(x)) out.add(x); });     // marcado aquí desde la última sincronización
+  baseSet.forEach(x => { if (!localSet.has(x)) out.delete(x); });  // desmarcado aquí desde la última sincronización
+  return out;
+}
+
+// Recalcula la marca "descargado" de cada tarjeta desde lo guardado y redibuja (también el botón del modal si está abierto).
+function aplicarDescargadosAMemoria() {
+  try { if (Array.isArray(allMovies)) allMovies.forEach(m => { if (m && m._id) m._descargado = isPrivadoDescargado(m._id); }); } catch {}
+  try { renderGrid(); } catch {}
+  try {
+    const ov = document.getElementById('np-modal-overlay');
+    if (ov && ov.classList.contains('show') && np_modalMovieIdx >= 0 && allMovies[np_modalMovieIdx]) actualLizarBotonDescargado(allMovies[np_modalMovieIdx]);
+  } catch {}
+}
+
+let cargandoDescargados = false;
 async function cargarDescargadosDesdeGithub() {
   const { owner, repo, token } = getSyncConfig();
   if (!owner || !repo || !token) { showSyncStatus('Sin configurar — el marcado queda solo en este navegador.'); return; }
+  if (cargandoDescargados) return;
+  cargandoDescargados = true;
   try {
     const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${DESCARGADOS_FILE}`;
-    const res = await fetch(apiUrl, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' } });
-    if (res.status === 404) { showSyncStatus('Todavía no hay nada sincronizado — se crea con la primera marca.'); return; }
+    // cache:'no-store' → la API de GitHub permite cachear ~60 s en el navegador; así siempre se lee lo último.
+    const res = await fetch(apiUrl, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' }, cache: 'no-store' });
+    if (res.status === 404) {
+      showSyncStatus('Todavía no hay nada sincronizado — se crea con la primera marca.');
+      if (getDescargadosSet().size) subirDescargadosAGithub();
+      return;
+    }
     if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.message || 'Error ' + res.status); }
     const data = await res.json();
-    const remote = JSON.parse(decodeGithubB64(data.content) || '{}');
-    const ids = remote[NP_USER] || [];
-    localStorage.setItem(descargadosKey(), JSON.stringify(ids));
-    showSyncStatus(`✓ Sincronizado (${ids.length} marcado${ids.length===1?'':'s'} como descargado).`);
-    renderGrid();
+    const remoteObj = JSON.parse(decodeGithubB64(data.content) || '{}');
+    const remoteSet = new Set(remoteObj[NP_USER] || []);
+    const local = getDescargadosSet();
+    const merged = mergeDescargados(remoteSet, local, getBaseSet(local));
+    const cambioLocal = !setsIguales(merged, local);
+    guardarDescargadosLocal(merged);
+    if (setsIguales(merged, remoteSet)) { saveBaseSet(remoteSet); localStorage.removeItem(descargadosPendKey()); }
+    else subirDescargadosAGithub(); // hay marcas hechas aquí que GitHub todavía no tiene
+    aplicarDescargadosAMemoria();
+    showSyncStatus(`✓ Sincronizado (${merged.size} marcado${merged.size===1?'':'s'} como descargado).`);
+    if (cambioLocal) npToast('☁️ Actualizado desde GitHub', 'ok');
   } catch (e) {
     showSyncStatus('✗ ' + e.message, true);
+  } finally {
+    cargandoDescargados = false;
   }
 }
 
 function subirDescargadosAGithub() {
   const { owner, repo, token } = getSyncConfig();
-  if (!owner || !repo || !token) return; // sin config → queda solo en este navegador, sin error
+  if (!owner || !repo || !token) {
+    npToast('⚠ Marcado solo en este navegador. Configurá ⚙️ Sincronización (GitHub) una vez y se guarda solo.', 'warn');
+    return;
+  }
   clearTimeout(syncDebounceTimer);
   showSyncStatus('Sincronizando…');
   syncDebounceTimer = setTimeout(async () => {
     try {
       const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${DESCARGADOS_FILE}`;
-      let sha = null, remote = {};
-      const getRes = await fetch(apiUrl, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' } });
-      if (getRes.ok) {
-        const d = await getRes.json();
-        sha = d.sha;
-        try { remote = JSON.parse(decodeGithubB64(d.content) || '{}'); } catch { remote = {}; }
-      } else if (getRes.status !== 404) {
-        const e = await getRes.json().catch(() => ({})); throw new Error(e.message || 'Error ' + getRes.status);
+      const hdr = { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' };
+      for (let intento = 0; intento < 3; intento++) {
+        // 1) leer lo último de GitHub (otro dispositivo pudo haber guardado)
+        let sha = null, remote = {};
+        const getRes = await fetch(apiUrl, { headers: hdr, cache: 'no-store' });
+        if (getRes.ok) {
+          const d = await getRes.json();
+          sha = d.sha;
+          try { remote = JSON.parse(decodeGithubB64(d.content) || '{}'); } catch { remote = {}; }
+        } else if (getRes.status !== 404) {
+          const e = await getRes.json().catch(() => ({})); throw new Error(e.message || 'Error ' + getRes.status);
+        }
+        // 2) aplicar encima SOLO lo que se marcó/desmarcó en este dispositivo
+        const local = getDescargadosSet();
+        const merged = mergeDescargados(new Set(remote[NP_USER] || []), local, getBaseSet(local));
+        remote[NP_USER] = [...merged];
+        const putRes = await fetch(apiUrl, {
+          method: 'PUT',
+          headers: hdr,
+          body: JSON.stringify({ message: 'Sync descargados — ' + new Date().toLocaleString(), content: encodeGithubB64(JSON.stringify(remote, null, 2)), ...(sha && { sha }) })
+        });
+        if (putRes.status === 409 || putRes.status === 422) continue; // alguien guardó justo antes: se vuelve a leer y mezclar
+        if (!putRes.ok) { const e = await putRes.json().catch(() => ({})); throw new Error(e.message || 'Error ' + putRes.status); }
+        // 3) guardado: si mientras tanto marcaste algo más, se conserva y se vuelve a subir
+        const ahora = getDescargadosSet();
+        const nuevoLocal = new Set(merged);
+        ahora.forEach(x => { if (!local.has(x)) nuevoLocal.add(x); });
+        local.forEach(x => { if (!ahora.has(x)) nuevoLocal.delete(x); });
+        guardarDescargadosLocal(nuevoLocal);
+        saveBaseSet(merged);
+        const quedanCambios = !setsIguales(ahora, local);
+        if (!quedanCambios) localStorage.removeItem(descargadosPendKey());
+        aplicarDescargadosAMemoria();
+        showSyncStatus('✓ Sincronizado.');
+        npToast('✓ Guardado en GitHub', 'ok');
+        if (quedanCambios) subirDescargadosAGithub();
+        return;
       }
-      remote[NP_USER] = [...getDescargadosSet()];
-      const putRes = await fetch(apiUrl, {
-        method: 'PUT',
-        headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' },
-        body: JSON.stringify({ message: 'Sync descargados — ' + new Date().toLocaleString(), content: encodeGithubB64(JSON.stringify(remote, null, 2)), ...(sha && { sha }) })
-      });
-      if (!putRes.ok) { const e = await putRes.json().catch(() => ({})); throw new Error(e.message || 'Error ' + putRes.status); }
-      showSyncStatus('✓ Sincronizado.');
+      throw new Error('conflicto al guardar, volvé a intentar');
     } catch (e) {
       showSyncStatus('✗ ' + e.message, true);
+      npToast('✗ No se pudo guardar en GitHub (' + e.message + '). Queda pendiente y se reintenta al volver a abrir.', 'error');
     }
   }, 900);
 }
+
+// Cada vez que vuelves a la pestaña (o cada minuto con la página visible) se descarga lo último de GitHub:
+// lo marcado en el otro dispositivo aparece solo, sin recargar.
+(function autoRefrescarDescargados() {
+  let ultimo = 0;
+  function refrescar() {
+    if (document.hidden) return;
+    const app = document.getElementById('app-screen');
+    if (!app || app.style.display === 'none') return; // sin sesión iniciada
+    const ahora = Date.now();
+    if (ahora - ultimo < 15000) return;
+    ultimo = ahora;
+    cargarDescargadosDesdeGithub();
+  }
+  document.addEventListener('visibilitychange', refrescar);
+  window.addEventListener('focus', refrescar);
+  setInterval(refrescar, 60000);
+})();
 
 function guardarSyncConfig() {
   const owner = document.getElementById('sync-gh-owner').value.trim();
