@@ -992,14 +992,19 @@
 <div id="admin-screen">
   <header class="admin-header">
     <div class="admin-header-inner">
-      <a href="../index.html" class="admin-logo-link">
-        <div class="admin-logo">
-          NOCTIS<span>MOVIES</span>
-          <small>Panel Admin</small>
-        </div>
-      </a>
+      <div style="display:flex;align-items:center;">
+        <!-- Logo NOCTISMOVIES → index (misma pestaña) -->
+        <a href="../index.html" class="admin-logo-link" title="Ir al index">
+          <div class="admin-logo">NOCTIS<span>MOVIES</span></div>
+        </a>
+        <!-- "Panel Admin" → el propio panel (sube al inicio), ya NO lleva al index -->
+        <a href="#" class="admin-logo-link" title="Panel Admin" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
+          <div class="admin-logo"><small>Panel Admin</small></div>
+        </a>
+      </div>
       <nav class="admin-nav">
         <a href="../index.html" target="_blank">🎬 Ver Catálogo</a>
+        <a href="../lelouchhangyaku-noctis-x7f2.html" title="Ir a Noctis Privado (misma pestaña)">🔒 Privado</a>
         <button class="logout-btn" onclick="doLogout()">Salir</button>
       </nav>
     </div>
