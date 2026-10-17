@@ -4074,10 +4074,32 @@ function privadoToMovie(item) {
 
   const esSerie = /temporada\s*\d+|\[\d+\s*\/\s*\d+\]|cap[íi]tulo/i.test(item.titulo || '');
 
+  // ── Tipo y formato de audio ──
+  // Si admin ya los guardó en noctis-privado.json (item.type / item.audioFormat), se usan tal cual:
+  // así la portada se dibuja igual que en el catálogo público (cinta FLAC/16-BITS, fondo difuminado de
+  // portada cuadrada, legacyCover sin cintas, etc.). Para entradas viejas sin esos campos se deduce del texto:
+  // música = formato de audio (FLAC/MP3/WAV/AAC) y NINGUNA resolución ni marca de video.
+  const textoUp = ((item.titulo || '') + ' ' + (item.masInfo || '')).toUpperCase();
+  const tieneResolucionVideo = /\d{3,4}\s*[X×]\s*\d{3,4}/.test(item.masInfo || '');
+  const tieneMarcaVideo = /WEB-?DL|WEB-?RIP|BLU-?RAY|BDRIP|BRRIP|REMUX|X26[45]|HEVC|\b(480|720|1080|2160)P\b|\b4K\b|HDTS|DVDRIP/.test(textoUp);
+  const pareceMusica = /\b(FLAC|MP3|WAV)\b|\bAAC\b/.test(textoUp) && !tieneResolucionVideo && !tieneMarcaVideo;
+  const tipoFinal = item.type || (pareceMusica ? 'Música' : (esSerie ? 'Serie' : 'Película'));
+  let audioFormat = item.audioFormat || '';
+  if (!audioFormat && (item.type ? item.type.includes('Música') : pareceMusica)) {
+    const fmts = [];
+    if (/32\s*-?\s*BITS?/.test(textoUp)) fmts.push('Master 32-bit');
+    else {
+      if (/24\s*-?\s*BITS?/.test(textoUp)) fmts.push('Hi-Res 24-bit');
+      if (/16\s*-?\s*BITS?/.test(textoUp)) fmts.push('Lossless 16-bit');
+    }
+    if (/\bMP3\b/.test(textoUp)) fmts.push('MP3');
+    audioFormat = fmts.join(', ');
+  }
+
   return {
     title: item.titulo, image: item.imagen, quality, audio, source,
-    hdr: '', streaming: '', descargaRaw: item.masInfo, type: esSerie ? 'Serie' : 'Película',
-    legacyCover: false, slug: item.id, uploadDate: null,
+    hdr: '', streaming: '', descargaRaw: item.masInfo, type: tipoFinal, audioFormat,
+    legacyCover: !!item.legacyCover, slug: item.id, uploadDate: null,
     originalTitle: item.originalTitle || '', year: item.year || '', country: item.country || '',
     duration: item.duration || '', genre: item.genre || '', description: item.description || '',
     _masInfo: item.masInfo, _enlaces: item.enlaces || [],
