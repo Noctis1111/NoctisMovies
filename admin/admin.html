@@ -1494,7 +1494,8 @@
           <button class="export-btn" style="width:auto;padding:0.3rem 0.8rem;margin:0;font-size:0.75rem;" onclick="clearAll()">🗑 Limpiar todo</button>
         </div>
         <div class="cv-row">
-          <button type="button" class="cv-btn cv-active" id="cv-btn-movies" onclick="setCatalogView('movies')">🎬 Películas / Series <span class="cv-n" id="cv-count-movies">0</span></button>
+          <button type="button" class="cv-btn cv-active" id="cv-btn-all" onclick="setCatalogView('all')">✨ Todo <span class="cv-n" id="cv-count-all">0</span></button>
+          <button type="button" class="cv-btn" id="cv-btn-movies" onclick="setCatalogView('movies')">🎬 Películas / Series <span class="cv-n" id="cv-count-movies">0</span></button>
           <button type="button" class="cv-btn cv-music" id="cv-btn-music" onclick="setCatalogView('music')">🎵 Música pura <span class="cv-n" id="cv-count-music">0</span></button>
         </div>
         <div style="padding:1rem 1.5rem 0;">
@@ -1616,7 +1617,7 @@ function saveMovies(arr) {
    "Música pura" = tipo exactamente "Música". Los híbridos ("Película | Música", etc.)
    NO entran aquí: siguen en noctis_movies / movies.json igual que antes. */
 var MUSIC_INDEX_FILE = 'musica.html'; // index 2 (aún por crear) — se usa para el botón "copiar URL de búsqueda"
-var catalogView = 'movies';           // qué catálogo se ve en la lista: 'movies' | 'music'
+var catalogView = 'all';              // qué catálogo se ve en la lista: 'all' (por defecto: videos + música) | 'movies' | 'music'
 var editingStore = 'movies';          // de cuál catálogo viene el título que se está editando
 function isPureMusicType(t) {
   const parts = (t || '').split(/[|,]/).map(x => x.trim()).filter(Boolean);
@@ -1635,9 +1636,28 @@ function saveMusic(arr) {
   }
 }
 function getAllItems() { return getMovies().concat(getMusic()); }
-function getCatalog() { return catalogView === 'music' ? getMusic() : getMovies(); }
+// Lista de referencias del catálogo visible: { item, store: 'movies'|'music', i: posición dentro de SU catálogo }.
+// En la vista "Todo" mezcla películas/series y música por fecha de subida (más reciente primero),
+// respetando el orden interno de cada catálogo. Editar/Eliminar usan store + i para tocar el correcto.
+function catalogRefs() {
+  const mov = getMovies().map((item, i) => ({ item, store: 'movies', i }));
+  const mus = getMusic().map((item, i) => ({ item, store: 'music', i }));
+  if (catalogView === 'movies') return mov;
+  if (catalogView === 'music') return mus;
+  const out = [];
+  let a = 0, b = 0;
+  while (a < mov.length || b < mus.length) {
+    if (b >= mus.length) { out.push(mov[a++]); continue; }
+    if (a >= mov.length) { out.push(mus[b++]); continue; }
+    const da = mov[a].item.uploadDate || '', db = mus[b].item.uploadDate || '';
+    if (db > da) out.push(mus[b++]); else out.push(mov[a++]);
+  }
+  return out;
+}
+function getCatalog() { return catalogRefs().map(r => r.item); }
 function setCatalogView(v) {
-  catalogView = (v === 'music') ? 'music' : 'movies';
+  catalogView = (v === 'music' || v === 'movies') ? v : 'all';
+  document.getElementById('cv-btn-all')?.classList.toggle('cv-active', catalogView === 'all');
   document.getElementById('cv-btn-movies')?.classList.toggle('cv-active', catalogView === 'movies');
   document.getElementById('cv-btn-music')?.classList.toggle('cv-active', catalogView === 'music');
   const t = document.getElementById('catalog-title-text');
@@ -3069,9 +3089,16 @@ function submitForm() {
   // antes de tocar "Agregar al Catálogo" es la que realmente se guarda.
   let privadoGuardado = false;
   const enlacesPrivadosFinal = enlacesPrivadosTextoAArray(document.getElementById('f-links-privados')?.value || '');
-  const tituloPrivado = (window.currentPrivadoDraft && window.currentPrivadoDraft.titulo) || data.title;
   const privList = getPrivado();
-  const idxPrivExistente = privList.findIndex(p => normTitulo(p.titulo) === normTitulo(tituloPrivado));
+  // Al EDITAR: se enlaza con SU entrada privada por catalogSlug (o por el título que tenía antes de editar),
+  // así cambiar título/portada/datos en el catálogo actualiza ESA entrada y no crea otra duplicada.
+  const _draftTit = window.currentPrivadoDraft && window.currentPrivadoDraft.titulo;
+  let idxPrivExistente = isEdit ? findPrivadoIdxForCatalog(privList, existing) : -1;
+  let tituloPrivado = _draftTit || data.title;
+  if (idxPrivExistente >= 0 && !_draftTit && normTitulo(privList[idxPrivExistente].titulo) !== normTitulo(existing.title)) {
+    tituloPrivado = privList[idxPrivExistente].titulo; // título propio del privado (distinto al público): se respeta
+  }
+  if (idxPrivExistente < 0) idxPrivExistente = privList.findIndex(p => normTitulo(p.titulo) === normTitulo(tituloPrivado));
 
   if (enlacesPrivadosFinal.length) {
     const masInfoPrivado = (window.currentPrivadoDraft && window.currentPrivadoDraft.masInfo)
@@ -3100,6 +3127,10 @@ function submitForm() {
       duration: data.duration || '',
       genre: data.genre || '',
       description: data.description || '',
+      type: data.type || '',
+      audioFormat: data.audioFormat || '',
+      legacyCover: !!data.legacyCover,
+      catalogSlug: data.slug || '',
     };
     if (idxPrivExistente >= 0) privList[idxPrivExistente] = entrada;
     else privList.push(entrada);
@@ -3121,7 +3152,8 @@ function submitForm() {
     'success'
   );
   clearForm();
-  setCatalogView(toMusic ? 'music' : 'movies'); // muestra el catálogo donde quedó guardado
+  sincronizarPrivadoConCatalogo(); renderPrivadoSavedList(); // el privado hereda la portada/tipo del público al instante
+  setCatalogView(catalogView === 'all' ? 'all' : (toMusic ? 'music' : 'movies')); // "Todo" se queda en Todo; si no, muestra el catálogo donde quedó guardado
 }
 
 function previewImg(url) {
@@ -3165,7 +3197,7 @@ function buscarGolden() {
   const n = countRaw ? Math.max(1, parseInt(countRaw) || 1) : Infinity;
   if (!q) { showToast('Escribí parte del título a buscar.', 'error'); return; }
 
-  const movies = getMovies();
+  const movies = getAllItems(); // películas/series + música pura (musica.json)
   // Nunca incluir ediciones Golden Quality ya armadas antes (si no, se auto-incluyen
   // a sí mismas en la próxima búsqueda y duplican/corrompen las resoluciones juntadas).
   const matches = movies.filter(m =>
@@ -3299,23 +3331,30 @@ function construirGolden(elegidas) {
   }
   resoluciones.sort((a, b) => resolucionArea(a) - resolucionArea(b));
 
+  const esMusicaGolden = elegidas.every(m => isPureMusicType(m.type));
   const lineasDatos = [];
   if (base.originalTitle) lineasDatos.push('Título Original: ' + base.originalTitle);
+  if (esMusicaGolden && base.artista) lineasDatos.push('Artista: ' + base.artista);
   if (base.year)          lineasDatos.push('Año: ' + base.year);
   if (base.country)       lineasDatos.push('Pais(es): ' + base.country);
   if (base.duration)      lineasDatos.push('Duración: ' + base.duration);
   if (base.genre)         lineasDatos.push('Genero: ' + base.genre);
   if (base.description) { lineasDatos.push(''); lineasDatos.push(base.description); }
 
+  // Música: no hay resolución y el formato es el del audio (FLAC, MP3...), no MKV.
+  const formatosGolden = [];
+  elegidas.forEach(m => { const f = (m.format || '').trim(); if (f && !formatosGolden.includes(f)) formatosGolden.push(f); });
   const lineasMasInfo = [
     'MAS INFO',
     'Calidad: MULTI-CALIDAD INGRESANDO AL LINK MAS INFO',
-    'Resolución: ' + resoluciones.join(' - '),
-    'Formato: MKV',
-    '',
-    '',
-    goldenSearchUrl(),
   ];
+  if (!esMusicaGolden) lineasMasInfo.push('Resolución: ' + resoluciones.join(' - '));
+  lineasMasInfo.push(
+    'Formato: ' + (esMusicaGolden ? (formatosGolden.join(' - ') || 'FLAC') : 'MKV'),
+    '',
+    '',
+    goldenSearchUrl()
+  );
 
   document.getElementById('golden-title').value = tituloGolden;
   document.getElementById('golden-datos').value = lineasDatos.join('\n');
@@ -4199,9 +4238,10 @@ function goPage(p) {
 }
 
 function editMovie(idx) {
-  const m = getCatalog()[idx];
+  const _ref = catalogRefs()[idx];
+  const m = _ref && _ref.item;
   if (!m) return;
-  editingStore = catalogView;
+  editingStore = _ref.store;
   document.getElementById('f-title').value = m.title||'';
   // Rebuild datos-raw (datos + sinopsis juntos)
   const datosLines = [];
@@ -4255,14 +4295,15 @@ function editMovie(idx) {
   const pwEl = document.getElementById('f-password'); if (pwEl) pwEl.value = m.password||'';
   document.getElementById('f-desc').value = m.description||'';
   if (m.image) { posterDataUrl = null; showPosterPreview(m.image); }
-  editingIndex = idx;
+  editingIndex = _ref.i; // posición dentro de SU catálogo (en "Todo" no coincide con idx)
   window.currentPrivadoDraft = null; // editar no re-pega el bloque; no arrastrar un borrador viejo
   // Carga los enlaces privados YA GUARDADOS de este título (si los hay), para poder verlos
   // y corregirlos al editar — antes este cuadro se vaciaba y parecía que no había nada.
   {
     const flp = document.getElementById('f-links-privados');
     if (flp) {
-      const yaGuardado = getPrivado().find(p => normTitulo(p.titulo) === normTitulo(m.title));
+      const _pl = getPrivado(); const _pi = findPrivadoIdxForCatalog(_pl, m);
+      const yaGuardado = _pi >= 0 ? _pl[_pi] : null;
       flp.value = yaGuardado ? enlacesPrivadosArrayATexto(yaGuardado.enlaces) : '';
     }
   }
@@ -4278,7 +4319,8 @@ function editMovie(idx) {
 function detailUrlFor(m, idx) {
   const ref = m.slug || idx;
   // admin.html vive en /admin/, detalle.html vive en raíz → subimos un nivel
-  return new URL('../detalle.html?id=' + encodeURIComponent(ref), window.location.href).href;
+  const catQ = isPureMusicType(m.type) ? '&cat=musica' : '';
+  return new URL('../detalle.html?id=' + encodeURIComponent(ref) + catQ, window.location.href).href;
 }
 
 function copyDetailUrl(idx) {
@@ -4358,12 +4400,22 @@ function fallbackCopy(text, onSuccess) {
 
 function deleteMovie(idx) {
   if (!confirm('¿Eliminar este título?')) return;
-  const lista = getCatalog(); lista.splice(idx, 1);
-  if (catalogView === 'music') saveMusic(lista); else saveMovies(lista);
+  const ref = catalogRefs()[idx];
+  if (!ref) return;
+  { // ¿tiene entrada en Noctis Privado? → preguntar si se elimina también (no se borra sin avisar)
+    const pl = getPrivado(); const pi = findPrivadoIdxForCatalog(pl, ref.item);
+    if (pi >= 0 && confirm('Este título también está en 🔒 Noctis Privado.\n\nAceptar = eliminarlo también del privado\nCancelar = dejarlo en el privado')) {
+      pl.splice(pi, 1); savePrivado(pl);
+    }
+  }
+  const lista = ref.store === 'music' ? getMusic() : getMovies();
+  lista.splice(ref.i, 1);
+  if (ref.store === 'music') saveMusic(lista); else saveMovies(lista);
   renderList(true); showToast('Eliminado.','info');
 }
 
 function clearAll() {
+  if (catalogView === 'all') { showToast('Elegí 🎬 Películas / Series o 🎵 Música pura para vaciar un catálogo.', 'info'); return; }
   const esMusica = catalogView === 'music';
   if (!confirm(esMusica ? '¿Eliminar TODO el catálogo de MÚSICA del almacenamiento local?' : '¿Eliminar TODO el catálogo del almacenamiento local?')) return;
   localStorage.removeItem(esMusica ? 'noctis_music' : 'noctis_movies');
@@ -4376,6 +4428,7 @@ function updateStats() {
   const nMusic = getMusic().length;
   const cm = document.getElementById('cv-count-movies'); if (cm) cm.textContent = m.length;
   const cu = document.getElementById('cv-count-music');  if (cu) cu.textContent = nMusic;
+  const ca = document.getElementById('cv-count-all');    if (ca) ca.textContent = m.length + nMusic;
   document.getElementById('stat-total').textContent = m.length + nMusic;
   document.getElementById('stat-movies').textContent = m.filter(x=>(x.type||'').includes('Película')).length;
   document.getElementById('stat-series').textContent = m.filter(x=>['Serie','Anime','Dorama','Documental'].some(t=>(x.type||'').includes(t))).length;
@@ -4439,7 +4492,7 @@ async function publishToGithub() {
       const privGet = await fetch(privApiUrl, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' } });
       if (privGet.ok) { const d = await privGet.json(); privSha = d.sha; }
       else if (privGet.status !== 404) { const e = await privGet.json().catch(() => ({})); throw new Error(e.message || 'Error ' + privGet.status); }
-      const privJson = JSON.stringify(getPrivado(), null, 2);
+      const privJson = JSON.stringify(sincronizarPrivadoConCatalogo(), null, 2);
       const privB64 = btoa(Array.from(new TextEncoder().encode(privJson), b => String.fromCharCode(b)).join(''));
       const privPut = await fetch(privApiUrl, {
         method: 'PUT',
@@ -4869,7 +4922,7 @@ function detectarChipsDesdePrivado(titulo, masInfo) {
 // catálogo, cae al detector de texto como último recurso.
 function getPrivadoBadgeKeys(item) {
   const det = detectarChipsDesdePrivado(item.titulo, item.masInfo);
-  const catalogMatch = matchMovieByTitle(item.titulo, item.masInfo);
+  const catalogMatch = catalogItemForPrivado(item);
   // Hereda del catálogo público (misma edición): si existe, sus datos mandan sobre lo detectado.
   const cm = catalogMatch || {};
   return getPeliBadgeKeysFromMovie({
@@ -4884,22 +4937,81 @@ function getPrivadoBadgeKeys(item) {
   });
 }
 
+// ── Enlace Catálogo (público) ↔ Noctis Privado ──
+// Cada entrada privada recuerda el slug de su título público (catalogSlug), que NO cambia al editar.
+// Así, aunque cambies el título, la portada o los datos en el catálogo, se sigue sabiendo cuál es.
+// Entradas viejas (sin catalogSlug): se enlazan por título y, si no, por título base + resolución.
+function catalogItemForPrivado(item) {
+  if (item && item.catalogSlug) {
+    const m = getAllItems().find(x => x.slug === item.catalogSlug);
+    if (m) return m;
+  }
+  return matchMovieByTitle(item.titulo, item.masInfo);
+}
+function findPrivadoIdxForCatalog(list, m) { // m = registro del catálogo tal como estaba ANTES de editar
+  if (!m) return -1;
+  let i = m.slug ? list.findIndex(p => p.catalogSlug && p.catalogSlug === m.slug) : -1;
+  if (i < 0) i = list.findIndex(p => normTitulo(p.titulo) === normTitulo(m.title));
+  if (i < 0) {
+    const baseM = baseTituloSinCalidad(m.title || '');
+    const resM = normalizarResolucion(m.resolution);
+    i = list.findIndex(p => !p.catalogSlug && baseTituloSinCalidad(p.titulo || '') === baseM
+                          && normalizarResolucion(resolucionDesdeMasInfo(p.masInfo)) === resM);
+  }
+  return i;
+}
+
+// Pone Noctis Privado al día con el catálogo público: misma portada (la que se guardó primero y
+// cualquier cambio posterior), mismo tipo, formato de audio, legacyCover y datos de ficha.
+// Sin esto la portada del privado quedaba "congelada" con la que tenía al guardarse y se veía
+// distinta a la pública cuando esta se corregía después. No toca enlaces ni el título propio.
+function sincronizarPrivadoConCatalogo() {
+  const lista = getPrivado();
+  let cambios = 0;
+  const CAMPOS_FICHA = ['originalTitle', 'year', 'country', 'duration', 'genre', 'description'];
+  lista.forEach(item => {
+    const m = catalogItemForPrivado(item);
+    if (!m) return;
+    if (m.slug && item.catalogSlug !== m.slug)                { item.catalogSlug = m.slug; cambios++; }
+    if (m.image && item.imagen !== m.image)                   { item.imagen = m.image; cambios++; }
+    if ((m.type || '') !== (item.type || ''))                 { item.type = m.type || ''; cambios++; }
+    if ((m.audioFormat || '') !== (item.audioFormat || ''))   { item.audioFormat = m.audioFormat || ''; cambios++; }
+    if (!!m.legacyCover !== !!item.legacyCover)               { item.legacyCover = !!m.legacyCover; cambios++; }
+    CAMPOS_FICHA.forEach(c => { if (m[c] && String(m[c]).trim() && item[c] !== m[c]) { item[c] = m[c]; cambios++; } });
+  });
+  if (cambios) { try { localStorage.setItem('noctis_privado', JSON.stringify(lista)); } catch (e) {} }
+  return lista;
+}
+
 function privadoPosterHtml(item, sizeClass) {
   // Portada heredada del catálogo público (la que se guardó primero); si no hay match, la propia.
-  const _cm = matchMovieByTitle(item.titulo, item.masInfo);
+  // Las cintas se calculan con el MISMO criterio que la lista del Catálogo (ver renderList):
+  //  · música pura → solo la cinta de formato de audio (FLAC, 16-BIT, etc.) + fondo difuminado
+  //  · portada legacyCover → sin cintas encima (ya viene diseñada con marco)
+  //  · Blu-ray / Blu-ray 3D → la cinta de Calidad no se dibuja (getPeliBadgeKeysFromMovie)
+  const _cm = catalogItemForPrivado(item);
   if (_cm && _cm.image) item = Object.assign({}, item, { imagen: _cm.image });
-  const badges = getPrivadoBadgeKeys(item);
-  const tieneMarco = !!(badges && badges.fuente);
-  const badgeLayersHtml = badges ? ['idioma','fuente','calidad','hdr','streaming'].map(cat => {
-    const key = badges[cat];
+  const refType = _cm ? (_cm.type || '') : (item.type || '');
+  const legacy = !!(_cm && _cm.legacyCover);
+  const esMusica = isPureMusicCoverAdmin({ type: refType, legacyCover: legacy });
+  const musicaKey = esMusica
+    ? musicaBadgeKeyFromMovieData({ audioFormat: _cm ? (_cm.audioFormat || '') : (item.audioFormat || '') })
+    : null;
+  const badges = (legacy || esMusica) ? null : getPrivadoBadgeKeys(item);
+  const tieneMarco = !!(badges && badges.fuente) || !!musicaKey;
+  const layer = (cat, key) => {
     if (!key) return '';
     const path = peliBadgePath(cat, key);
     return path ? `<img class="movie-item-badge-overlay" src="${path}" alt="" onerror="this.style.display='none'"/>` : '';
-  }).join('') : '';
+  };
+  const badgeLayersHtml = (badges ? ['idioma','fuente','calidad','hdr','streaming'].map(cat => layer(cat, badges[cat])).join('') : '')
+    + (musicaKey ? layer('musica', musicaKey) : '');
+  const sqBg = esMusica ? posterSquareBgHtmlAdmin({ type: refType, legacyCover: legacy, image: item.imagen }, true) : '';
   const npFallback = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='108' height='62'%3E%3Crect fill='%23161b24' width='108' height='62'/%3E%3C/svg%3E`;
   return `
     <div class="movie-item-poster-wrap ${sizeClass||''}">
-      <img class="movie-item-poster ${tieneMarco ? 'has-frame' : ''}" src="${item.imagen||''}" alt="${(item.titulo||'').replace(/"/g,'')}" onerror="this.src='${npFallback}'"/>
+      ${sqBg}
+      <img class="movie-item-poster ${tieneMarco ? 'has-frame' : ''}${esMusica ? ' img-contain-music' : ''}" src="${item.imagen||''}" alt="${(item.titulo||'').replace(/"/g,'')}" onerror="this.src='${npFallback}'"/>
       ${badgeLayersHtml}
     </div>`;
 }
@@ -5018,7 +5130,7 @@ function reemparejarPrivadoConCatalogo() {
 }
 
 function downloadPrivadoJSON() {
-  const json = JSON.stringify(getPrivado(), null, 2);
+  const json = JSON.stringify(sincronizarPrivadoConCatalogo(), null, 2);
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
   a.download = 'noctis-privado.json'; a.click();
@@ -5026,7 +5138,7 @@ function downloadPrivadoJSON() {
 }
 
 function copyPrivadoJSON() {
-  navigator.clipboard.writeText(JSON.stringify(getPrivado(), null, 2))
+  navigator.clipboard.writeText(JSON.stringify(sincronizarPrivadoConCatalogo(), null, 2))
     .then(() => showToast('noctis-privado.json copiado ✓', 'success'))
     .catch(() => showToast('No se pudo copiar', 'error'));
 }
