@@ -3038,6 +3038,56 @@ function generateSlug(title) {
   return s || 'titulo';
 }
 
+// ── Slugs ÚNICOS ──
+// generateSlug() pasa todo a minúsculas, así que "Zona Cero (2026) WEBRip…" y "Zona cero (2026) WEBRip…"
+// daban el MISMO slug: los dos títulos compartían página de detalle, vistas y entrada en Noctis Privado
+// (el segundo pisaba al primero). Ahora cada título tiene su slug propio, con sufijo -2, -3… si hace falta.
+function slugsEnUso(excluir) { // excluir = { store, i } (posición del título que se está editando, o null)
+  const usados = new Set();
+  getMovies().forEach((m, i) => { if (m.slug && !(excluir && excluir.store === 'movies' && excluir.i === i)) usados.add(m.slug); });
+  getMusic().forEach((m, i)  => { if (m.slug && !(excluir && excluir.store === 'music'  && excluir.i === i)) usados.add(m.slug); });
+  return usados;
+}
+function slugUnico(base, excluir) {
+  const usados = slugsEnUso(excluir);
+  if (!usados.has(base)) return base;
+  let n = 2;
+  while (usados.has(base + '-' + n)) n++;
+  return base + '-' + n;
+}
+
+// Arregla los slugs repetidos que ya existen en el catálogo: se queda con el slug el título MÁS VIEJO
+// (el que ya pudo haberse compartido o contado vistas) y a los más nuevos les pone sufijo -2, -3…
+function repararSlugsDuplicados() {
+  const movies = getMovies(), music = getMusic();
+  const refs = [];
+  movies.forEach((item, i) => refs.push({ item, store: 'movies', i }));
+  music.forEach((item, i)  => refs.push({ item, store: 'music',  i }));
+  const grupos = {};
+  refs.forEach(r => { if (r.item.slug) (grupos[r.item.slug] = grupos[r.item.slug] || []).push(r); });
+  const usados = new Set(refs.map(r => r.item.slug).filter(Boolean));
+  let cambios = 0;
+  Object.keys(grupos).forEach(slug => {
+    const g = grupos[slug];
+    if (g.length < 2) return;
+    // más viejo primero: por fecha de subida y, a igual fecha, el que está más abajo en la lista (se guarda con unshift)
+    g.sort((a, b) => (a.item.uploadDate || '').localeCompare(b.item.uploadDate || '') || (b.i - a.i));
+    for (let k = 1; k < g.length; k++) {
+      let n = k + 1, nuevo = slug + '-' + n;
+      while (usados.has(nuevo)) { n++; nuevo = slug + '-' + n; }
+      usados.add(nuevo);
+      g[k].item.slug = nuevo;
+      cambios++;
+    }
+  });
+  if (cambios) {
+    saveMovies(movies); saveMusic(music);
+    showToast('🔧 Se corrigieron ' + cambios + ' título(s) con slug repetido. Publicá con 🚀 para subirlo.', 'info');
+    try { renderList(true); } catch (e) {}
+  }
+  return cambios;
+}
+
 function submitForm() {
   const data = getFormData();
   if (!data.title) { showToast('El título es obligatorio.', 'error'); return; }
@@ -3058,11 +3108,8 @@ function submitForm() {
   const sameStore = isEdit && ((editingStore === 'music') === toMusic);
 
   // Generar slug: conservar el existente si ya tiene uno (al editar)
-  if (existing && existing.slug) {
-    data.slug = existing.slug;
-  } else {
-    data.slug = generateSlug(data.title);
-  }
+  const _excluir = isEdit ? { store: editingStore === 'music' ? 'music' : 'movies', i: editingIndex } : null;
+  data.slug = slugUnico((existing && existing.slug) ? existing.slug : generateSlug(data.title), _excluir);
 
   if (isEdit) {
     // Si el título editado ya tenía fecha de subida, se conserva tal cual
@@ -3103,7 +3150,9 @@ function submitForm() {
   if (idxPrivExistente >= 0 && !_draftTit && normTitulo(privList[idxPrivExistente].titulo) !== normTitulo(existing.title)) {
     tituloPrivado = privList[idxPrivExistente].titulo; // título propio del privado (distinto al público): se respeta
   }
-  if (idxPrivExistente < 0) idxPrivExistente = privList.findIndex(p => normTitulo(p.titulo) === normTitulo(tituloPrivado));
+  // Título NUEVO → siempre entrada privada nueva (antes se buscaba por título sin mayúsculas y la segunda
+  // edición "Zona cero"/"Zona Cero" pisaba a la primera). Al editar solo se reutiliza una entrada sin enlazar y con título exacto.
+  if (idxPrivExistente < 0 && isEdit) idxPrivExistente = privList.findIndex(p => !p.catalogSlug && p.titulo === tituloPrivado);
 
   if (enlacesPrivadosFinal.length) {
     const masInfoPrivado = (window.currentPrivadoDraft && window.currentPrivadoDraft.masInfo)
@@ -3970,6 +4019,7 @@ function resetDropZone() {
 // Inicializar drag & drop
 document.addEventListener('DOMContentLoaded', function() {
   loadGhConfig();
+  try { repararSlugsDuplicados(); } catch (e) { console.error(e); }
   initChips();
   const dz = document.getElementById('drop-zone');
   if (!dz) return;
@@ -4946,24 +4996,43 @@ function getPrivadoBadgeKeys(item) {
 // Cada entrada privada recuerda el slug de su título público (catalogSlug), que NO cambia al editar.
 // Así, aunque cambies el título, la portada o los datos en el catálogo, se sigue sabiendo cuál es.
 // Entradas viejas (sin catalogSlug): se enlazan por título y, si no, por título base + resolución.
-function catalogItemForPrivado(item) {
-  if (item && item.catalogSlug) {
-    const m = getAllItems().find(x => x.slug === item.catalogSlug);
+// Enlace SEGURO: por slug o por título exacto (respetando mayúsculas). Distingue ediciones que comparten
+// título base y resolución (ej. "Zona Cero … WEB-DL" y "Zona Cero … WEBRip").
+function catalogItemExactoParaPrivado(item) {
+  if (!item) return null;
+  const todos = getAllItems();
+  if (item.catalogSlug) {
+    const m = todos.find(x => x.slug === item.catalogSlug);
     if (m) return m;
   }
-  return matchMovieByTitle(item.titulo, item.masInfo);
+  const iguales = todos.filter(x => x.title === item.titulo);
+  if (!iguales.length) return null;
+  const res = normalizarResolucion(resolucionDesdeMasInfo(item.masInfo));
+  return (res && iguales.find(x => normalizarResolucion(x.resolution) === res)) || iguales[0];
+}
+function catalogItemForPrivado(item) {
+  // Si no hay enlace seguro, se cae al emparejado aproximado (título base + resolución) como siempre.
+  return catalogItemExactoParaPrivado(item) || matchMovieByTitle(item.titulo, item.masInfo);
 }
 function findPrivadoIdxForCatalog(list, m) { // m = registro del catálogo tal como estaba ANTES de editar
   if (!m) return -1;
+  // 1) por slug (único y fijo)
   let i = m.slug ? list.findIndex(p => p.catalogSlug && p.catalogSlug === m.slug) : -1;
-  if (i < 0) i = list.findIndex(p => normTitulo(p.titulo) === normTitulo(m.title));
-  if (i < 0) {
-    const baseM = baseTituloSinCalidad(m.title || '');
-    const resM = normalizarResolucion(m.resolution);
-    i = list.findIndex(p => !p.catalogSlug && baseTituloSinCalidad(p.titulo || '') === baseM
-                          && normalizarResolucion(resolucionDesdeMasInfo(p.masInfo)) === resM);
-  }
-  return i;
+  if (i >= 0) return i;
+  // Entradas viejas (sin catalogSlug todavía). Nunca se "roba" una entrada ya enlazada a OTRO título.
+  const libres = list.map((p, idx) => ({ p, idx })).filter(x => !x.p.catalogSlug);
+  const resM = normalizarResolucion(m.resolution);
+  const mismaRes = p => { const rp = normalizarResolucion(resolucionDesdeMasInfo(p.masInfo)); return !resM || !rp || resM === rp; };
+  // 2) título EXACTO (respetando mayúsculas: "Zona Cero" y "Zona cero" son entradas distintas)
+  let f = libres.find(x => x.p.titulo === m.title && mismaRes(x.p));
+  if (f) return f.idx;
+  // 3) título igual ignorando mayúsculas, solo si la resolución no contradice
+  f = libres.find(x => normTitulo(x.p.titulo) === normTitulo(m.title) && mismaRes(x.p));
+  if (f) return f.idx;
+  // 4) título base + resolución
+  const baseM = baseTituloSinCalidad(m.title || '');
+  f = libres.find(x => baseTituloSinCalidad(x.p.titulo || '') === baseM && resM && normalizarResolucion(resolucionDesdeMasInfo(x.p.masInfo)) === resM);
+  return f ? f.idx : -1;
 }
 
 // Pone Noctis Privado al día con el catálogo público: misma portada (la que se guardó primero y
@@ -4975,9 +5044,11 @@ function sincronizarPrivadoConCatalogo() {
   let cambios = 0;
   const CAMPOS_FICHA = ['originalTitle', 'year', 'country', 'duration', 'genre', 'description'];
   lista.forEach(item => {
-    const m = catalogItemForPrivado(item);
+    const exacto = catalogItemExactoParaPrivado(item);
+    const m = exacto || matchMovieByTitle(item.titulo, item.masInfo);
     if (!m) return;
-    if (m.slug && item.catalogSlug !== m.slug)                { item.catalogSlug = m.slug; cambios++; }
+    // El slug solo se enlaza con un emparejado seguro, para no atar la entrada a otra edición parecida.
+    if (exacto && exacto.slug && item.catalogSlug !== exacto.slug) { item.catalogSlug = exacto.slug; cambios++; }
     if (m.image && item.imagen !== m.image)                   { item.imagen = m.image; cambios++; }
     if ((m.type || '') !== (item.type || ''))                 { item.type = m.type || ''; cambios++; }
     if ((m.audioFormat || '') !== (item.audioFormat || ''))   { item.audioFormat = m.audioFormat || ''; cambios++; }
