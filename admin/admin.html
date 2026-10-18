@@ -1938,17 +1938,20 @@ function parseBloqueCompleto(raw, shorteners, multiserver) {
   // apareció. Antes la detección de capturas era solo por posición (antes de "MAS INFO"),
   // así que una captura fuera de lugar (ej. pegada después de los enlaces) terminaba
   // clasificada como link de descarga y se colaba en Enlaces privados.
-  const HOSTS_IMAGEN = ['imgur.com','ibb.co','postimg.cc','imgfz.com','media.themoviedb.org','themoviedb.org','blogger.googleusercontent.com','blogspot.com'];
+  const HOSTS_IMAGEN = ['imgur.com','ibb.co','postimg.cc','imgfz.com','media.themoviedb.org','themoviedb.org','tmdb.org','gstatic.com','blogger.googleusercontent.com','blogspot.com'];
   function esHostDeImagen(url) {
     try {
-      const host = new URL(url).hostname.replace(/^www\./i, '').toLowerCase();
-      return HOSTS_IMAGEN.some(d => host === d || host.endsWith('.' + d));
+      const u = new URL(url);
+      const host = u.hostname.replace(/^www\./i, '').toLowerCase();
+      if (HOSTS_IMAGEN.some(d => host === d || host.endsWith('.' + d))) return true;
+      // Cualquier otro dominio: si la URL termina en una extensión de imagen, es una imagen (captura), no un enlace de descarga.
+      return /\.(jpe?g|png|webp|gif|avif)$/i.test(u.pathname);
     } catch { return false; }
   }
   // Dominios que NUNCA son nada útil (ni captura, ni enlace de descarga) — páginas de origen,
   // foros, etc. que a veces quedan pegadas dentro del bloque. Se ignoran directamente, igual
   // que el contenido entre líneas de guiones.
-  const HOSTS_SIEMPRE_OMITIR = ['gdrivelatinohd.net', 'identi.io'];
+  const HOSTS_SIEMPRE_OMITIR = ['gdrivelatinohd.net', 'identi.io', 'compucalitv.lol'];
   function esHostAOmitir(url) {
     try {
       const host = new URL(url).hostname.replace(/^www\./i, '').toLowerCase();
@@ -2116,7 +2119,7 @@ function parseBloqueCompleto(raw, shorteners, multiserver) {
   //    la pusiste ahí a propósito para mostrarla en público. Si está sola, después de un espacio en
   //    blanco, sin nada que la describa, se toma como el link "de verdad" y se descarta (va solo a Privado).
   const reUrlPub = /^https?:\/\//i;
-  const dominiosSiempreExcluir = ['imgur.com', 'ibb.co', 'postimg.cc', 'imgfz.com', 'media.themoviedb.org', 'themoviedb.org', 'gdrivelatinohd.net', 'identi.io', 'blogger.googleusercontent.com', 'blogspot.com', 'youtu.be', 'youtube.com'];
+  const dominiosSiempreExcluir = ['imgur.com', 'ibb.co', 'postimg.cc', 'imgfz.com', 'media.themoviedb.org', 'themoviedb.org', 'tmdb.org', 'gstatic.com', 'compucalitv.lol', 'gdrivelatinohd.net', 'identi.io', 'blogger.googleusercontent.com', 'blogspot.com', 'youtu.be', 'youtube.com'];
   const enlacesFiltrados = [];
   for (let i = 0; i < enlacesCombinadosConBlancos.length; i++) {
     const l = enlacesCombinadosConBlancos[i];
@@ -4795,7 +4798,7 @@ function construirPrivadosEspejoDePublicos(rawBlock, publicLinksText, shorteners
       return (multiserver || []).some(d => host === d || host.endsWith('.' + d));
     } catch { return false; }
   };
-  const dominiosDescartar = ['gdrivelatinohd.net','identi.io','youtu.be','youtube.com','imgur.com','ibb.co','postimg.cc','imgfz.com','blogger.googleusercontent.com','blogspot.com','themoviedb.org'];
+  const dominiosDescartar = ['gdrivelatinohd.net','identi.io','compucalitv.lol','tmdb.org','gstatic.com','youtu.be','youtube.com','imgur.com','ibb.co','postimg.cc','imgfz.com','blogger.googleusercontent.com','blogspot.com','themoviedb.org'];
   const esDescartable = (u) => {
     try {
       const host = new URL(u).hostname.replace(/^www\./i, '').toLowerCase();
@@ -4890,7 +4893,7 @@ function parseNoctisPrivadoBloque(raw, shorteners, multiserver) {
   const enlaces = [];
   let multiCount = 0;
   const vistos = new Set();
-  const dominiosDescartar = ['gdrivelatinohd.net','identi.io','youtu.be','youtube.com','imgur.com','ibb.co','postimg.cc','imgfz.com','themoviedb.org','blogger.googleusercontent.com','blogspot.com'];
+  const dominiosDescartar = ['gdrivelatinohd.net','identi.io','compucalitv.lol','tmdb.org','gstatic.com','youtu.be','youtube.com','imgur.com','ibb.co','postimg.cc','imgfz.com','themoviedb.org','blogger.googleusercontent.com','blogspot.com'];
   for (const l of lineas) {
     if (!l || !reUrl.test(l)) continue;
     let host;
