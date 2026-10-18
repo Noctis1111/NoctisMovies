@@ -5473,5 +5473,30 @@
     "audioFormat": "",
     "legacyCover": false,
     "catalogSlug": "constantine-2005-bluray-trial-1080p-dv-hdr-ingles-espanol"
+  },
+  {
+    "id": "la-lista-de-schindler-1993-blu-ray-4k-uhd-hdr10-dual-espanol-ingles-mvd3sy0l-4pwkck",
+    "titulo": "La lista de Schindler (1993) Blu-ray 4K UHD HDR10 Dual Español-Inglés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/1tqW1AcidWRQgmKJH1yRX9cyYuz.jpg",
+    "masInfo": "Audio: Español (AAC 2 CH) – Inglés (Dolby TrueHD 8 CH)\nCalidad: Blu-ray\nResolución: 3840x2160p\nFormato: MKV\nTamaño: 83.4 GiB\nCodec: HEVC / H.265 (Main 10) | HDR10\nSubtítulos: Sí (Español PGS, Inglés PGS)",
+    "enlaces": [
+      {
+        "etiqueta": "megaup",
+        "url": "https://megaup.net/folder/91d741ac12cdb9230bd25718397d0768/Schindler_s_List_"
+      }
+    ],
+    "fecha": "17 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=la-lista-de-schindler-1993-blu-ray-4k-uhd-hdr10-dual-espanol-ingles",
+    "descargado": false,
+    "originalTitle": "Schindler's List",
+    "year": "1993",
+    "country": "United States",
+    "duration": "3 h 15 min",
+    "genre": "Drama, Historia, Bélica",
+    "description": "Gira en torno a Oskar Schindler, un empresario alemán que durante la Segunda Guerra Mundial comienza a emplear trabajadores judíos en su fábrica por motivos económicos, pero que poco a poco, al presenciar la persecución y el exterminio nazi, transforma sus motivaciones para utilizar su influencia y fortuna en salvar a más de mil personas de la muerte.",
+    "type": "Película",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "la-lista-de-schindler-1993-blu-ray-4k-uhd-hdr10-dual-espanol-ingles"
   }
 ]
