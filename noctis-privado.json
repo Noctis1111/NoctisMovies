@@ -5600,5 +5600,30 @@
     "audioFormat": "Lossless 16-bit",
     "legacyCover": false,
     "catalogSlug": "britpop-robbie-williams-2026-deluxe-flac-16-bit-441khz"
+  },
+  {
+    "id": "carrie-2026-serie-completa-webrip-720p-espanol-latino-ingles-mvg04yih-qw1cqt",
+    "titulo": "Carrie (2026) Serie Completa WEBRip 720p Español Latino-Inglés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/eS83I38AwNkZn1dETD63bgsukzP.jpg",
+    "masInfo": "Audio: Español Latino, Inglés\nCalidad: WEBRip\nResolución: 1280 × 640\nFormato: MKV\nTamaño: 3.77 GiB aproximadamente\nCodec: H.264/AVC\nSubtítulos: Español (forzados y completos)",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1K2AI1O75EWtmxX_lp8UuQA"
+      }
+    ],
+    "fecha": "19 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=carrie-2026-serie-completa-webrip-720p-espanol-latino-ingles",
+    "descargado": false,
+    "originalTitle": "Carrie",
+    "year": "2026",
+    "country": "Estados Unidos",
+    "duration": "6 h 56 min aproximadamente",
+    "genre": "Terror, Drama, Sobrenatural",
+    "description": "Gira en torno a Carrie White, una adolescente que, tras la muerte de su padre, debe enfrentarse al ambiente hostil de la escuela pública y al acoso que se vuelve viral en las redes sociales. Mientras intenta adaptarse a su nueva vida, descubre que posee poderes telequinéticos que comienzan a manifestarse durante su adolescencia.",
+    "type": "Serie",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "carrie-2026-serie-completa-webrip-720p-espanol-latino-ingles"
   }
 ]
