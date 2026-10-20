@@ -1093,6 +1093,22 @@ header::after {
   <style>
      50%{opacity:1} }
   </style>
+<style id="genre-style">
+  .genre-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 6px 10px; border-radius: 6px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-family: inherit; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; text-align: left; cursor: pointer; transition: all 0.2s; }
+  .genre-btn:hover, .genre-btn.active, .genre-btn[aria-expanded="true"] { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+  .genre-caret { font-size: 0.7rem; transition: transform 0.2s; }
+  .genre-btn[aria-expanded="true"] .genre-caret { transform: rotate(180deg); }
+  .genre-panel { margin-top: 0.5rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface2); overflow: hidden; }
+  .genre-panel[hidden] { display: none; }
+  #genre-search { width: 100%; box-sizing: border-box; padding: 7px 10px; background: transparent; border: 0; border-bottom: 1px solid var(--border); color: var(--white); outline: none; font-size: 0.78rem; font-family: inherit; }
+  #genre-search::placeholder { color: var(--muted); }
+  .genre-list { max-height: 240px; overflow-y: auto; padding: 0.25rem; scrollbar-width: thin; }
+  .genre-item { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; padding: 5px 8px; border-radius: 5px; color: var(--muted); font-size: 0.74rem; font-weight: 600; letter-spacing: 0.4px; text-decoration: none; transition: all 0.15s; }
+  .genre-item:hover, .genre-item.active { color: var(--gold); background: rgba(201,168,76,0.1); }
+  .genre-count { font-size: 0.65rem; opacity: 0.7; }
+  .genre-clear { color: #ff8a8a; }
+  .genre-empty { padding: 0.7rem; color: var(--muted); font-size: 0.74rem; text-align: center; }
+</style>
 </head>
 <body>
 <!-- Fondo Cinemático de Humo -->
@@ -1201,6 +1217,16 @@ header::after {
           <a class="side-tag" href="index.html?filter=hentai">🔞 ADULT/HENTAI</a>
           <a class="side-tag" href="index.html?filter=erotico">🔥 ERÓTICO</a>
           <a class="side-tag" href="musica.html">🎵 MÚSICA</a>
+        </div>
+      </div>
+    </div>
+    <div class="side-box genre-box"><svg class="sb-trace-svg"><rect class="sb-trace-rect" x="1" y="1" width="100%" height="100%" rx="11" ry="11"/></svg>
+      <div class="side-box-title">GÉNERO</div>
+      <div class="side-filter-group">
+        <button type="button" id="genre-btn" class="genre-btn" aria-haspopup="listbox" aria-expanded="false"><span id="genre-btn-label">Seleccionar género</span><span class="genre-caret">▾</span></button>
+        <div id="genre-panel" class="genre-panel" hidden>
+          <input type="text" id="genre-search" placeholder="Buscar género..." autocomplete="off"/>
+          <div id="genre-list" class="genre-list"></div>
         </div>
       </div>
     </div>
@@ -1320,6 +1346,110 @@ let activeFilter = 'all';
 let activeSource = '';
 let activeYear = '';
 let searchQuery = '';
+
+// ── FILTRO POR GÉNERO: se arma solo con el campo "Género" de cada título ──
+// (Documental NO cuenta como género: ya tiene su propio filtro en TIPO)
+const GENRE_PAGE = 'index.html';
+const GENRE_ALIASES = {
+  'sci-fi':'ciencia ficcion','scifi':'ciencia ficcion','sci fi':'ciencia ficcion',
+  'science fiction':'ciencia ficcion','ciencia-ficcion':'ciencia ficcion',
+  'action':'accion','adventure':'aventura','animation':'animacion','comedy':'comedia',
+  'crime':'crimen','fantasy':'fantasia','history':'historia','horror':'terror',
+  'mystery':'misterio','family':'familia','war':'belica','guerra':'belica','aventuras':'aventura'
+};
+const GENRE_EXCLUDE = ['documental', 'documentary'];
+let activeGenre = '';
+let GENRE_INDEX = [];
+
+function genreKey(g) {
+  const k = norm(g).replace(/\s+/g, ' ').trim();
+  return GENRE_ALIASES[k] || k;
+}
+function prettyGenre(s) {
+  s = String(s || '').trim();
+  // Si ya viene bien escrito ("II Guerra Mundial") se respeta; solo se arregla TODO MAYÚSCULAS o todo minúsculas
+  if (s !== s.toUpperCase() && s !== s.toLowerCase()) return s;
+  return s.toLowerCase().replace(/(^|[\s\-])(\S)/g, (m0, a, b) => a + b.toUpperCase());
+}
+function escGenre(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+// Géneros de un título (sin repetir y sin "Documental")
+function genresOf(m) {
+  const out = [];
+  String(m.genre || '').split(/[,;\/|]|\.(?=\s|$)|\s[–—-]\s/).forEach(raw => {
+    const t = raw.trim();
+    if (!t) return;
+    const k = genreKey(t);
+    if (!k || GENRE_EXCLUDE.includes(k)) return;
+    if (!out.some(o => o.key === k)) out.push({ key: k, label: t });
+  });
+  return out;
+}
+function genreLabel(key) {
+  const f = GENRE_INDEX.find(g => g.key === key);
+  return f ? f.label : prettyGenre(key);
+}
+
+function buildGenreUI() {
+  const btn   = document.getElementById('genre-btn');
+  const panel = document.getElementById('genre-panel');
+  const list  = document.getElementById('genre-list');
+  const input = document.getElementById('genre-search');
+  const lbl   = document.getElementById('genre-btn-label');
+  if (!btn || !panel || !list) return;
+
+  // Contar géneros reales del catálogo cargado
+  const map = {};
+  allMovies.forEach(m => genresOf(m).forEach(g => {
+    const e = map[g.key] || (map[g.key] = { key: g.key, count: 0, variants: {} });
+    e.count++;
+    e.variants[g.label] = (e.variants[g.label] || 0) + 1;
+  }));
+  GENRE_INDEX = Object.values(map).map(e => {
+    const v = Object.keys(e.variants);
+    const pref = v.find(x => norm(x).replace(/\s+/g, ' ').trim() === e.key)
+              || v.sort((a, b) => e.variants[b] - e.variants[a])[0];
+    return { key: e.key, count: e.count, label: prettyGenre(pref) };
+  }).sort((a, b) => a.label.localeCompare(b.label, 'es'));
+
+  if (lbl) lbl.textContent = activeGenre ? genreLabel(activeGenre) : 'Seleccionar género';
+  btn.classList.toggle('active', !!activeGenre);
+
+  function renderItems(q) {
+    const qn = norm(q || '').trim();
+    let html = '';
+    if (activeGenre) html += `<a class="genre-item genre-clear" href="${GENRE_PAGE}">✕ Quitar filtro de género</a>`;
+    const items = GENRE_INDEX.filter(g => !qn || norm(g.label).includes(qn));
+    if (!GENRE_INDEX.length) html += '<div class="genre-empty">Aún no hay géneros</div>';
+    else if (!items.length) html += '<div class="genre-empty">Sin resultados</div>';
+    html += items.map(g =>
+      `<a class="genre-item${g.key === activeGenre ? ' active' : ''}" href="${GENRE_PAGE}?genre=${encodeURIComponent(g.key)}">` +
+      `<span>${escGenre(g.label)}</span><span class="genre-count">${g.count}</span></a>`
+    ).join('');
+    list.innerHTML = html;
+  }
+  renderItems('');
+
+  function setOpen(open) {
+    panel.hidden = !open;
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open && input) { input.value = ''; renderItems(''); try { input.focus({ preventScroll: true }); } catch (e) {} }
+  }
+  btn.onclick = () => setOpen(panel.hidden);
+  if (input) input.oninput = () => renderItems(input.value);
+  if (!buildGenreUI._bound) {
+    buildGenreUI._bound = true;
+    document.addEventListener('click', e => {
+      const box = document.querySelector('.genre-box');
+      if (box && !box.contains(e.target)) { const p = document.getElementById('genre-panel'); if (p && !p.hidden) { p.hidden = true; const b = document.getElementById('genre-btn'); if (b) b.setAttribute('aria-expanded', 'false'); } }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { const p = document.getElementById('genre-panel'); if (p && !p.hidden) { p.hidden = true; const b = document.getElementById('genre-btn'); if (b) b.setAttribute('aria-expanded', 'false'); } }
+    });
+  }
+}
+
 
 // Normaliza texto para comparación sin acento, minúsculas
 function norm(str) {
@@ -1449,6 +1579,8 @@ async function loadMovies() {
   const sourceParam = params.get('source');
   const yearParam   = params.get('year');
   const searchParam = params.get('search');
+  const genreParam  = params.get('genre');
+  if (genreParam) activeGenre = genreKey(genreParam);
 
   if (searchParam) {
     searchQuery = norm(searchParam.trim());
@@ -1486,13 +1618,14 @@ async function loadMovies() {
 
   // Generar años en sidebar
   buildYearSidebar();
+  buildGenreUI();
   renderGrid();
   build2026(allMovies);
 
   // Si llegamos con una búsqueda ya cargada en la URL (ej. desde detalle.html
   // al presionar Enter en el buscador), replicamos el mismo scroll automático
   // hacia los resultados que ocurre cuando se escribe directamente acá.
-  if (searchParam || filterParam || sourceParam || yearParam) {
+  if (searchParam || filterParam || sourceParam || yearParam || genreParam) {
     const tabsEl = document.querySelector('.filter-tabs');
     if (tabsEl) {
       setTimeout(() => tabsEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
@@ -1557,11 +1690,13 @@ function renderGrid() {
       norm(m.title).includes(searchQuery) ||
       String(m.year || '').includes(searchQuery);
 
-    return matchFilter && matchSource && matchYear && matchSearch;
+    const matchGenre = !activeGenre || genresOf(m).some(g => g.key === activeGenre);
+    return matchFilter && matchSource && matchYear && matchSearch && matchGenre;
   });
 
   // Label dinámico
-  if (activeYear) label.textContent = `Año ${activeYear}`;
+  if (activeGenre) label.textContent = 'Género: ' + genreLabel(activeGenre);
+  else if (activeYear) label.textContent = `Año ${activeYear}`;
   else if (activeSource) label.textContent = activeSource;
   else if (activeFilter !== 'all') label.textContent = activeFilter.toUpperCase();
   else label.textContent = 'Últimos Aportes';
