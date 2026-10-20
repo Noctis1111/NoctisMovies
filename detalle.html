@@ -1497,6 +1497,14 @@
     .title-tag.tag-type { font-family: 'Bebas Neue', sans-serif; font-size: 0.85rem; letter-spacing: 1.5px; padding: 4px 12px; border-radius: 6px; background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.45); color: var(--gold); }
     /* Fecha de subida: misma fila que las demas etiquetas, pero pegada al
        extremo derecho (margin-left:auto la empuja al otro lado de la fila) */
+    /* Géneros clicables: mismo dorado de siempre; al pasar el cursor suben, brillan y les cruza un destello */
+    a.title-tag { text-decoration: none; cursor: pointer; transition: all 0.22s ease; }
+    a.title-tag.tag-genre { position: relative; overflow: hidden; }
+    a.title-tag.tag-genre::after { content: ''; position: absolute; top: 0; left: -60%; width: 40%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,236,170,0.55), transparent); transform: skewX(-20deg); transition: left 0.55s ease; pointer-events: none; }
+    a.title-tag.tag-genre:hover { transform: translateY(-2px); color: var(--gold); border-color: var(--gold); background: rgba(201,168,76,0.18); box-shadow: 0 6px 16px rgba(201,168,76,0.3); }
+    a.title-tag.tag-genre:hover::after { left: 120%; }
+    a.title-tag.tag-genre:active { transform: translateY(0) scale(0.96); }
+    a.title-tag.tag-genre:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
     .title-tag.tag-date { margin-left: auto; border-style: dashed; color: #b8bfcc; font-weight: 700; font-size: 0.85rem; padding: 4px 12px; }
 
     /* ── Móviles Android de alta densidad (ej. Motorola Edge 50 Pro, 1220x2712px)
@@ -2705,13 +2713,33 @@ async function init() {
   // Fuente/Encode: WEB-DL, REMUX, HDTS, X265…
   if (m.source) tags.push(m.source.toUpperCase());
   // Géneros (máx 3)
-  if (m.genre) m.genre.split(',').slice(0,3).forEach(g => { const t = g.trim(); if(t) tags.push(t.toUpperCase()); });
+  // Géneros (máx 3): cada uno es un enlace que abre el catálogo ya filtrado por ese género.
+  // Documental no es género: ya tiene su filtro de TIPO.
+  const GENRE_ALIASES = {
+  'sci-fi':'ciencia ficcion','scifi':'ciencia ficcion','sci fi':'ciencia ficcion',
+  'science fiction':'ciencia ficcion','ciencia-ficcion':'ciencia ficcion',
+  'action':'accion','adventure':'aventura','animation':'animacion','comedy':'comedia',
+  'crime':'crimen','fantasy':'fantasia','history':'historia','horror':'terror',
+  'mystery':'misterio','family':'familia','war':'belica','guerra':'belica','aventuras':'aventura'
+};
+  const genrePage = window.NOCTIS_MUSIC ? 'musica.html' : 'index.html';
+  let genreHtml = '';
+  if (m.genre) m.genre.split(/[,;\/|]|\.(?=\s|$)|\s[–—-]\s/).filter(x => x.trim()).slice(0,3).forEach(g => {
+    const t = g.trim();
+    if (!t) return;
+    const k0 = t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
+    const k = GENRE_ALIASES[k0] || k0;
+    const href = (k === 'documental' || k === 'documentary')
+      ? 'index.html?filter=documental'
+      : `${genrePage}?genre=${encodeURIComponent(k)}`;
+    genreHtml += `<a class="title-tag tag-genre" href="${href}">${t.toUpperCase()}</a>`;
+  });
   // Año destacado al inicio, luego Tipo/+18, luego el resto
   const yearHtml = m.year ? `<span class="title-year">${m.year}</span>` : '';
   // Fecha de subida (si el titulo la tiene) — al fondo, extremo derecho de la fila
   const uploadLabel = formatUploadDate(m.uploadDate);
   const dateHtml = uploadLabel ? `<span class="title-tag tag-date">${uploadLabel}</span>` : '';
-  tagsEl.innerHTML = yearHtml + typeHtml + tags.map(t => `<span class="title-tag">${t}</span>`).join('') + dateHtml;
+  tagsEl.innerHTML = yearHtml + typeHtml + tags.map(t => `<span class="title-tag">${t}</span>`).join('') + genreHtml + dateHtml;
 
   // Poster
   const posterEl = document.getElementById('d-poster');
