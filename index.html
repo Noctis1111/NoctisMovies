@@ -1175,6 +1175,7 @@ header::after {
       <button class="filter-tab" data-filter="hentai">🔞 Adult/Hentai</button>
       <button class="filter-tab" data-filter="erotico">🔥 Erótico</button>
       <button class="filter-tab" data-filter="musica" data-go="musica.html">🎵 Música</button>
+      <button class="filter-tab" data-filter="musica-video">🎞 Música &amp; Video</button>
       <button class="filter-tab" data-filter="4k">4K</button>
       <button class="filter-tab" data-filter="1080p">1080p</button>
       <button class="filter-tab" data-filter="latino">Latino</button>
@@ -1217,6 +1218,7 @@ header::after {
           <a class="side-tag" href="index.html?filter=hentai">🔞 ADULT/HENTAI</a>
           <a class="side-tag" href="index.html?filter=erotico">🔥 ERÓTICO</a>
           <a class="side-tag" href="musica.html">🎵 MÚSICA</a>
+          <a class="side-tag" href="index.html?filter=musica-video">🎞 MÚSICA &amp; VIDEO</a>
         </div>
       </div>
     </div>
@@ -1658,7 +1660,10 @@ function renderGrid() {
   let filtered = allMovies.filter(m => {
     // FILTRO TIPO/RESOLUCIÓN/AUDIO/FUENTE
     let matchFilter = true;
-    if (activeFilter !== 'all') {
+    if (activeFilter === 'musica-video') {
+      // Híbrido: tipo combinado que incluye Música (ej. "Película | Música"), sin ser música pura
+      matchFilter = isMusicContent(m) && norm(m.type).replace(/\s+/g, '') !== 'musica';
+    } else if (activeFilter !== 'all') {
       const f = norm(activeFilter);
       // Tipo (Película, Serie, Anime, Dorama, Hentai, Música)
       const typeMatch   = norm(m.type).includes(f);
@@ -1698,7 +1703,7 @@ function renderGrid() {
   if (activeGenre) label.textContent = 'Género: ' + genreLabel(activeGenre);
   else if (activeYear) label.textContent = `Año ${activeYear}`;
   else if (activeSource) label.textContent = activeSource;
-  else if (activeFilter !== 'all') label.textContent = activeFilter.toUpperCase();
+  else if (activeFilter !== 'all') label.textContent = (activeFilter === 'musica-video') ? 'MÚSICA & VIDEO' : activeFilter.toUpperCase();
   else label.textContent = 'Últimos Aportes';
 
   if (filtered.length === 0) {
