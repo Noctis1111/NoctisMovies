@@ -5700,5 +5700,42 @@
     "audioFormat": "",
     "legacyCover": false,
     "catalogSlug": "v-de-vendetta-2006-web-dl-4k-dv-hdr10-espanol-latino-ingles"
+  },
+  {
+    "id": "black-sails-2014-2017-serie-completa-38-38-web-dl-1080p-latino-ingles-mvid3cyl-qh6ylg",
+    "titulo": "BLACK SAILS (2014-2017) SERIE COMPLETA [38/38] WEB-DL 1080P LATINO-INGLÉS",
+    "imagen": "https://image.tmdb.org/t/p/original/xbj5HBV8n4zoUgpa0c1VHjE1eLC.jpg",
+    "masInfo": "Audio: Español Latino E-AC3 2.0-Ingles E-AC3 5.1\nCalidad: WEBDL\nResolución: 1920x1080\nFormato: MKV\nTamaño: 1,5GB a 3GB Por Cap (Total 87.6GB)\nCodec: H264\nSubtítulos: Español Latino (SRT)",
+    "enlaces": [
+      {
+        "etiqueta": "Temporada 1:",
+        "url": "https://1024terabox.com/s/18qn826AGrgbxoa7iK3JBDg"
+      },
+      {
+        "etiqueta": "Temporada 2:",
+        "url": "https://1024terabox.com/s/1Hkdo4uIjWgciqbNJG5HJwQ"
+      },
+      {
+        "etiqueta": "Temporada 3:",
+        "url": "https://1024terabox.com/s/10CjOARNP-GNudKhlPB22HA"
+      },
+      {
+        "etiqueta": "Temporada 4:",
+        "url": "https://1024terabox.com/s/13lgpm9ahJzQB9J2SJD85hw"
+      }
+    ],
+    "fecha": "21 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=black-sails-2014-2017-serie-completa-38-38-web-dl-1080p-latino-ingles",
+    "descargado": false,
+    "originalTitle": "Black Sails",
+    "year": "2014-2017",
+    "country": "South Africa",
+    "duration": "60 min",
+    "genre": "Serie de TV. Aventuras I Piratas. Siglo XVIII",
+    "description": "Serie de TV. (2014-2017). 4 temporadas. 38 episodios. 1715. La Edad Dorada de la Piratería. La isla New Providence es un territorio sin ley donde hay piratas, prostitutas, ladrones y cazadores de fortunas. Está controlada por los piratas más importantes, de los cuales el más brillante y temido es el Capitán Flint y su tripulante John Silver. Con amenazas por todas partes, deben luchar por su supervivencia: contra la Marina Británica cuando vuelven para reclamar su territorio y terminar para siempre con los piratas, con una marina de soldados españoles que está entre ellos y el mayor botín que hayan conocido, y de un nuevo rival que nunca podrían haberse imaginado, uno que los conoce, los entiende y que los volverá unos contra otros.",
+    "type": "Serie",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "black-sails-2014-2017-serie-completa-38-38-web-dl-1080p-latino-ingles"
   }
 ]
