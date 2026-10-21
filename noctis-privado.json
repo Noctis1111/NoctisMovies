@@ -5777,7 +5777,7 @@
   },
   {
     "id": "dragon-ball-super-beerus-t1e02-2026-montaje-web-dl-1080p-espanol-latino-mvidva1n-n3kf3z",
-    "titulo": "Dragon Ball Super: Beerus T1E02 (2026) Montaje WEB-DL 1080p Español Latino",
+    "titulo": "Dragon Ball Super: Beerus T1E02 (2026) Montaje V1 WEB-DL 1080p Español Latino",
     "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/ycaeQclsoHdEVLIRZDOLY2oq7E2.jpg",
     "masInfo": "Audio: Español Latino AAC LC, 2.0 canales, 44.1 kHz\nCalidad: WEB-DL\nResolución: 1920 × 1080 (1080p)\nFormato: MKV\nTamaño: 1.37 GiB\nCodec: AVC (H.264), 8 bits\nSubtítulos: No indicados",
     "enlaces": [
@@ -5815,5 +5815,46 @@
     "audioFormat": "",
     "legacyCover": false,
     "catalogSlug": "dragon-ball-super-beerus-t1e02-2026-montaje-web-dl-1080p-espanol-latino"
+  },
+  {
+    "id": "dragon-ball-super-beerus-t1e02-2026-montaje-v2-web-dl-1080p-espanol-latino-castellano-mvif2uqo-o8qv9m",
+    "titulo": "Dragon Ball Super: Beerus T1E02 (2026) Montaje V2 WEB-DL 1080p Español Latino-Castellano",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/ycaeQclsoHdEVLIRZDOLY2oq7E2.jpg",
+    "masInfo": "Audio: Español Latino PCM, 2.0 canales, 16 bits, 44.1 kHz; Castellano PCM, 2.0 canales, 16 bits, 44.1 kHz\nCalidad: WEB-DL\nResolución: 1920 × 1080 (1080p)\nFormato: MKV\nTamaño: 1.53 GiB\nCodec: AVC (H.264), 8 bits\nSubtítulos: Español de España",
+    "enlaces": [
+      {
+        "etiqueta": "pixeldrain",
+        "url": "https://pixeldrain.com/u/UTFbwM24"
+      },
+      {
+        "etiqueta": "gofile",
+        "url": "https://gofile.io/d/dPXLzoSX"
+      },
+      {
+        "etiqueta": "transfer",
+        "url": "https://transfer.it/t/pwi9itoHyRTK"
+      },
+      {
+        "etiqueta": "akirabox",
+        "url": "https://akirabox.to/ex5z2XYEBmKq/file"
+      },
+      {
+        "etiqueta": "fuckingfast",
+        "url": "https://fuckingfast.net/9fh6bjt17eqb"
+      }
+    ],
+    "fecha": "21 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=dragon-ball-super-beerus-t1e02-2026-montaje-v2-web-dl-1080p-espanol-latino-castellano",
+    "descargado": false,
+    "originalTitle": "Dragon Ball Super: Beerus",
+    "year": "2026",
+    "country": "Japón",
+    "duration": "23 min 17 s",
+    "genre": "Acción, Aventura, Comedia, Fantasía",
+    "description": "Gira en torno a la continuación de la edición remasterizada y con narrativa reconstruida de Dragon Ball Super: Beerus, que adapta el arco de la Batalla de los Dioses. Esta versión presenta el montaje de los doblajes latino y castellano, realizado por Reptill1423 y Yhan.",
+    "type": "Película",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "dragon-ball-super-beerus-t1e02-2026-montaje-v2-web-dl-1080p-espanol-latino-castellano"
   }
 ]
