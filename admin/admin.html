@@ -2530,8 +2530,14 @@ function autoRellenarTodo() {
     setActiveChip('chips-audio','');
     // Formato de audio — multi-selección: detecta TODOS los formatos que aparezcan en el bloque pegado
     const formatosDetectados = [];
-    if (/24[\s\-]?BITS?|HI[\s\-]?RES|96\s*KHZ|192\s*KHZ/.test(musicaUp)) formatosDetectados.push('Hi-Res 24-bit');
-    if (/16[\s\-]?BITS?|44[.,]?1\s*KHZ|\bFLAC\b|LOSSLESS|\bWAV\b/.test(musicaUp)) formatosDetectados.push('Lossless 16-bit');
+    // "FLAC"/"Lossless"/"WAV" por sí solos NO indican 16-bit (un FLAC puede ser 24-bit): solo se usan
+    // como respaldo cuando el bloque no menciona ninguna profundidad de bits.
+    const dice24 = /24[\s\-]?BITS?|HI[\s\-]?RES|96\s*KHZ|192\s*KHZ/.test(musicaUp);
+    const dice16 = /16[\s\-]?BITS?|44[.,]?1\s*KHZ/.test(musicaUp);
+    const dice32 = /32[\s\-]?BITS?/.test(musicaUp);
+    const diceSinBits = /\bFLAC\b|LOSSLESS|\bWAV\b/.test(musicaUp);
+    if (dice24) formatosDetectados.push('Hi-Res 24-bit');
+    if (dice16 || (diceSinBits && !dice24 && !dice32)) formatosDetectados.push('Lossless 16-bit');
     if (/\bAAC\b|\.M4A\b/.test(musicaUp)) formatosDetectados.push('AAC');
     if (/\bMP3\b|320\s*KBPS/.test(musicaUp)) formatosDetectados.push('MP3');
     // Master 32-bit solo si se menciona explícitamente "32-bit"/"32 bit" (no se asume por defecto)
