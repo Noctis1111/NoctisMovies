@@ -1080,7 +1080,6 @@
                 <button type="button" class="chip" data-value="1080p">1080p</button>
                 <button type="button" class="chip" data-value="720p">720p</button>
                 <button type="button" class="chip" data-value="480p">480p</button>
-                <button type="button" class="chip" data-value="CAM">CAM</button>
               </div>
               <input type="hidden" id="f-quality" value="Full HD"/>
               </div>
@@ -1093,6 +1092,7 @@
                 <button type="button" class="chip" data-value="Japonés">Japonés</button>
                 <button type="button" class="chip" data-value="Koreano">Koreano</button>
                 <button type="button" class="chip" data-value="Chino">Chino</button>
+                <button type="button" class="chip" data-value="Castellano">Castellano</button>
               </div>
               <input type="hidden" id="f-audio" value="Latino"/>
               </div>
@@ -1431,6 +1431,7 @@
                   <button type="button" class="chip" data-value="Japonés" onclick="setGoldenAudioChip(this)">Japonés</button>
                   <button type="button" class="chip" data-value="Koreano" onclick="setGoldenAudioChip(this)">Koreano</button>
                   <button type="button" class="chip" data-value="Chino" onclick="setGoldenAudioChip(this)">Chino</button>
+                  <button type="button" class="chip" data-value="Castellano" onclick="setGoldenAudioChip(this)">Castellano</button>
                 </div>
                 <input type="hidden" id="golden-audio" value=""/>
               </div>
@@ -1689,7 +1690,7 @@ const PELI_FILE_FOR = {
     '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','blu-ray-3d':'blu-ray-3d','brrip':'brrip','dcp-rip':'dcp-rip',
     'hdrip':'hdrip','hdts':'hdts','remux':'remux','web-dl':'web-dl','web-rip':'web-rip','web-scr':'web-scr','x265':'x265',
   },
-  idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino' },
+  idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino','castellano':'Castellano' },
   calidad: { '480p':'420p','720p':'720p','1080p':'1080p','full-hd':'full hd','4k':'4k' },
   hdr: { 'sdr':'SDR','hdr10':'HDR 10','hdr10-plus':'HDR 10+','hdr10-dv':'HDR 10 DV','hdr10-plus-dv':'HDR 10+ DV' },
   streaming: {
@@ -1750,11 +1751,11 @@ function peliFuenteKey() {
 function peliCalidadKey() {
   const v = document.getElementById('f-quality')?.value || '';
   const map = { '4K':'4k', 'Full HD':'full-hd', '1080p':'1080p', '720p':'720p', '480p':'480p' };
-  return map[v] || null; // CAM no tiene cinta
+  return map[v] || null;
 }
 function peliIdiomaKey() {
   const v = document.getElementById('f-audio')?.value || '';
-  const map = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino' };
+  const map = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino', 'Castellano':'castellano' };
   return map[v] || null;
 }
 // HDR y streaming no tienen chip propio: se detectan del texto ya escrito (titulo + datos + descarga)
@@ -1799,7 +1800,7 @@ function peliStreamingKey() {
 function getPeliBadgeKeysFromMovie(m) {
   if ((m.type || '').includes('Música')) return null; // esto es solo para peliculas/series
   const map = { '4K':'4k', 'Full HD':'full-hd', '1080p':'1080p', '720p':'720p', '480p':'480p' };
-  const audioMap = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino' };
+  const audioMap = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino', 'Castellano':'castellano' };
   const text = ((m.title||'') + ' ' + (m.descargaRaw||'')).toUpperCase();
   const hasPlus = /HDR\s*10\s*\+/.test(text);
   const hasDV = /\bDV\b|DOLBY\s*VISION/.test(text);
@@ -1951,10 +1952,13 @@ function parseBloqueCompleto(raw, shorteners, multiserver) {
   // Dominios que NUNCA son nada útil (ni captura, ni enlace de descarga) — páginas de origen,
   // foros, etc. que a veces quedan pegadas dentro del bloque. Se ignoran directamente, igual
   // que el contenido entre líneas de guiones.
-  const HOSTS_SIEMPRE_OMITIR = ['gdrivelatinohd.net', 'identi.io', 'compucalitv.lol'];
+  const HOSTS_SIEMPRE_OMITIR = ['gdrivelatinohd.net', 'identi.io', 'compucalitv.lol', 'zinfinal.com'];
   function esHostAOmitir(url) {
     try {
       const host = new URL(url).hostname.replace(/^www\./i, '').toLowerCase();
+      const u2 = new URL(url);
+      // zinfinal.com: las páginas (post.php, etc.) se ignoran, pero sus imágenes (.png/.jpg...) son capturas.
+      if ((host === 'zinfinal.com' || host.endsWith('.zinfinal.com')) && /\.(jpe?g|png|webp|gif|avif)$/i.test(u2.pathname)) return false;
       return HOSTS_SIEMPRE_OMITIR.some(d => host === d || host.endsWith('.' + d));
     } catch { return false; }
   }
@@ -2119,7 +2123,7 @@ function parseBloqueCompleto(raw, shorteners, multiserver) {
   //    la pusiste ahí a propósito para mostrarla en público. Si está sola, después de un espacio en
   //    blanco, sin nada que la describa, se toma como el link "de verdad" y se descarta (va solo a Privado).
   const reUrlPub = /^https?:\/\//i;
-  const dominiosSiempreExcluir = ['imgur.com', 'ibb.co', 'postimg.cc', 'imgfz.com', 'media.themoviedb.org', 'themoviedb.org', 'tmdb.org', 'gstatic.com', 'compucalitv.lol', 'gdrivelatinohd.net', 'identi.io', 'blogger.googleusercontent.com', 'blogspot.com', 'youtu.be', 'youtube.com'];
+  const dominiosSiempreExcluir = ['imgur.com', 'ibb.co', 'postimg.cc', 'imgfz.com', 'media.themoviedb.org', 'themoviedb.org', 'tmdb.org', 'gstatic.com', 'compucalitv.lol', 'gdrivelatinohd.net', 'identi.io', 'zinfinal.com', 'blogger.googleusercontent.com', 'blogspot.com', 'youtu.be', 'youtube.com'];
   const enlacesFiltrados = [];
   for (let i = 0; i < enlacesCombinadosConBlancos.length; i++) {
     const l = enlacesCombinadosConBlancos[i];
@@ -2550,7 +2554,12 @@ function autoRellenarTodo() {
 
   // AUDIO (idioma) — no aplica para música, ya se limpió arriba
   if (!isMusicFormat) {
-    if (audLow.includes('latino')||audLow.includes('español')||tituloUp.includes('LATINO'))
+    // Prioridad: "Latino" explícito > Castellano > "Español" solo (se toma como Latino)
+    if (audLow.includes('latino')||tituloUp.includes('LATINO'))
+      setActiveChip('chips-audio','Latino');
+    else if (audLow.includes('castellano')||audLow.includes('españa')||audLow.includes('espana')||audLow.includes('spain'))
+      setActiveChip('chips-audio','Castellano');
+    else if (audLow.includes('español'))
       setActiveChip('chips-audio','Latino');
     else if (audLow.includes('inglés')||audLow.includes('ingles')||audLow.includes('english')||tituloUp.includes('INGLES')||tituloUp.includes('INGLÉS'))
       setActiveChip('chips-audio','Inglés');
@@ -2880,7 +2889,10 @@ function autoRellenarDescarga() {
   // no detectó nada.
   if (!esMusica && dp.audio2) {
     const aud = dp.audio2.toLowerCase();
-    if (aud.includes('latino') || aud.includes('español')) setActiveChip('chips-audio', 'Latino');
+    // Prioridad: "Latino" explícito > Castellano > "Español" solo (se toma como Latino)
+    if (aud.includes('latino')) setActiveChip('chips-audio', 'Latino');
+    else if (aud.includes('castellano') || aud.includes('españa') || aud.includes('espana') || aud.includes('spain')) setActiveChip('chips-audio', 'Castellano');
+    else if (aud.includes('español')) setActiveChip('chips-audio', 'Latino');
     else if (aud.includes('ingles') || aud.includes('inglés') || aud.includes('english')) setActiveChip('chips-audio', 'Inglés');
     else if (aud.includes('japón') || aud.includes('japon') || aud.includes('japanese')) setActiveChip('chips-audio', 'Japonés');
     else if (aud.includes('korean') || aud.includes('coreano') || aud.includes('koreano')) setActiveChip('chips-audio', 'Koreano');
@@ -3509,7 +3521,7 @@ function previewGoldenPosterUrl(url) {
 
 // ── 🎧 Audio de la sección Golden Quality — TOTALMENTE APARTE del chip Audio del
 // formulario "Agregar Película" de arriba. No lee ni escribe f-audio en ningún momento.
-const GOLDEN_AUDIO_KEY = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino' };
+const GOLDEN_AUDIO_KEY = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino', 'Castellano':'castellano' };
 
 function setGoldenAudioChip(btn) {
   const group = document.getElementById('chips-golden-audio');
@@ -4798,7 +4810,7 @@ function construirPrivadosEspejoDePublicos(rawBlock, publicLinksText, shorteners
       return (multiserver || []).some(d => host === d || host.endsWith('.' + d));
     } catch { return false; }
   };
-  const dominiosDescartar = ['gdrivelatinohd.net','identi.io','compucalitv.lol','tmdb.org','gstatic.com','youtu.be','youtube.com','imgur.com','ibb.co','postimg.cc','imgfz.com','blogger.googleusercontent.com','blogspot.com','themoviedb.org'];
+  const dominiosDescartar = ['gdrivelatinohd.net','identi.io','zinfinal.com','compucalitv.lol','tmdb.org','gstatic.com','youtu.be','youtube.com','imgur.com','ibb.co','postimg.cc','imgfz.com','blogger.googleusercontent.com','blogspot.com','themoviedb.org'];
   const esDescartable = (u) => {
     try {
       const host = new URL(u).hostname.replace(/^www\./i, '').toLowerCase();
@@ -4893,7 +4905,7 @@ function parseNoctisPrivadoBloque(raw, shorteners, multiserver) {
   const enlaces = [];
   let multiCount = 0;
   const vistos = new Set();
-  const dominiosDescartar = ['gdrivelatinohd.net','identi.io','compucalitv.lol','tmdb.org','gstatic.com','youtu.be','youtube.com','imgur.com','ibb.co','postimg.cc','imgfz.com','themoviedb.org','blogger.googleusercontent.com','blogspot.com'];
+  const dominiosDescartar = ['gdrivelatinohd.net','identi.io','zinfinal.com','compucalitv.lol','tmdb.org','gstatic.com','youtu.be','youtube.com','imgur.com','ibb.co','postimg.cc','imgfz.com','themoviedb.org','blogger.googleusercontent.com','blogspot.com'];
   for (const l of lineas) {
     if (!l || !reUrl.test(l)) continue;
     let host;
