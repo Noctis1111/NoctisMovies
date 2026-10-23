@@ -1656,7 +1656,15 @@ function catalogRefs() {
     if (b >= mus.length) { out.push(mov[a++]); continue; }
     if (a >= mov.length) { out.push(mus[b++]); continue; }
     const da = mov[a].item.uploadDate || '', db = mus[b].item.uploadDate || '';
-    if (db > da) out.push(mus[b++]); else out.push(mov[a++]);
+    const ta = mov[a].item.uploadTs || 0, tb = mus[b].item.uploadTs || 0;
+    // 1) fecha distinta -> gana la más reciente; 2) misma fecha -> gana la hora exacta (uploadTs);
+    // 3) misma fecha y solo uno tiene hora -> ese es el nuevo; 4) misma fecha sin horas (títulos viejos) -> música primero.
+    let musPrimero;
+    if (db !== da) musPrimero = db > da;
+    else if (ta && tb) musPrimero = tb > ta;
+    else if (ta || tb) musPrimero = !!tb;
+    else musPrimero = true;
+    if (musPrimero) out.push(mus[b++]); else out.push(mov[a++]);
   }
   return out;
 }
@@ -3131,6 +3139,7 @@ function submitForm() {
     // (editar no debe "resetear" cuándo se subió). Si no tenía (catálogo
     // viejo importado sin este campo), se le asigna ahora.
     data.uploadDate = (existing && existing.uploadDate) || currentUploadDate();
+    if (existing && existing.uploadTs) data.uploadTs = existing.uploadTs;
     if (sameStore) {
       targetList[editingIndex] = data;
     } else {
@@ -3140,6 +3149,7 @@ function submitForm() {
     }
   } else {
     data.uploadDate = currentUploadDate();
+    data.uploadTs = Date.now(); // hora exacta: desempata títulos subidos el mismo día (películas vs música)
     targetList.unshift(data);
   }
   let ok = true;
