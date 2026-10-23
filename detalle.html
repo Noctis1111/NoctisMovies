@@ -1423,7 +1423,7 @@
       .logo-text { font-size: 1rem !important; letter-spacing: 1px !important; }
       nav a { display: none; }
       nav { flex: 1; justify-content: flex-end; }
-      .nav-search { flex: 1; max-width: 100%; width: auto; }
+      .nav-search { flex: 1; max-width: 100%; width: auto; min-width: 0; }
       .nav-search input { width: 100%; min-width: 0; }
       /* Detalle: stack vertical */
       .page-wrap { padding: 0.75rem !important; gap: 0.75rem !important; }
@@ -1742,7 +1742,6 @@
           <a class="side-tag" href="index.html?filter=1080p">1080P</a>
           <a class="side-tag" href="index.html?filter=720p">720P</a>
           <a class="side-tag" href="index.html?filter=480p">480P</a>
-          <a class="side-tag" href="index.html?filter=cam">CAM</a>
         </div>
       </div>
     </div>
@@ -1787,6 +1786,7 @@
           <a class="side-tag" href="index.html?filter=japonés">JAPONÉS</a>
           <a class="side-tag" href="index.html?filter=koreano">KOREANO</a>
           <a class="side-tag" href="index.html?filter=chino">CHINO</a>
+          <a class="side-tag" href="index.html?filter=castellano">CASTELLANO</a>
         </div>
       </div>
     </div>
@@ -2165,7 +2165,7 @@ const PELI_FILE_FOR = {
     '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','blu-ray-3d':'blu-ray-3d','brrip':'brrip','dcp-rip':'dcp-rip',
     'hdrip':'hdrip','hdts':'hdts','remux':'remux','web-dl':'web-dl','web-rip':'web-rip','web-scr':'web-scr','x265':'x265',
   },
-  idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino' },
+  idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino','castellano':'Castellano' },
   calidad: { '480p':'420p','720p':'720p','1080p':'1080p','full-hd':'full hd','4k':'4k' },
   hdr: { 'sdr':'SDR','hdr10':'HDR 10','hdr10-plus':'HDR 10+','hdr10-dv':'HDR 10 DV','hdr10-plus-dv':'HDR 10+ DV' },
   streaming: {
@@ -2205,7 +2205,7 @@ function getPeliBadgeKeysFromMovie(m) {
     };
   }
   const map = { '4K':'4k', 'Full HD':'full-hd', '1080p':'1080p', '720p':'720p', '480p':'480p' };
-  const audioMap = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino' };
+  const audioMap = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino', 'Castellano':'castellano' };
   const text = ((m.title||'') + ' ' + (m.descargaRaw||'')).toUpperCase();
   const hasPlus = /HDR\s*10\s*\+/.test(text);
   const hasDV = /\bDV\b|DOLBY\s*VISION/.test(text);
@@ -2408,10 +2408,14 @@ const SERVER_MAP = [
   { re: /\btransfer\b(?!\s*\.?sh)/i, domain: 'transfer.it' },
   { re: /megaup/i,                  domain: 'megaup.net' },
   { re: /\bmega\b/i,                domain: 'mega.nz' },
-  { re: /drive\.google|google\s*drive|\bgdrive\b/i, domain: 'drive.google.com' },
+  // "google", "drive", "google drive" o "gdrive" escritos en la etiqueta = Google Drive
+  { re: /drive\.google|\bgoogle\b|\bdrive\b|\bgdrive\b/i, domain: 'drive.google.com' },
   { re: /gofile/i,                  domain: 'gofile.io' },
   { re: /fireload/i,                domain: 'fireload.com' },
   { re: /imagenetz/i,               domain: 'imagenetz.de' },
+  { re: /fuckingfast/i,             domain: 'fuckingfast.co' },
+  { re: /mixdrop/i,                 domain: 'mixdrop.ag' },
+  { re: /playmogo/i,                domain: 'playmogo.com' },
 ];
 const MULTI_RE = /multi\s*server|multiservidor/i;
 
