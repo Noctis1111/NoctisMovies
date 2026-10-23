@@ -2444,9 +2444,14 @@ function getServerIconsHtml(text, url) {
   if (!domains.length) {
     return `<img class="enlace-icon" src="server/multiserver.png" alt="" title="Multi-servidor / no identificado" onerror="multiIconFallback(this)"/>`;
   }
-  return domains.map(d =>
-    `<img class="enlace-icon" src="https://www.google.com/s2/favicons?sz=64&domain=${d}" alt="" onerror="this.style.display='none'"/>`
-  ).join('');
+  return domains.map(d => {
+    const s2 = `https://www.google.com/s2/favicons?sz=64&domain=${d}`;
+    // Google Drive: el servicio de favicons devuelve la "G" de Google, así que se usa el ícono oficial del triángulo de Drive
+    if (d === 'drive.google.com') {
+      return `<img class="enlace-icon" src="https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png" alt="" onerror="this.onerror=function(){this.style.display='none'};this.src='${s2}'"/>`;
+    }
+    return `<img class="enlace-icon" src="${s2}" alt="" onerror="this.style.display='none'"/>`;
+  }).join('');
 }
 
 // =============================================
