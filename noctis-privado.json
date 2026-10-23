@@ -6005,5 +6005,55 @@
     "audioFormat": "",
     "legacyCover": false,
     "catalogSlug": "ant-man-3d-2015-blu-ray-remux-3d-1080p-dual-ingles-espanol-latino"
+  },
+  {
+    "id": "zona-cero-2026-web-dl-1080p-espanol-latino-coreano-mvl6fpz8-8ojkb3",
+    "titulo": "Zona Cero (2026) WEB-DL 1080p Español Latino-Coreano",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/pzyIh9dTRr6nCzZ6fPvjiMr1dem.jpg",
+    "masInfo": "Audio: Español Latino AC-3, 5.1 canales, 384 kb/s; Coreano AC-3, 5.1 canales, 384 kb/s\nCalidad: WEB-DL\nResolución: 1912 × 790 (1080p)\nFormato: MKV\nTamaño: 9.17 GB\nCodec: AVC (H.264)\nSubtítulos: Español Latino (forzados y completos)",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1nKai5UK8nR9Z34FHpQTxFA"
+      }
+    ],
+    "fecha": "23 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=zona-cero-2026-web-dl-1080p-espanol-latino-coreano",
+    "descargado": false,
+    "originalTitle": "Gunche (군체)",
+    "year": "2026",
+    "country": "Corea del Sur",
+    "duration": "2 h 2 min",
+    "genre": "Acción, Ciencia ficción, Suspenso, Terror, Thriller",
+    "description": "Gira en torno a una conferencia de biotecnología que se convierte en una pesadilla cuando se libera un virus de rápida mutación. Mientras los infectados sufren transformaciones aterradoras, las autoridades sellan el edificio y los supervivientes deben luchar por mantenerse con vida y encontrar una salida.",
+    "type": "Película",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "zona-cero-2026-web-dl-1080p-espanol-latino-coreano"
+  },
+  {
+    "id": "epic-elvis-presley-in-concert-elvis-presley-2026-flac-24-bit-48-khz-mvl6uot9-cwj3n4",
+    "titulo": "EPiC: Elvis Presley in Concert - Elvis Presley (2026) FLAC 24-bit / 48 kHz",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/gWs1UMAeViWuPeagxuK5wmUSR3P.jpg",
+    "masInfo": "• Tamaño total: 835.7 MiB\n• Formato de audio: FLAC sin pérdidas\nAudio: FLAC, 2 canales (estéreo), 24 bits, 48 kHz\nCalidad: FLAC 24bit Hi-Res\nResolución: N/A (Álbum Musical)\nFormato: FLAC\nTamaño: 835.7 MiB\nCodec: FLAC (sin pérdidas)\nSubtítulos: N/A",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1JS8tf9pSFQ8KWWffPWlH7A"
+      }
+    ],
+    "fecha": "23 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=epic-elvis-presley-in-concert-elvis-presley-2026-flac-24-bit-48-khz&cat=musica",
+    "descargado": false,
+    "originalTitle": "EPiC: Elvis Presley in Concert",
+    "year": "2026",
+    "country": "",
+    "duration": "1 h 10 min 7 s",
+    "genre": "Rock and Roll, Rock, Gospel, Orchestral Pop, Classical, Pop",
+    "description": "Gira en torno a una recopilación musical de 26 pistas que reúne interpretaciones de Elvis Presley, versiones especiales, arreglos orquestales y colaboraciones con Jamieson Shaw y The Royal Philharmonic Orchestra.",
+    "type": "Música",
+    "audioFormat": "Hi-Res 24-bit",
+    "legacyCover": false,
+    "catalogSlug": "epic-elvis-presley-in-concert-elvis-presley-2026-flac-24-bit-48-khz"
   }
 ]
