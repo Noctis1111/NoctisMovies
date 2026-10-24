@@ -1746,6 +1746,14 @@
       </div>
     </div>
     <div class="side-box"><svg class="sb-trace-svg"><rect class="sb-trace-rect" x="1" y="1" width="100%" height="100%" rx="11" ry="11"/></svg>
+      <div class="side-box-title">IMAX</div>
+      <div class="side-filter-group">
+        <div class="side-tags">
+          <a class="side-tag" href="index.html?filter=imax">IMAX</a>
+        </div>
+      </div>
+    </div>
+    <div class="side-box"><svg class="sb-trace-svg"><rect class="sb-trace-rect" x="1" y="1" width="100%" height="100%" rx="11" ry="11"/></svg>
       <div class="side-box-title">🎧 FORMATO DE AUDIO</div>
       <div class="side-filter-group">
         <div class="side-tags">
@@ -2174,6 +2182,7 @@ const PELI_FILE_FOR = {
     'paramount-plus':'paramount+','peacock':'peacock','prime-video':'primevideo','star-plus':'star+',
     'apple-tv-plus':'tv+','vix':'vix','movies-anywhere':'movies anywhere',
   },
+  imax: { 'imax':'imax' },
   musica: { 'mp3':'mp3', '16-bits':'16-bits', '24-bits':'24-bits', '16-24-bits':'16-24-bits', 'wav-32-bits':'wav-32-bits' },
 };
 // detalle.html vive en la raíz del repo, igual que la carpeta badges/ -> sin subir nivel
@@ -2200,7 +2209,7 @@ function getPeliBadgeKeysFromMovie(m) {
   const isMusica = (m.type || '').includes('Música');
   if (isMusica) {
     return {
-      fuente: null, idioma: null, calidad: null, hdr: null, streaming: null,
+      fuente: null, idioma: null, calidad: null, hdr: null, streaming: null, imax: null,
       musica: musicaBadgeKeyFromFormats((m.audioFormat||'').split(',').map(s=>s.trim()).filter(Boolean)),
     };
   }
@@ -2241,6 +2250,8 @@ function getPeliBadgeKeysFromMovie(m) {
     calidad: ocultaCalidad ? null : (map[m.quality] || null),
     hdr: (m.hdr || hdr),
     streaming: (m.streaming || streaming),
+    // IMAX: si el título guardado tiene el campo, manda; si es un título viejo sin el campo, se detecta por el texto del título
+    imax: ((m.imax !== undefined) ? !!m.imax : /\bIMAX\b/i.test(m.title || '')) ? 'imax' : null,
     musica: null,
   };
 }
@@ -2260,7 +2271,7 @@ function badgeOverlayHtml(m, cssClass) {
   if (m && m.legacyCover) return '';
   const badges = getPeliBadgeKeysFromMovie(m);
   if (!badges) return '';
-  return ['idioma','fuente','calidad','hdr','streaming','musica'].map(cat => {
+  return ['idioma','fuente','calidad','hdr','streaming','imax','musica'].map(cat => {
     const key = badges[cat];
     if (!key) return '';
     const path = peliBadgePath(cat, key);
@@ -2414,6 +2425,7 @@ const SERVER_MAP = [
   { re: /fireload/i,                domain: 'fireload.com' },
   { re: /imagenetz/i,               domain: 'imagenetz.de' },
   { re: /fuckingfast/i,             domain: 'fuckingfast.co' },
+  { re: /filedot/i,                 domain: 'filedot.to' },
   { re: /mixdrop/i,                 domain: 'mixdrop.ag' },
   { re: /playmogo/i,                domain: 'playmogo.com' },
 ];
@@ -2770,7 +2782,7 @@ async function init() {
   if (posterFrameElEarly) {
     posterFrameElEarly.querySelectorAll('.poster-cintas-overlay').forEach(el => el.remove());
     const peliBadgesActive = getPeliBadgeKeysFromMovie(m);
-    const anyPeliBadge = !m.legacyCover && !!(peliBadgesActive && ['idioma','fuente','calidad','hdr','streaming','musica'].some(k => peliBadgesActive[k]));
+    const anyPeliBadge = !m.legacyCover && !!(peliBadgesActive && ['idioma','fuente','calidad','hdr','streaming','imax','musica'].some(k => peliBadgesActive[k]));
     posterEl.classList.toggle('has-frame', hasFrame(m));
     if (anyPeliBadge) posterFrameElEarly.insertAdjacentHTML('beforeend', badgeOverlayHtml(m, 'poster-cintas-overlay'));
 
