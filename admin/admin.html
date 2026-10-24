@@ -1059,6 +1059,11 @@
                 <div class="form-group" style="margin-bottom:0;min-width:80px;">
                   <label>Año</label>
                   <input type="text" id="f-year-filter" placeholder="2024" maxlength="4" style="text-align:center;letter-spacing:2px;width:80px;"/>
+                  <label style="margin-top:0.55rem;">IMAX</label>
+                  <div class="chip-group" id="chips-imax">
+                    <button type="button" class="chip" data-value="IMAX">IMAX</button>
+                  </div>
+                  <input type="hidden" id="f-imax" value=""/>
                 </div>
               </div>
 
@@ -1198,6 +1203,7 @@
                   <img id="peli-calidad" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:4;"/>
                   <img id="peli-hdr" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:5;"/>
                   <img id="peli-streaming" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:6;"/>
+                  <img id="peli-imax" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:6;"/>
                   <img id="peli-musica" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:4;"/>
                   <button onclick="clearPoster()" title="Quitar imagen" style="position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.7);border:1px solid var(--border);color:#fff;font-size:0.7rem;cursor:pointer;line-height:1;z-index:9;">✕</button>
                 </div>
@@ -1707,6 +1713,7 @@ const PELI_FILE_FOR = {
     'paramount-plus':'paramount+','peacock':'peacock','prime-video':'primevideo','star-plus':'star+',
     'apple-tv-plus':'tv+','vix':'vix','movies-anywhere':'movies anywhere',
   },
+  imax: { 'imax':'imax' },
   musica: { 'mp3':'mp3', '16-bits':'16-bits', '24-bits':'24-bits', '16-24-bits':'16-24-bits', 'wav-32-bits':'wav-32-bits' },
 };
 
@@ -1846,6 +1853,7 @@ function getPeliBadgeKeysFromMovie(m) {
     calidad: ocultaCalidad ? null : (map[m.quality] || null),
     hdr: (m.hdr || hdr),
     streaming: (m.streaming || streaming),
+    imax: ((m.imax !== undefined) ? !!m.imax : /\bIMAX\b/i.test(m.title || '')) ? 'imax' : null,
     musica: (m.type||'').includes('Música') ? musicaBadgeKeyFromFormats((m.audioFormat||'').split(',').map(s=>s.trim()).filter(Boolean)) : null,
   };
 }
@@ -1947,7 +1955,7 @@ function parseBloqueCompleto(raw, shorteners, multiserver) {
   // apareció. Antes la detección de capturas era solo por posición (antes de "MAS INFO"),
   // así que una captura fuera de lugar (ej. pegada después de los enlaces) terminaba
   // clasificada como link de descarga y se colaba en Enlaces privados.
-  const HOSTS_IMAGEN = ['imgur.com','ibb.co','postimg.cc','imgfz.com','media.themoviedb.org','themoviedb.org','tmdb.org','gstatic.com','blogger.googleusercontent.com','blogspot.com'];
+  const HOSTS_IMAGEN = ['imgur.com','ibb.co','postimg.cc','imgfz.com','iili.io','media-amazon.com','media.themoviedb.org','themoviedb.org','tmdb.org','gstatic.com','blogger.googleusercontent.com','blogspot.com'];
   function esHostDeImagen(url) {
     try {
       const u = new URL(url);
@@ -2131,7 +2139,7 @@ function parseBloqueCompleto(raw, shorteners, multiserver) {
   //    la pusiste ahí a propósito para mostrarla en público. Si está sola, después de un espacio en
   //    blanco, sin nada que la describa, se toma como el link "de verdad" y se descarta (va solo a Privado).
   const reUrlPub = /^https?:\/\//i;
-  const dominiosSiempreExcluir = ['imgur.com', 'ibb.co', 'postimg.cc', 'imgfz.com', 'media.themoviedb.org', 'themoviedb.org', 'tmdb.org', 'gstatic.com', 'compucalitv.lol', 'gdrivelatinohd.net', 'identi.io', 'zinfinal.com', 'blogger.googleusercontent.com', 'blogspot.com', 'youtu.be', 'youtube.com'];
+  const dominiosSiempreExcluir = ['imgur.com', 'ibb.co', 'postimg.cc', 'imgfz.com','iili.io','media-amazon.com', 'media.themoviedb.org', 'themoviedb.org', 'tmdb.org', 'gstatic.com', 'compucalitv.lol', 'gdrivelatinohd.net', 'identi.io', 'zinfinal.com', 'blogger.googleusercontent.com', 'blogspot.com', 'youtu.be', 'youtube.com'];
   const enlacesFiltrados = [];
   for (let i = 0; i < enlacesCombinadosConBlancos.length; i++) {
     const l = enlacesCombinadosConBlancos[i];
@@ -2685,6 +2693,10 @@ function autoRellenarTodo() {
   else if (durMin>=60)
     setActiveTypeChips('Película');
 
+  // IMAX: se activa si el título o los datos técnicos (Calidad/Resolución/Formato) lo mencionan
+  const textoImax = [p.titulo || document.getElementById('f-title').value || '', p.calidad2 || '', p.resolucion2 || '', p.formato2 || ''].join(' ');
+  setActiveChip('chips-imax', /\bIMAX\b/i.test(textoImax) ? 'IMAX' : '');
+
   updatePeliBadgePreview();
 }
 
@@ -2739,7 +2751,7 @@ function initChips() {
         const isSource = hiddenInputId === 'f-source';
         const isStreaming = hiddenInputId === 'f-streaming';
         // Fuente, HDR y Streaming permiten des-seleccionar (clickear el chip activo lo apaga)
-        const isDeselectable = isSource || hiddenInputId === 'f-hdr' || isStreaming;
+        const isDeselectable = isSource || hiddenInputId === 'f-hdr' || hiddenInputId === 'f-imax' || isStreaming;
 
         // Desactivar todos en el grupo
         group.querySelectorAll('.chip').forEach(c => {
@@ -2976,6 +2988,7 @@ function getFormData() {
     audioFormat:   document.getElementById('f-audioformat').value,
     source:        document.getElementById('f-source').value,
     hdr:           document.getElementById('f-hdr').value,
+    imax:          document.getElementById('f-imax')?.value || '',
     streaming:     document.getElementById('f-streaming').value,
     yearFilter:    document.getElementById('f-year-filter').value.trim(),
     audio:         document.getElementById('f-audio').value,
@@ -3035,6 +3048,7 @@ function clearForm() {
   setActiveChip('chips-source', '');
   setActiveChip('chips-audioformat', '');
   setActiveChip('chips-hdr', '');
+  setActiveChip('chips-imax', '');
   setActiveChip('chips-streaming', '');
   document.getElementById('f-quality').value = 'Full HD';
   document.getElementById('f-source').value = '';
@@ -3348,7 +3362,7 @@ function renderGoldenPosterPicks() {
     const idx = goldenMatchesData.indexOf(m);
     const peliBadges = m.legacyCover ? null : getPeliBadgeKeysFromMovie(m);
     const tieneMarco = !!(peliBadges && (peliBadges.fuente || peliBadges.musica));
-    const badgeLayersHtml = peliBadges ? ['idioma','fuente','calidad','hdr','streaming','musica'].map(cat => {
+    const badgeLayersHtml = peliBadges ? ['idioma','fuente','calidad','hdr','streaming','imax','musica'].map(cat => {
       const key = peliBadges[cat];
       if (!key) return '';
       const path = peliBadgePath(cat, key);
@@ -3716,7 +3730,7 @@ function renderGoldenPreviewCanvas() {
     if (goldenPreviewPosterImg) drawImageCoverInFuenteWindow(ctx, goldenPreviewPosterImg, CW, CH);
     const badges = getPeliBadgeKeysFromMovie(goldenSelectedMovieRef);
     if (badges) {
-      ['idioma','fuente','calidad','hdr','streaming'].forEach(cat => {
+      ['idioma','fuente','calidad','hdr','streaming','imax'].forEach(cat => {
         const key = badges[cat];
         if (!key) return;
         const img = getCachedMovieBadgeImg(cat, key);
@@ -3809,7 +3823,7 @@ async function construirCanvasGolden(forcePosterDataUrl) {
     drawImageCoverInFuenteWindow(ctx, posterImg, CW, CH);
     const badges = getPeliBadgeKeysFromMovie(goldenSelectedMovieRef);
     if (badges) {
-      for (const cat of ['idioma','fuente','calidad','hdr','streaming']) {
+      for (const cat of ['idioma','fuente','calidad','hdr','streaming','imax']) {
         const key = badges[cat];
         if (!key) continue;
         try {
@@ -3979,7 +3993,7 @@ function updatePeliBadgePreview() {
   // Si no hay chip activo, recién ahí se cae al autodetector por texto.
   const hdrManual = document.getElementById('f-hdr')?.value || '';
   const streamingManual = document.getElementById('f-streaming')?.value || '';
-  const layers = { idioma: peliIdiomaKey(), fuente: peliFuenteKey(), calidad: (['blu-ray','blu-ray-3d'].includes(peliFuenteKey())) ? null : peliCalidadKey(), hdr: hdrManual || peliHdrKey(), streaming: streamingManual || peliStreamingKey() };
+  const layers = { idioma: peliIdiomaKey(), fuente: peliFuenteKey(), calidad: (['blu-ray','blu-ray-3d'].includes(peliFuenteKey())) ? null : peliCalidadKey(), hdr: hdrManual || peliHdrKey(), streaming: streamingManual || peliStreamingKey(), imax: (document.getElementById('f-imax')?.value ? 'imax' : null) };
   const musicaKey = (esMusica && !isLegacyCover) ? musicaBadgeKey() : null;
   // El marco de "fuente" (películas/series) y el de "música" recortan la foto al mismo
   // hueco real del marco → misma clase has-frame para ambos casos.
@@ -3999,7 +4013,7 @@ function updatePeliBadgePreview() {
     if (showBg) sqBgImg.style.backgroundImage = `url("${imgPreview.src}")`;
   }
 
-  ['idioma','fuente','calidad','hdr','streaming'].forEach(cat => {
+  ['idioma','fuente','calidad','hdr','streaming','imax'].forEach(cat => {
     const el = document.getElementById('peli-' + cat);
     if (!el) return;
     const key = (esMusica || isLegacyCover) ? null : layers[cat];
@@ -4246,7 +4260,7 @@ function renderList(resetPage) {
     // música se calcula aparte acá, igual que hace el preview del formulario.
     const musicaKeyList = isPureMusicCoverAdmin(m) ? musicaBadgeKeyFromMovieData(m) : null;
     const tieneMarco = !!(peliBadges && (peliBadges.fuente || peliBadges.musica)) || !!musicaKeyList;
-    const badgeLayersHtml = (peliBadges ? ['idioma','fuente','calidad','hdr','streaming','musica'].map(cat => {
+    const badgeLayersHtml = (peliBadges ? ['idioma','fuente','calidad','hdr','streaming','imax','musica'].map(cat => {
       const key = peliBadges[cat];
       if (!key) return '';
       const path = peliBadgePath(cat, key);
@@ -4364,6 +4378,7 @@ function editMovie(idx) {
   setActiveChip('chips-audio', esMusicaEdit ? (m.audio||'') : (m.audio||'Latino'));
   setActiveChip('chips-source', m.source||'');
   setActiveChip('chips-hdr', m.hdr||'');
+  setActiveChip('chips-imax', m.imax||'');
   setActiveChip('chips-streaming', m.streaming||'');
   setActiveChips('chips-audioformat', (m.audioFormat||'').split(',').map(s=>s.trim()).filter(Boolean));
   document.getElementById('f-quality').value = esMusicaEdit ? (m.quality||'') : (m.quality||'Full HD');
@@ -4826,7 +4841,7 @@ function construirPrivadosEspejoDePublicos(rawBlock, publicLinksText, shorteners
       return (multiserver || []).some(d => host === d || host.endsWith('.' + d));
     } catch { return false; }
   };
-  const dominiosDescartar = ['gdrivelatinohd.net','identi.io','zinfinal.com','compucalitv.lol','tmdb.org','gstatic.com','youtu.be','youtube.com','imgur.com','ibb.co','postimg.cc','imgfz.com','blogger.googleusercontent.com','blogspot.com','themoviedb.org'];
+  const dominiosDescartar = ['gdrivelatinohd.net','identi.io','zinfinal.com','compucalitv.lol','tmdb.org','gstatic.com','youtu.be','youtube.com','imgur.com','ibb.co','postimg.cc','imgfz.com','iili.io','media-amazon.com','blogger.googleusercontent.com','blogspot.com','themoviedb.org'];
   const esDescartable = (u) => {
     try {
       const host = new URL(u).hostname.replace(/^www\./i, '').toLowerCase();
@@ -4921,7 +4936,7 @@ function parseNoctisPrivadoBloque(raw, shorteners, multiserver) {
   const enlaces = [];
   let multiCount = 0;
   const vistos = new Set();
-  const dominiosDescartar = ['gdrivelatinohd.net','identi.io','zinfinal.com','compucalitv.lol','tmdb.org','gstatic.com','youtu.be','youtube.com','imgur.com','ibb.co','postimg.cc','imgfz.com','themoviedb.org','blogger.googleusercontent.com','blogspot.com'];
+  const dominiosDescartar = ['gdrivelatinohd.net','identi.io','zinfinal.com','compucalitv.lol','tmdb.org','gstatic.com','youtu.be','youtube.com','imgur.com','ibb.co','postimg.cc','imgfz.com','iili.io','media-amazon.com','themoviedb.org','blogger.googleusercontent.com','blogspot.com'];
   for (const l of lineas) {
     if (!l || !reUrl.test(l)) continue;
     let host;
@@ -5019,6 +5034,7 @@ function getPrivadoBadgeKeys(item) {
     source: cm.source || det.source,
     hdr: cm.hdr || '',
     streaming: cm.streaming || '',
+    imax: (cm.imax !== undefined) ? cm.imax : undefined,
     type: 'Película',
   });
 }
@@ -5111,7 +5127,7 @@ function privadoPosterHtml(item, sizeClass) {
     const path = peliBadgePath(cat, key);
     return path ? `<img class="movie-item-badge-overlay" src="${path}" alt="" onerror="this.style.display='none'"/>` : '';
   };
-  const badgeLayersHtml = (badges ? ['idioma','fuente','calidad','hdr','streaming'].map(cat => layer(cat, badges[cat])).join('') : '')
+  const badgeLayersHtml = (badges ? ['idioma','fuente','calidad','hdr','streaming','imax'].map(cat => layer(cat, badges[cat])).join('') : '')
     + (musicaKey ? layer('musica', musicaKey) : '');
   const sqBg = esMusica ? posterSquareBgHtmlAdmin({ type: refType, legacyCover: legacy, image: item.imagen }, true) : '';
   const npFallback = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='108' height='62'%3E%3Crect fill='%23161b24' width='108' height='62'/%3E%3C/svg%3E`;
