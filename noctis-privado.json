@@ -6259,5 +6259,30 @@
     "audioFormat": "Lossless 16-bit",
     "legacyCover": false,
     "catalogSlug": "titanic-music-from-the-motion-picture-james-horner-1997-banda-sonora-flac-16-bit-441-khz"
+  },
+  {
+    "id": "mecano-grandes-exitos-2005-flac-16-bit-44-1-khz-mvlool59-62kssq",
+    "titulo": "Mecano - Grandes Éxitos (2005) FLAC 16-bit / 44.1 kHz",
+    "imagen": "https://i.discogs.com/uSF5kJwYWQZPo04cS5-lxOMIo-zFvCozbWQlTiKJ-b4/rs:fit/g:sm/q:90/h:480/w:523/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE2MTE4/MTM0LTE2MDM3MzI2/MTUtMTMwNS5qcGVn.jpeg",
+    "masInfo": "Audio: FLAC, 2 canales (estéreo), 16 bits, 44.1 kHz\nCalidad: FLAC 16-bit\nResolución: N/A (Álbum Musical)\nFormato: FLAC\nTamaño: N/A\nCodec: FLAC (sin pérdidas)\nSubtítulos: N/A",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/166uUZQpl1t6GoiGq5kCroQ"
+      }
+    ],
+    "fecha": "23 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=mecano-grandes-exitos-2005-flac-16-bit-441-khz&cat=musica",
+    "descargado": false,
+    "originalTitle": "Grandes éxitos",
+    "year": "2005",
+    "country": "",
+    "duration": "N/A",
+    "genre": "Pop, Tecno-pop, Synth-pop, Pop español",
+    "description": "Gira en torno a una recopilación de grandes éxitos de Mecano, uno de los grupos más representativos del pop español. Reúne canciones emblemáticas que combinan sintetizadores, melodías pegadizas y letras sobre el amor, las relaciones y la vida cotidiana, con temas como “Hoy no me puedo levantar”, “Cruz de navajas”, “Hijo de la Luna” y “Mujer contra mujer”.",
+    "type": "Música",
+    "audioFormat": "Lossless 16-bit",
+    "legacyCover": false,
+    "catalogSlug": "mecano-grandes-exitos-2005-flac-16-bit-441-khz"
   }
 ]
