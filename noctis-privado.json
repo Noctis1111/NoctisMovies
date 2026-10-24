@@ -6284,5 +6284,30 @@
     "audioFormat": "Lossless 16-bit",
     "legacyCover": false,
     "catalogSlug": "mecano-grandes-exitos-2005-flac-16-bit-441-khz"
+  },
+  {
+    "id": "exorcismo-en-el-vaticano-2015-bdrip-x265-1080p-latino-ingles-mvmnr3qn-zcraft",
+    "titulo": "EXORCISMO EN EL VATICANO (2015) BDRIP X265 1080P LATINO-INGLÉS",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/cyaB8wRcEJocsnA2vuqRyaHxtGa.jpg",
+    "masInfo": "Audio: Español Latino AC3 5.1 - Ingles AC3 5.1\nCalidad: BDRipx265\nResolución: 1920x1080\nFormato: MKV\nTamaño: 1,96GB\nCodec: H265 I 10bit\nSubtítulos: Español Latino (SRT), Forzados (SRT)",
+    "enlaces": [
+      {
+        "etiqueta": "1024tera",
+        "url": "https://www.1024tera.com/spanish/sharing/link?surl=L0BAUwNdYwbBYxR6xmVdag"
+      }
+    ],
+    "fecha": "24 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=exorcismo-en-el-vaticano-2015-bdrip-x265-1080p-latino-ingles",
+    "descargado": false,
+    "originalTitle": "The Vatican Tapes",
+    "year": "2015",
+    "country": "United States of America",
+    "duration": "90 min",
+    "genre": "Terror. Thriller | Posesiones / Exorcismos. Metraje encontrado",
+    "description": "Angela Holmes lleva una vida completamente normal hasta que su presencia empieza a provocar sucesos terribles a su alrededor, causando dolor y muerte a todos los que le rodean. Los expertos creen que Holmes está poseída, pero cuando acuden al Vaticano para realizar un exorcismo descubren que su posesión es una fuerza satánica mucho más poderosa de lo que jamás habían imaginado. El Padre Lorenzo tendrá que luchar contra el mal para salvar el alma de Angela.",
+    "type": "Película",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "exorcismo-en-el-vaticano-2015-bdrip-x265-1080p-latino-ingles"
   }
 ]
