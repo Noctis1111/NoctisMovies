@@ -4873,7 +4873,7 @@
       }
     ],
     "fecha": "19 Septiembre 2026",
-    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=proyecto-fin-del-mundo-2026-imax-brrip-1080p-latino-ingles",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=proyecto-fin-del-mundo-2026-imax-bdremux-1080p-latino-ingles",
     "descargado": false,
     "originalTitle": "Project Hail Mary",
     "year": "2026",
@@ -4881,8 +4881,10 @@
     "duration": "156 min",
     "genre": "Ciencia ficción, Aventura",
     "description": "El profesor de ciencias Ryland Grace despierta en una nave espacial a años luz de su hogar sin recordar quién es ni cómo llegó allí. A medida que recupera la memoria, comienza a descubrir su misión: resolver el enigma de la misteriosa sustancia que está causando la extinción del sol.",
-    "catalogSlug": "proyecto-fin-del-mundo-2026-imax-bdremux-1080p-latino-ingles",
-    "type": "Película"
+    "type": "Película",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "proyecto-fin-del-mundo-2026-imax-bdremux-1080p-latino-ingles"
   },
   {
     "id": "proyecto-fin-del-mundo-2026-imax-bdrip-1080p-latino-ingles-mu8p9yz9-9wdk22",
@@ -4973,8 +4975,10 @@
     "duration": "156 min",
     "genre": "Ciencia ficción, Aventura",
     "description": "El profesor de ciencias Ryland Grace despierta en una nave espacial a años luz de su hogar sin recordar quién es ni cómo llegó allí. A medida que recupera la memoria, comienza a descubrir su misión: resolver el enigma de la misteriosa sustancia que está causando la extinción del sol.",
-    "catalogSlug": "proyecto-fin-del-mundo-2026-imax-bdrip-4k-dv-hdr10-latino-ingles",
-    "type": "Película"
+    "type": "Película",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "proyecto-fin-del-mundo-2026-imax-bdrip-4k-dv-hdr10-latino-ingles"
   },
   {
     "id": "resident-evil-noche-cero-2026-telesync-1080p-multilenguaje-mu8pwnpe-ghp5g0",
@@ -6189,10 +6193,6 @@
     "enlaces": [
       {
         "etiqueta": "1024terabox",
-        "url": "https://m.media-amazon.com/images/I/91tiRtwMXsL._SL1500_.jpg"
-      },
-      {
-        "etiqueta": "1024terabox",
         "url": "https://1024terabox.com/s/1tjhrLu18wQHOmx_NMuh5AA"
       }
     ],
@@ -6309,5 +6309,253 @@
     "audioFormat": "",
     "legacyCover": false,
     "catalogSlug": "exorcismo-en-el-vaticano-2015-bdrip-x265-1080p-latino-ingles"
+  },
+  {
+    "id": "exorcismo-en-el-vaticano-2015-brrip-1080p-latino-ingles-mvmotez7-1a37bj",
+    "titulo": "EXORCISMO EN EL VATICANO (2015) BRRIP 1080P LATINO-INGLÉS",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/cyaB8wRcEJocsnA2vuqRyaHxtGa.jpg",
+    "masInfo": "Audio: Español Latino AC3 5.1 - Ingles AC3 5.1\nCalidad: BRRip\nResolución: 1920x1080\nFormato: MKV\nTamaño: 3,10GB\nCodec: H264\nSubtítulos: Español Latino (SRT), Forzados (SRT)",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1SG8tBW_JlkLRi9uzBskp9w"
+      }
+    ],
+    "fecha": "24 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=exorcismo-en-el-vaticano-2015-brrip-1080p-latino-ingles",
+    "descargado": false,
+    "originalTitle": "",
+    "year": "",
+    "country": "",
+    "duration": "",
+    "genre": "",
+    "description": "Angela Holmes lleva una vida completamente normal hasta que su presencia empieza a provocar sucesos terribles a su alrededor, causando dolor y muerte a todos los que le rodean. Los expertos creen que Holmes está poseída, pero cuando acuden al Vaticano para realizar un exorcismo descubren que su posesión es una fuerza satánica mucho más poderosa de lo que jamás habían imaginado. El Padre Lorenzo tendrá que luchar contra el mal para salvar el alma de Angela.",
+    "type": "Película",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "exorcismo-en-el-vaticano-2015-brrip-1080p-latino-ingles"
+  },
+  {
+    "id": "exorcismo-en-el-vaticano-2015-bdrip-1080p-latino-ingles-mvmotkka-hy2vnr",
+    "titulo": "EXORCISMO EN EL VATICANO (2015) BDRIP 1080P LATINO-INGLÉS",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/cyaB8wRcEJocsnA2vuqRyaHxtGa.jpg",
+    "masInfo": "Audio: Español Latino AC3 5.1 - Ingles DTS 5.1\nCalidad: BDRip\nResolución: 1920x1080\nFormato: MKV\nTamaño: 11,6GB\nCodec: H264\nSubtítulos: Español Latino (SRT), Forzados (SRT)",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1vEaBGWhbrbLtMPku2fJh4w"
+      }
+    ],
+    "fecha": "24 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=exorcismo-en-el-vaticano-2015-bdrip-1080p-latino-ingles",
+    "descargado": false,
+    "originalTitle": "",
+    "year": "",
+    "country": "",
+    "duration": "",
+    "genre": "",
+    "description": "Angela Holmes lleva una vida completamente normal hasta que su presencia empieza a provocar sucesos terribles a su alrededor, causando dolor y muerte a todos los que le rodean. Los expertos creen que Holmes está poseída, pero cuando acuden al Vaticano para realizar un exorcismo descubren que su posesión es una fuerza satánica mucho más poderosa de lo que jamás habían imaginado. El Padre Lorenzo tendrá que luchar contra el mal para salvar el alma de Angela.",
+    "type": "Película",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "exorcismo-en-el-vaticano-2015-bdrip-1080p-latino-ingles"
+  },
+  {
+    "id": "exorcismo-en-el-vaticano-2015-bdremux-1080p-latino-ingles-mvmotsu9-pclp46",
+    "titulo": "EXORCISMO EN EL VATICANO (2015) BDREMUX 1080P LATINO-INGLÉS",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/cyaB8wRcEJocsnA2vuqRyaHxtGa.jpg",
+    "masInfo": "Audio: Español Latino AC3 5.1 - Ingles DTS-HD 5.1\nCalidad: BDRemux\nResolución: 1920x1080\nFormato: MKV\nTamaño: 24,4GB\nCodec: H264\nSubtítulos: Español Latino (SRT), Español Latino (PGS), Forzados (SRT)",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1duiQOnEIVxIM6aUAESuP8g"
+      }
+    ],
+    "fecha": "24 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=exorcismo-en-el-vaticano-2015-bdremux-1080p-latino-ingles",
+    "descargado": false,
+    "originalTitle": "",
+    "year": "",
+    "country": "",
+    "duration": "",
+    "genre": "",
+    "description": "Angela Holmes lleva una vida completamente normal hasta que su presencia empieza a provocar sucesos terribles a su alrededor, causando dolor y muerte a todos los que le rodean. Los expertos creen que Holmes está poseída, pero cuando acuden al Vaticano para realizar un exorcismo descubren que su posesión es una fuerza satánica mucho más poderosa de lo que jamás habían imaginado. El Padre Lorenzo tendrá que luchar contra el mal para salvar el alma de Angela.",
+    "type": "Película",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "exorcismo-en-el-vaticano-2015-bdremux-1080p-latino-ingles"
+  },
+  {
+    "id": "coyote-vs-acme-2026-web-dl-1080p-60fps-espanol-latino-ingles-mvmouf2b-hm00dh",
+    "titulo": "Coyote vs. Acme (2026) WEB-DL 1080p 60FPS Español Latino-Inglés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/oYWeCzV8gIjTE8U7ukmM6rK0ZDO.jpg",
+    "masInfo": "Audio: Español Latino AAC 5.1, Inglés AAC 5.1\nCalidad: WEB-DL\nResolución: 1920 × 800\nFormato: MKV\nTamaño: 2.38 GB\nCodec: H.264 (60 FPS)\nSubtítulos: Español, Inglés y Español forzado (.SRT, completos)",
+    "enlaces": [
+      {
+        "etiqueta": "transfer",
+        "url": "https://transfer.it/t/0mNqgdhXWB7R"
+      },
+      {
+        "etiqueta": "mediafire",
+        "url": "https://www.mediafire.com/file/ltfnpsae3e2tfld/KVABNQWV.7z/file"
+      }
+    ],
+    "fecha": "24 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=coyote-vs-acme-2026-web-dl-1080p-60fps-espanol-latino-ingles",
+    "descargado": false,
+    "originalTitle": "Coyote vs. Acme",
+    "year": "2026",
+    "country": "Estados Unidos",
+    "duration": "N/A",
+    "genre": "Comedia, Animación, Aventuras",
+    "description": "Gira en torno a Wile E. Coyote, quien, tras décadas de fracasos intentando atrapar al Correcaminos, decide demandar a ACME por los productos defectuosos que arruinaron sus planes. En un juicio tan absurdo como divertido, la comedia y la animación se mezclan en una batalla legal que podría cambiar el destino del desierto para siempre.",
+    "type": "Película",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "coyote-vs-acme-2026-web-dl-1080p-60fps-espanol-latino-ingles"
+  },
+  {
+    "id": "spider-man-un-nuevo-dia-2026-web-dl-2160p-4k-uhd-dolby-vision-hdr10-dual-latino-ingles-mvmp7q0z-3pt6vs",
+    "titulo": "Spider-Man: Un nuevo día (2026) WEB-DL 2160p 4K UHD Dolby Vision HDR10+ Dual Latino-Inglés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/uEedQL2ZNhe9HcgWdI6pZBcFpL8.jpg",
+    "masInfo": "Audio: Dual Latino e Inglés, DDP 5.1 Atmos\nCalidad: WEB-DL\nResolución: 3840 × 2160 (4K UHD)\nFormato: MKV\nTamaño: 28 GB\nCodec: H.265 (HEVC), Dolby Vision, HDR10+\nSubtítulos: No especificado",
+    "enlaces": [
+      {
+        "etiqueta": "mediafire",
+        "url": "https://www.mediafire.com/folder/2fuhtqz792v7v/26.21_5P179D3R44d7210d"
+      },
+      {
+        "etiqueta": "mega",
+        "url": "https://mega.nz/folder/3qh1zBiT#hZfYAANvF31thJ_JwJfjkw"
+      },
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1lpvndpmyIawj6AKQy8VlYg"
+      }
+    ],
+    "fecha": "24 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=spider-man-un-nuevo-dia-2026-web-dl-2160p-4k-uhd-dolby-vision-hdr10-dual-latino-ingles",
+    "descargado": false,
+    "originalTitle": "Spider-Man: Brand New Day",
+    "year": "2026",
+    "country": "Estados Unidos, Canadá, Reino Unido, Alemania",
+    "duration": "145 minutos",
+    "genre": "Acción, Aventura, Ciencia ficción, Superhéroes",
+    "description": "Gira en torno a Peter Parker, quien, cuatro años después de los acontecimientos de Spider-Man: No Way Home, vive completamente solo y combate el crimen a tiempo completo como Spider-Man. Mientras el mundo ha olvidado su identidad, la presión de su nueva vida provoca una transformación inesperada que podría poner en peligro su existencia. Al mismo tiempo, una nueva amenaza emerge en Nueva York, obligándolo a enfrentarse a uno de los mayores desafíos de su carrera mientras intenta proteger la ciudad y a quienes todavía significan algo para él.",
+    "type": "Película",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "spider-man-un-nuevo-dia-2026-web-dl-2160p-4k-uhd-dolby-vision-hdr10-dual-latino-ingles"
+  },
+  {
+    "id": "spider-man-un-nuevo-dia-2026-web-rip-4k-ligero-2160p-hdr10-dolby-vision-dual-latino-ingles-mvmpjey0-g5enqp",
+    "titulo": "Spider-Man: Un nuevo día (2026) WEB-Rip 4K Ligero 2160p HDR10+ Dolby Vision Dual Latino-Inglés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/uEedQL2ZNhe9HcgWdI6pZBcFpL8.jpg",
+    "masInfo": "- Audio 1: E-AC-3 JOC Dolby Digital Plus with Dolby Atmos 5.1 - Inglés\n- Audio 2: E-AC-3 Dolby Digital Plus  5.1 - Latino [Extraído de Prime Video]\nCalidad:\nAudio: Inglés E-AC-3 JOC (Dolby Digital Plus con Dolby Atmos) 5.1, Español Latino E-AC-3 5.1\nCalidad: WEB-Rip\nResolución: 3832 × 1600\nFormato: MKV\nTamaño: 6.75 GB\nCodec: H.265 (HEVC) Main 10, HDR10, HDR10+ y Dolby Vision Profile 8.1\nSubtítulos: 44 pistas de texto, incluidos Español e Inglés",
+    "enlaces": [
+      {
+        "etiqueta": "transfer parte 1",
+        "url": "https://transfer.it/t/houm1i5FBR5b"
+      },
+      {
+        "etiqueta": "transfer parte 2",
+        "url": "https://transfer.it/t/83cwpmoBQRAK"
+      },
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1fbW89Scun2so-XaQlwV8Pg"
+      },
+      {
+        "etiqueta": "mediafire",
+        "url": "https://www.mediafire.com/folder/h2c0hqirbr6a2/SMBND20261006152255"
+      },
+      {
+        "etiqueta": "MediaFire  .Rev",
+        "url": "https://www.mediafire.com/folder/jpg06nrr2xp84/SMBND20261006152255_Rev"
+      }
+    ],
+    "fecha": "24 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=spider-man-un-nuevo-dia-2026-web-rip-4k-ligero-2160p-hdr10-dolby-vision-dual-latino-ingles",
+    "descargado": false,
+    "originalTitle": "Spider-Man: Brand New Day",
+    "year": "2026",
+    "country": "N/A",
+    "duration": "2 horas 25 minutos",
+    "genre": "Acción, Aventura, Ciencia ficción, Superhéroes",
+    "description": "Gira en torno a Peter Parker, quien, cuatro años después de los acontecimientos de No Way Home, vive completamente solo y se dedica a combatir el crimen a tiempo completo como Spider-Man. Mientras protege una Nueva York que ha olvidado su identidad, la creciente presión desencadena una evolución física que amenaza su existencia. Al mismo tiempo, un extraño patrón de crímenes anuncia la llegada de una de las amenazas más poderosas a las que se ha enfrentado.",
+    "type": "Película",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "spider-man-un-nuevo-dia-2026-web-rip-4k-ligero-2160p-hdr10-dolby-vision-dual-latino-ingles"
+  },
+  {
+    "id": "spider-man-un-nuevo-dia-2026-imax-4k-uhd-hdr10-dual-latino-ingles-mvmptbvx-star5i",
+    "titulo": "Spider-Man: Un Nuevo Día (2026) IMAX 4K UHD HDR10 Dual Latino-Inglés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/uEedQL2ZNhe9HcgWdI6pZBcFpL8.jpg",
+    "masInfo": "Audio: Español Latino Dolby Digital Plus (E-AC-3) 5.1, Inglés Dolby Digital Plus Atmos (E-AC-3 JOC) 5.1\nCalidad: IMAX 4K UHD\nResolución: 3840 × 2160 (4K UHD)\nFormato: N/A\nTamaño: 80.6 GB\nCodec: H.265 (HEVC), HDR10\nSubtítulos: Español Latino, Inglés e Inglés SDH",
+    "enlaces": [
+      {
+        "etiqueta": "PARTE 1 (del 1 - 5)",
+        "url": "https://pastelink.net/zbhknbex"
+      },
+      {
+        "etiqueta": "PARTE 2 (del 6 - 9)",
+        "url": "https://pastelink.net/oqhiwl8i"
+      }
+    ],
+    "fecha": "24 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=spider-man-un-nuevo-dia-2026-imax-4k-uhd-hdr10-dual-latino-ingles",
+    "descargado": false,
+    "originalTitle": "Spider-Man: Brand New Day",
+    "year": "2026",
+    "country": "N/A",
+    "duration": "N/A",
+    "genre": "Acción, Aventura, Ciencia ficción, Superhéroes",
+    "description": "Gira en torno a Peter Parker, quien, cuatro años después de los acontecimientos de No Way Home, vive en completa soledad tras desaparecer de la vida y los recuerdos de quienes ama. Mientras combate el crimen a tiempo completo en una Nueva York que ha olvidado su identidad, la presión desencadena una sorprendente evolución física que amenaza su existencia. Al mismo tiempo, un extraño patrón de crímenes anuncia la llegada de una de las amenazas más poderosas a las que se ha enfrentado.",
+    "type": "Película",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "spider-man-un-nuevo-dia-2026-imax-4k-uhd-hdr10-dual-latino-ingles"
+  },
+  {
+    "id": "spider-man-un-nuevo-dia-2026-imax-4k-ligero-web-rip-2160p-hdr10-dual-latino-ingles-mvmr0mff-k2fonw",
+    "titulo": "Spider-Man: Un Nuevo Día (2026) IMAX 4K Ligero WEB-Rip 2160p HDR10 Dual Latino-Inglés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/uEedQL2ZNhe9HcgWdI6pZBcFpL8.jpg",
+    "masInfo": "- Audio 1: E-AC-3 JOC Dolby Digital Plus with Dolby Atmos 5.1 - Inglés\n- Audio 2: E-AC-3 Dolby Digital Plus  5.1 - Latino [Extraído de Prime Video]\nCalidad:\nAudio: Inglés E-AC-3 JOC (Dolby Digital Plus con Dolby Atmos) 5.1, Español Latino E-AC-3 5.1\nCalidad: WEB-Rip\nResolución: 3840 × 2020 (categoría 4K del catálogo)\nFormato: MKV\nTamaño: 9.79 GB\nCodec: H.265 (HEVC) Main 10, HDR10\nSubtítulos: 41 pistas de texto, incluido Español",
+    "enlaces": [
+      {
+        "etiqueta": "transfer parte 1",
+        "url": "https://transfer.it/t/1BEXMqgFyBJY"
+      },
+      {
+        "etiqueta": "transfer parte 2",
+        "url": "https://transfer.it/t/ENg9JywBEBAI"
+      },
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1Ar9ILfL27sK12NNFGsmjFQ"
+      },
+      {
+        "etiqueta": "mediafire",
+        "url": "https://www.mediafire.com/folder/x4b7o2rl4ryg0/SMBNDIX20261008142148"
+      },
+      {
+        "etiqueta": "MediaFire  .Rev",
+        "url": "https://www.mediafire.com/folder/13ispl3h8tuyj/SMBNDIX20261008142148_Rev"
+      }
+    ],
+    "fecha": "24 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=spider-man-un-nuevo-dia-2026-imax-4k-ligero-web-rip-2160p-hdr10-dual-latino-ingles",
+    "descargado": false,
+    "originalTitle": "Spider-Man: Brand New Day",
+    "year": "2026",
+    "country": "N/A",
+    "duration": "N/A",
+    "genre": "Acción, Aventura, Ciencia ficción, Superhéroes",
+    "description": "Gira en torno a Peter Parker, quien, cuatro años después de los acontecimientos de No Way Home, vive completamente solo tras desaparecer voluntariamente de la vida y los recuerdos de quienes ama. Mientras combate el crimen a tiempo completo en una Nueva York que ha olvidado su identidad, la creciente presión desencadena una evolución física que amenaza su existencia. Al mismo tiempo, un extraño patrón de crímenes anuncia la llegada de una de las amenazas más poderosas a las que se ha enfrentado.",
+    "type": "Película",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "spider-man-un-nuevo-dia-2026-imax-4k-ligero-web-rip-2160p-hdr10-dual-latino-ingles"
   }
 ]
