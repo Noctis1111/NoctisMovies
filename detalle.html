@@ -1610,6 +1610,7 @@
             <div class="dato-row"><span class="dato-label" id="d-country-label">País(es):</span><span class="dato-value" id="d-country">—</span></div>
             <div class="dato-row"><span class="dato-label">Duración:</span><span class="dato-value" id="d-duration">—</span></div>
             <div class="dato-row"><span class="dato-label">Género:</span><span class="dato-value" id="d-genre">—</span></div>
+            <div class="dato-row" id="d-views-row" style="display:none;"><span class="dato-label">Vistas:</span><span class="dato-value" id="d-views" title="Personas que han entrado a esta página">👁 —</span></div>
           </div>
           <div class="section-box">
             <div class="section-box-title">SINOPSIS</div>
@@ -2340,10 +2341,11 @@ function stopRippleEffect() {
   if (container) container.innerHTML = '';
 }
 
-// ===== CONTADOR DE VISTAS (CounterAPI — gratis, sin token) =====
-// Namespace único para que no choque con contadores de otros sitios.
-// Si quieres, cámbialo por algo aún más único; debe ser IGUAL aquí y en admin.html.
-const VIEWS_NAMESPACE = 'noctis1111-noctismovies-7c3a';
+// ===== CONTADOR DE VISTAS (GoatCounter — gratis, sin claves en el código) =====
+// Cuenta: https://noctis111.goatcounter.com  (requiere activar en Settings:
+// "Allow adding visitor counts on your website"). Cada película cuenta en su propia ruta /vista/<slug>.
+const GC_CODE = 'noctis111';
+const GC_BASE = `https://${GC_CODE}.goatcounter.com`;
 
 function viewKeyFor(slugOrIdx) {
   const raw = String(slugOrIdx);
@@ -2353,14 +2355,43 @@ function viewKeyFor(slugOrIdx) {
   return raw.slice(0, 55) + '-' + h.toString(36);
 }
 
+function showViews(n) {
+  const row = document.getElementById('d-views-row');
+  const el = document.getElementById('d-views');
+  if (!row || !el) return;
+  el.textContent = '👁 ' + Number(n).toLocaleString('es');
+  row.style.display = '';
+}
+
+// Lee el número guardado en GoatCounter (público, lo puede leer cualquier visitante)
+async function loadViews(path, justCounted) {
+  try {
+    const res = await fetch(`${GC_BASE}/counter/${encodeURIComponent(path)}.json`, { cache: 'no-store' });
+    if (res.status === 404) { showViews(justCounted ? 1 : 0); return; } // todavía no hay visitas registradas
+    if (!res.ok) return;
+    const data = await res.json();
+    const n = parseInt(String(data.count || '0').replace(/\D/g, ''), 10) || 0;
+    showViews(n);
+  } catch (e) { /* sin conexión o bloqueado por un adblocker: no se muestra la fila */ }
+}
+
 function registerView(m, idx) {
   const key = viewKeyFor(m.slug || ('idx-' + idx));
-  const sessionFlag = 'noctis_viewed_' + key;
-  // Evita sumar vistas de más si el usuario recarga la página en la misma sesión
-  if (sessionStorage.getItem(sessionFlag)) return;
-  sessionStorage.setItem(sessionFlag, '1');
-  // CountAPI: /hit/{namespace}/{key} incrementa Y devuelve el valor
-  fetch(`https://api.countapi.xyz/hit/${VIEWS_NAMESPACE}/${encodeURIComponent(key).slice(0,120)}`).catch(() => {});
+  const path = '/vista/' + key;
+  const sessionFlag = 'noctis_gcviewed_' + key;
+  // Evita sumar de más si el usuario recarga la página en la misma sesión
+  const yaContada = !!sessionStorage.getItem(sessionFlag);
+  const esLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  if (!yaContada && !esLocal) {
+    sessionStorage.setItem(sessionFlag, '1');
+    // GoatCounter acepta el conteo como una imagen invisible (sin cargar ningún script externo)
+    const px = new Image();
+    px.src = `${GC_BASE}/count?p=${encodeURIComponent(path)}&t=${encodeURIComponent(m.title || key)}&rnd=${Math.random().toString(36).slice(2)}`;
+    // el conteo nuevo tarda unos segundos en reflejarse: esperar un poco antes de leer el número
+    setTimeout(() => loadViews(path, true), 2500);
+  } else {
+    loadViews(path, false);
+  }
 }
 
 function qualityClass(q = '') {
