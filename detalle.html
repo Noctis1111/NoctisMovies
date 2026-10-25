@@ -1505,6 +1505,8 @@
     a.title-tag.tag-genre:hover::after { left: 120%; }
     a.title-tag.tag-genre:active { transform: translateY(0) scale(0.96); }
     a.title-tag.tag-genre:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+    .title-meta-right { margin-left: auto; display: inline-flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; }
+    .title-tag.tag-views { border-style: dashed; color: #b8bfcc; font-weight: 700; font-size: 0.85rem; padding: 4px 12px; }
     .title-tag.tag-date { margin-left: auto; border-style: dashed; color: #b8bfcc; font-weight: 700; font-size: 0.85rem; padding: 4px 12px; }
 
     /* ── Móviles Android de alta densidad (ej. Motorola Edge 50 Pro, 1220x2712px)
@@ -1610,7 +1612,6 @@
             <div class="dato-row"><span class="dato-label" id="d-country-label">País(es):</span><span class="dato-value" id="d-country">—</span></div>
             <div class="dato-row"><span class="dato-label">Duración:</span><span class="dato-value" id="d-duration">—</span></div>
             <div class="dato-row"><span class="dato-label">Género:</span><span class="dato-value" id="d-genre">—</span></div>
-            <div class="dato-row" id="d-views-row" style="display:none;"><span class="dato-label">Vistas:</span><span class="dato-value" id="d-views" title="Personas que han entrado a esta página">👁 —</span></div>
           </div>
           <div class="section-box">
             <div class="section-box-title">SINOPSIS</div>
@@ -2355,30 +2356,45 @@ function viewKeyFor(slugOrIdx) {
   return raw.slice(0, 55) + '-' + h.toString(36);
 }
 
-function showViews(n) {
-  const row = document.getElementById('d-views-row');
-  const el = document.getElementById('d-views');
-  if (!row || !el) return;
-  el.textContent = '👁 ' + Number(n).toLocaleString('es');
-  row.style.display = '';
+function viewsLabel(n) {
+  return (n === undefined || n === null) ? '—' : Number(n).toLocaleString('es');
 }
 
-// Lee el número guardado en GoatCounter (público, lo puede leer cualquier visitante)
+// Guarda y muestra el número (si ya hay uno, se queda con el mayor: nunca baja de lo ya visto)
+function showViews(n) {
+  const cur = window.__noctisViews;
+  window.__noctisViews = (cur === undefined || cur === null) ? n : Math.max(cur, n);
+  const el = document.getElementById('d-views');
+  if (el) el.textContent = '👁 ' + viewsLabel(window.__noctisViews);
+}
+
+// 1) Copia guardada junto al sitio (views.json): no depende de GoatCounter, así que un bloqueador no la afecta
+async function loadViewsSnapshot(key) {
+  try {
+    const res = await fetch('views.json', { cache: 'no-cache' });
+    if (!res.ok) return;
+    const data = await res.json();
+    const n = data && data.views ? Number(data.views[key]) : NaN;
+    if (!isNaN(n)) showViews(n);
+  } catch (e) { /* sin copia guardada todavía */ }
+}
+
+// 2) Número en vivo desde GoatCounter (público; si un bloqueador lo impide, queda la copia guardada)
 async function loadViews(path, justCounted) {
   try {
     const res = await fetch(`${GC_BASE}/counter/${encodeURIComponent(path)}.json`, { cache: 'no-store' });
-    if (res.status === 404) { showViews(justCounted ? 1 : 0); return; } // todavía no hay visitas registradas
+    if (res.status === 404) { showViews(justCounted ? 1 : 0); return; } // todavía sin visitas registradas
     if (!res.ok) return;
     const data = await res.json();
-    const n = parseInt(String(data.count || '0').replace(/\D/g, ''), 10) || 0;
-    showViews(n);
-  } catch (e) { /* sin conexión o bloqueado por un adblocker: no se muestra la fila */ }
+    showViews(parseInt(String(data.count || '0').replace(/\D/g, ''), 10) || 0);
+  } catch (e) { /* bloqueado o sin conexión */ }
 }
 
 function registerView(m, idx) {
   const key = viewKeyFor(m.slug || ('idx-' + idx));
   const path = '/vista/' + key;
   const sessionFlag = 'noctis_gcviewed_' + key;
+  loadViewsSnapshot(key);
   // Evita sumar de más si el usuario recarga la página en la misma sesión
   const yaContada = !!sessionStorage.getItem(sessionFlag);
   const esLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
@@ -2792,7 +2808,9 @@ async function init() {
   // Fecha de subida (si el titulo la tiene) — al fondo, extremo derecho de la fila
   const uploadLabel = formatUploadDate(m.uploadDate);
   const dateHtml = uploadLabel ? `<span class="title-tag tag-date">${uploadLabel}</span>` : '';
-  tagsEl.innerHTML = yearHtml + typeHtml + tags.map(t => `<span class="title-tag">${t}</span>`).join('') + genreHtml + dateHtml;
+  // Vistas (👁): siempre visible; el número lo rellena loadViews() (contador en vivo o copia guardada en views.json)
+  const viewsHtml = `<span class="title-tag tag-views" id="d-views" title="Vistas">👁 ${viewsLabel(window.__noctisViews)}</span>`;
+  tagsEl.innerHTML = yearHtml + typeHtml + tags.map(t => `<span class="title-tag">${t}</span>`).join('') + genreHtml + `<span class="title-meta-right">${dateHtml}${viewsHtml}</span>`;
 
   // Poster
   const posterEl = document.getElementById('d-poster');
