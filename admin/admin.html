@@ -4127,16 +4127,20 @@ function viewKeyFor(m, idx) {
   return raw.slice(0, 55) + '-' + h.toString(36);
 }
 
-// ── Helper: fetch a counterapi.dev con manejo de CORS ────────────────────
-async function fetchCounterApiCount(key) {
-  // CountAPI: GET /get/{namespace}/{key} -> { value: N }
-  // Funciona con CORS desde GitHub Pages sin problemas
-  const safeKey = encodeURIComponent(key).slice(0, 120);
-  const url = `https://api.countapi.xyz/get/${VIEWS_NAMESPACE}/${safeKey}`;
-  const res = await fetch(url, { mode: 'cors' });
+// ── Lee el contador de GoatCounter (reemplaza a CountAPI, que ya no existe) ──
+// Cuenta: noctis111.goatcounter.com · cada película cuenta en la ruta /vista/<slug>
+const GC_BASE = 'https://noctis111.goatcounter.com';
+async function fetchCounterApiCount(key, _reintento) {
+  const url = `${GC_BASE}/counter/${encodeURIComponent('/vista/' + key)}.json`;
+  const res = await fetch(url, { cache: 'no-store' });
+  if (res.status === 404) return 0;                      // todavía sin visitas
+  if (res.status === 429 && !_reintento) {               // demasiadas consultas seguidas: esperar y reintentar una vez
+    await new Promise(r => setTimeout(r, 2000));
+    return fetchCounterApiCount(key, true);
+  }
   if (!res.ok) throw new Error('http ' + res.status);
   const data = await res.json();
-  return Number(data.value ?? 0);
+  return parseInt(String(data.count ?? '0').replace(/\D/g, ''), 10) || 0;
 }
 
 // ── Visitas a la página principal (index) ────────────────────────────────
@@ -4160,14 +4164,14 @@ async function fetchHomeVisits() {
   }
 }
 
-async function refreshViews(showFeedback) {
+async function refreshViews(showFeedback, onProgress) {
   const movies = getAllItems();
   const btn = document.getElementById('views-refresh-btn');
   if (!movies.length) { if (showFeedback) showToast('No hay títulos en el catálogo.', 'info'); return; }
   if (btn) btn.classList.add('loading');
   if (showFeedback) showToast('Actualizando vistas...', 'info');
-  // Procesar en lotes de 5 para no saturar la API
-  const BATCH = 5;
+  // GoatCounter limita las consultas por segundo: de 2 en 2 y con pausa entre lotes
+  const BATCH = 2;
   const results = [];
   for (let i = 0; i < movies.length; i += BATCH) {
     const batch = movies.slice(i, i + BATCH);
@@ -4178,13 +4182,15 @@ async function refreshViews(showFeedback) {
         const count = await fetchCounterApiCount(key);
         return [key, count];
       } catch {
-        return [key, viewsCache[key] ?? 0];
+        return [key, viewsCache[key]]; // GoatCounter no respondió: se conserva el número anterior (no se pisa con 0)
       }
     }));
     results.push(...batchRes);
-    if (i + BATCH < movies.length) await new Promise(r => setTimeout(r, 120));
+    if (onProgress) onProgress(Math.min(i + BATCH, movies.length), movies.length);
+    if (i + BATCH < movies.length) await new Promise(r => setTimeout(r, 600));
+    if (showFeedback && i > 0 && (i % 100) < BATCH) showToast(`Actualizando vistas… ${Math.min(i + BATCH, movies.length)}/${movies.length}`, 'info');
   }
-  results.forEach(([key, count]) => { viewsCache[key] = count; });
+  results.forEach(([key, count]) => { if (typeof count === 'number') viewsCache[key] = count; });
   try { localStorage.setItem('noctis_views_cache', JSON.stringify(viewsCache)); } catch {}
   if (btn) btn.classList.remove('loading');
   renderList(false);
@@ -4627,10 +4633,40 @@ async function publishToGithub() {
       musicaMsg = em.message;
     }
 
-    const todoOk = privadoOk && musicaOk;
+    // ── Publica también views.json (copia de las vistas, visible aunque un bloqueador impida leer GoatCounter).
+    // Se actualiza sola al publicar; si GoatCounter no respondió, se conservan los números anteriores.
+    let viewsOk = true, viewsMsg = '';
+    try {
+      // Las vistas se actualizan solas al publicar (ya no hace falta tocar 🔄 antes).
+      statusEl.textContent = '✓ Catálogo publicado · actualizando vistas…';
+      await refreshViews(false, (hecho, total) => { statusEl.textContent = `✓ Catálogo publicado · actualizando vistas… ${hecho}/${total}`; });
+      const todos = getAllItems();
+      const viewsMap = {};
+      todos.forEach((m, i) => { const k = viewKeyFor(m, i); if (typeof viewsCache[k] === 'number') viewsMap[k] = viewsCache[k]; });
+      if (Object.keys(viewsMap).length) {
+        const vwApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/views.json`;
+        let vwSha = null;
+        const vwGet = await fetch(vwApiUrl, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' } });
+        if (vwGet.ok) { const d = await vwGet.json(); vwSha = d.sha; }
+        else if (vwGet.status !== 404) { const e = await vwGet.json().catch(() => ({})); throw new Error(e.message || 'Error ' + vwGet.status); }
+        const vwJson = JSON.stringify({ updated: new Date().toISOString(), views: viewsMap }, null, 1);
+        const vwB64 = btoa(Array.from(new TextEncoder().encode(vwJson), b => String.fromCharCode(b)).join(''));
+        const vwPut = await fetch(vwApiUrl, {
+          method: 'PUT',
+          headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' },
+          body: JSON.stringify({ message: 'Actualizar vistas — ' + new Date().toLocaleString(), content: vwB64, ...(vwSha && { sha: vwSha }) })
+        });
+        if (!vwPut.ok) { const e = await vwPut.json().catch(() => ({})); throw new Error(e.message || 'Error ' + vwPut.status); }
+      }
+    } catch (ev) {
+      viewsOk = false;
+      viewsMsg = ev.message;
+    }
+
+    const todoOk = privadoOk && musicaOk && viewsOk;
     statusEl.textContent = todoOk
-      ? '✓ Publicado (catálogo + privado + música). Tarda ~1 min en reflejarse en el sitio.'
-      : '✓ Catálogo publicado' + (privadoOk ? '' : ' · ✗ privado: ' + privadoMsg) + (musicaOk ? '' : ' · ✗ música: ' + musicaMsg);
+      ? '✓ Publicado (catálogo + privado + música + vistas). Tarda ~1 min en reflejarse en el sitio.'
+      : '✓ Catálogo publicado' + (privadoOk ? '' : ' · ✗ privado: ' + privadoMsg) + (musicaOk ? '' : ' · ✗ música: ' + musicaMsg) + (viewsOk ? '' : ' · ✗ vistas: ' + viewsMsg);
     statusEl.style.color = todoOk ? 'var(--green)' : '#e5b44b';
     showToast(todoOk ? '🚀 Catálogo + Privado + Música publicados' : '🚀 Catálogo publicado · algo falló (ver estado)', todoOk ? 'success' : 'error');
   } catch(e) {
