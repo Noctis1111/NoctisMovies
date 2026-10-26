@@ -4168,8 +4168,9 @@ async function refreshViews(showFeedback, onProgress) {
   const movies = getAllItems();
   const btn = document.getElementById('views-refresh-btn');
   if (!movies.length) { if (showFeedback) showToast('No hay títulos en el catálogo.', 'info'); return; }
+  const btnTextoOriginal = btn ? btn.textContent : '';
   if (btn) btn.classList.add('loading');
-  if (showFeedback) showToast('Actualizando vistas...', 'info');
+  if (showFeedback) showToast('Actualizando vistas… puede tardar unos minutos, no cierres la página', 'info');
   // GoatCounter limita las consultas por segundo: de 2 en 2 y con pausa entre lotes
   const BATCH = 2;
   const results = [];
@@ -4186,13 +4187,14 @@ async function refreshViews(showFeedback, onProgress) {
       }
     }));
     results.push(...batchRes);
+    if (btn) btn.textContent = `🔄 ${Math.min(i + BATCH, movies.length)}/${movies.length}`;
     if (onProgress) onProgress(Math.min(i + BATCH, movies.length), movies.length);
     if (i + BATCH < movies.length) await new Promise(r => setTimeout(r, 600));
     if (showFeedback && i > 0 && (i % 100) < BATCH) showToast(`Actualizando vistas… ${Math.min(i + BATCH, movies.length)}/${movies.length}`, 'info');
   }
   results.forEach(([key, count]) => { if (typeof count === 'number') viewsCache[key] = count; });
   try { localStorage.setItem('noctis_views_cache', JSON.stringify(viewsCache)); } catch {}
-  if (btn) btn.classList.remove('loading');
+  if (btn) { btn.classList.remove('loading'); btn.textContent = btnTextoOriginal; }
   renderList(false);
   if (showFeedback) showToast('✓ Vistas actualizadas', 'success');
 }
