@@ -103,6 +103,8 @@
     gtag('js', new Date());
     gtag('config', 'G-F18ZM0ZHHJ');
   </script>
+  <!-- GoatCounter: solo para ver las visitas en noctis111.goatcounter.com (no se muestra en la página) -->
+  <script data-goatcounter="https://noctis111.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -2107,17 +2109,7 @@ function build2026(movies) {
 
 loadMovies();
 
-// ── Contador de visitas a la página principal ──────────────────────────────
-(function() {
-  const NS = 'noctis1111-noctismovies-7c3a';
-  const KEY = 'home';
-  // Solo cuenta una vez por sesión
-  if (!sessionStorage.getItem('noctis_home_counted')) {
-    sessionStorage.setItem('noctis_home_counted', '1');
-    // CountAPI: /hit/{namespace}/{key} incrementa Y devuelve el valor
-    fetch(`https://api.countapi.xyz/hit/${NS}/${KEY}`).catch(() => {});
-  }
-})();
+// (El conteo de visitas ahora lo hace GoatCounter desde el <head>; solo se consulta en goatcounter.com)
 // 
 </script>
 <script>
