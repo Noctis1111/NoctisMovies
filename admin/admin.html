@@ -771,6 +771,14 @@
     .toast.success { background: var(--green); color: #000; }
     .toast.error { background: var(--red); color: #fff; }
     .toast.info { background: var(--gold); color: #000; }
+    /* Aviso de vistas: se queda en pantalla hasta que se cierra con la X */
+    .views-notice { position: fixed; bottom: 5.5rem; right: 2rem; max-width: min(420px, calc(100vw - 2rem)); display: none; align-items: flex-start; gap: 0.8rem; padding: 0.9rem 1rem 0.9rem 1.3rem; border-radius: 10px; font-weight: 600; font-size: 0.9rem; z-index: 1000; box-shadow: 0 6px 24px rgba(0,0,0,0.5); }
+    .views-notice.show { display: flex; }
+    .views-notice.success { background: var(--green); color: #000; }
+    .views-notice.error { background: var(--red); color: #fff; }
+    .views-notice.info { background: var(--gold); color: #000; }
+    .views-notice button { background: rgba(0,0,0,0.22); color: inherit; border: none; border-radius: 6px; width: 26px; height: 26px; flex: 0 0 26px; cursor: pointer; font-size: 0.85rem; line-height: 1; font-weight: 700; }
+    .views-notice button:hover { background: rgba(0,0,0,0.4); }
 
     /* MOVIE LIST */
     .movie-list { display: flex; flex-direction: column; gap: 0.75rem; }
@@ -1501,7 +1509,8 @@
             <button class="sort-btn sort-btn-sm active" id="sort-btn-default" onclick="setSortMode('default')">Orden de subida</button>
             <button class="sort-btn sort-btn-sm" id="sort-btn-views_desc" onclick="setSortMode('views_desc')">Más vistas</button>
             <button class="sort-btn sort-btn-sm" id="sort-btn-views_asc" onclick="setSortMode('views_asc')">Menos vistas</button>
-            <button class="views-refresh-btn sort-btn-sm" id="views-refresh-btn" onclick="refreshViews(true)" title="Actualizar vistas">🔄 Vistas</button>
+            <button class="views-refresh-btn sort-btn-sm" id="views-read-btn" onclick="refreshViews(true)" title="Leer las vistas de GoatCounter de todos los catálogos">🔄</button>
+            <button class="views-refresh-btn sort-btn-sm" id="views-refresh-btn" onclick="updateAndPublishViews()" title="Publicar las vistas para quienes tienen bloqueador (las vistas se leen solas al abrir el admin)">📊 Vistas</button>
           </div>
           <button class="export-btn" style="width:auto;padding:0.3rem 0.8rem;margin:0;font-size:0.75rem;" onclick="clearAll()">🗑 Limpiar todo</button>
         </div>
@@ -1551,6 +1560,7 @@
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="views-notice" id="views-notice" role="status"><span id="views-notice-text"></span><button type="button" onclick="closeViewsNotice()" aria-label="Cerrar aviso" title="Cerrar">✕</button></div>
 
 <script>
 const ADMIN_PASSWORD = '72941361'; // ← CAMBIA TU CONTRASEÑA
@@ -4164,11 +4174,19 @@ async function fetchHomeVisits() {
   }
 }
 
-async function refreshViews(showFeedback, onProgress) {
+let _viewsRefreshPromise = null;
+let lastViewsRefresh = 0;
+function refreshViews(showFeedback, onProgress) {
+  if (_viewsRefreshPromise) return _viewsRefreshPromise;   // ya hay una en curso (p. ej. la automática al abrir el admin)
+  _viewsRefreshPromise = _refreshViewsImpl(showFeedback, onProgress).finally(() => { _viewsRefreshPromise = null; });
+  return _viewsRefreshPromise;
+}
+
+async function _refreshViewsImpl(showFeedback, onProgress) {
   const movies = getAllItems();
-  const btn = document.getElementById('views-refresh-btn');
+  const btn = document.getElementById('views-read-btn');
   if (!movies.length) { if (showFeedback) showToast('No hay títulos en el catálogo.', 'info'); return; }
-  const btnTextoOriginal = btn ? btn.textContent : '';
+  const btnTextoOriginal = '🔄';
   if (btn) btn.classList.add('loading');
   if (showFeedback) showToast('Actualizando vistas… puede tardar unos minutos, no cierres la página', 'info');
   // GoatCounter limita las consultas por segundo: de 2 en 2 y con pausa entre lotes
@@ -4194,9 +4212,55 @@ async function refreshViews(showFeedback, onProgress) {
   }
   results.forEach(([key, count]) => { if (typeof count === 'number') viewsCache[key] = count; });
   try { localStorage.setItem('noctis_views_cache', JSON.stringify(viewsCache)); } catch {}
+  lastViewsRefresh = Date.now();
   if (btn) { btn.classList.remove('loading'); btn.textContent = btnTextoOriginal; }
   renderList(false);
   if (showFeedback) showToast('✓ Vistas actualizadas', 'success');
+}
+
+// Botón 📊 Vistas: PUBLICA las vistas (views.json) para quienes tienen bloqueador. Es manual a propósito.
+// Las vistas en sí se leen solas al abrir el admin; este botón solo las sube. Si la lectura automática sigue en curso,
+// espera a que termine; si los números tienen más de 10 minutos, los actualiza antes de subirlos.
+// El resultado sale en un aviso que NO se cierra solo (se cierra con la X).
+let _viewsPublishing = false;
+async function updateAndPublishViews() {
+  if (_viewsPublishing) { showViewsNotice('Ya se están publicando las vistas…', 'info'); return; }
+  _viewsPublishing = true;
+  const btn = document.getElementById('views-refresh-btn');
+  try {
+    const owner = document.getElementById('gh-owner').value.trim();
+    const repo = document.getElementById('gh-repo').value.trim();
+    const token = document.getElementById('gh-token').value.trim();
+    if (!owner || !repo || !token) { showViewsNotice('Configura usuario, repositorio y token (Sync GitHub) para poder publicar las vistas.', 'error'); return; }
+    closeViewsNotice();
+    if (_viewsRefreshPromise) await _viewsRefreshPromise;
+    else if (Date.now() - lastViewsRefresh > 10 * 60 * 1000) await refreshViews(false);
+    const todos = getAllItems();
+    const viewsMap = {};
+    todos.forEach((m, i) => { const k = viewKeyFor(m, i); if (typeof viewsCache[k] === 'number') viewsMap[k] = viewsCache[k]; });
+    const total = Object.keys(viewsMap).length;
+    if (!total) { showViewsNotice('No hay vistas para publicar todavía.', 'info'); return; }
+    if (btn) { btn.classList.add('loading'); btn.textContent = '📊 publicando…'; }
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/views.json`;
+    let sha = null;
+    const getRes = await fetch(apiUrl, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' } });
+    if (getRes.ok) { const d = await getRes.json(); sha = d.sha; }
+    else if (getRes.status !== 404) { const e = await getRes.json().catch(() => ({})); throw new Error(e.message || 'Error ' + getRes.status); }
+    const json = JSON.stringify({ updated: new Date().toISOString(), views: viewsMap }, null, 1);
+    const b64 = btoa(Array.from(new TextEncoder().encode(json), b => String.fromCharCode(b)).join(''));
+    const putRes = await fetch(apiUrl, {
+      method: 'PUT',
+      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' },
+      body: JSON.stringify({ message: 'Actualizar vistas — ' + new Date().toLocaleString(), content: b64, ...(sha && { sha }) })
+    });
+    if (!putRes.ok) { const e = await putRes.json().catch(() => ({})); throw new Error(e.message || 'Error ' + putRes.status); }
+    showViewsNotice(`✓ Vistas publicadas (${total} títulos). Tardan ~1 min en verse en el sitio para quienes tienen bloqueador.`, 'success');
+  } catch (err) {
+    showViewsNotice('✗ No se pudieron publicar las vistas: ' + err.message, 'error');
+  } finally {
+    if (btn) { btn.classList.remove('loading'); btn.textContent = '📊 Vistas'; }
+    _viewsPublishing = false;
+  }
 }
 
 let adminTypeFilter = null;
@@ -4635,40 +4699,10 @@ async function publishToGithub() {
       musicaMsg = em.message;
     }
 
-    // ── Publica también views.json (copia de las vistas, visible aunque un bloqueador impida leer GoatCounter).
-    // Se actualiza sola al publicar; si GoatCounter no respondió, se conservan los números anteriores.
-    let viewsOk = true, viewsMsg = '';
-    try {
-      // Las vistas se actualizan solas al publicar (ya no hace falta tocar 🔄 antes).
-      statusEl.textContent = '✓ Catálogo publicado · actualizando vistas…';
-      await refreshViews(false, (hecho, total) => { statusEl.textContent = `✓ Catálogo publicado · actualizando vistas… ${hecho}/${total}`; });
-      const todos = getAllItems();
-      const viewsMap = {};
-      todos.forEach((m, i) => { const k = viewKeyFor(m, i); if (typeof viewsCache[k] === 'number') viewsMap[k] = viewsCache[k]; });
-      if (Object.keys(viewsMap).length) {
-        const vwApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/views.json`;
-        let vwSha = null;
-        const vwGet = await fetch(vwApiUrl, { headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' } });
-        if (vwGet.ok) { const d = await vwGet.json(); vwSha = d.sha; }
-        else if (vwGet.status !== 404) { const e = await vwGet.json().catch(() => ({})); throw new Error(e.message || 'Error ' + vwGet.status); }
-        const vwJson = JSON.stringify({ updated: new Date().toISOString(), views: viewsMap }, null, 1);
-        const vwB64 = btoa(Array.from(new TextEncoder().encode(vwJson), b => String.fromCharCode(b)).join(''));
-        const vwPut = await fetch(vwApiUrl, {
-          method: 'PUT',
-          headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' },
-          body: JSON.stringify({ message: 'Actualizar vistas — ' + new Date().toLocaleString(), content: vwB64, ...(vwSha && { sha: vwSha }) })
-        });
-        if (!vwPut.ok) { const e = await vwPut.json().catch(() => ({})); throw new Error(e.message || 'Error ' + vwPut.status); }
-      }
-    } catch (ev) {
-      viewsOk = false;
-      viewsMsg = ev.message;
-    }
-
-    const todoOk = privadoOk && musicaOk && viewsOk;
+    const todoOk = privadoOk && musicaOk;
     statusEl.textContent = todoOk
-      ? '✓ Publicado (catálogo + privado + música + vistas). Tarda ~1 min en reflejarse en el sitio.'
-      : '✓ Catálogo publicado' + (privadoOk ? '' : ' · ✗ privado: ' + privadoMsg) + (musicaOk ? '' : ' · ✗ música: ' + musicaMsg) + (viewsOk ? '' : ' · ✗ vistas: ' + viewsMsg);
+      ? '✓ Publicado (catálogo + privado + música). Tarda ~1 min en reflejarse en el sitio.'
+      : '✓ Catálogo publicado' + (privadoOk ? '' : ' · ✗ privado: ' + privadoMsg) + (musicaOk ? '' : ' · ✗ música: ' + musicaMsg);
     statusEl.style.color = todoOk ? 'var(--green)' : '#e5b44b';
     showToast(todoOk ? '🚀 Catálogo + Privado + Música publicados' : '🚀 Catálogo publicado · algo falló (ver estado)', todoOk ? 'success' : 'error');
   } catch(e) {
@@ -5326,6 +5360,15 @@ document.addEventListener('DOMContentLoaded', renderPrivadoSavedList);
 
 /* ======================== TOAST ======================== */
 let toastTimer;
+function showViewsNotice(msg, type='info') {
+  const n = document.getElementById('views-notice');
+  document.getElementById('views-notice-text').textContent = msg;
+  n.className = 'views-notice show ' + type;
+}
+function closeViewsNotice() {
+  document.getElementById('views-notice').classList.remove('show');
+}
+
 function showToast(msg, type='info') {
   const t = document.getElementById('toast');
   t.textContent = msg; t.className = 'toast show '+type;
