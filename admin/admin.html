@@ -386,6 +386,13 @@
   font-size: 0.7rem !important;
   border-radius: 6px !important;
 }
+/* Cabecera del catálogo en UNA sola fila: título · orden · 🔄 📊 · Limpiar todo */
+#catalog-panel-header { flex-wrap: nowrap !important; padding: 0.5rem 0.8rem !important; gap: 0.4rem !important; }
+#catalog-panel-header .panel-title { font-size: 1.15rem !important; letter-spacing: 1px !important; white-space: nowrap; flex: 0 0 auto; }
+#catalog-panel-header .sort-row-inline { flex-wrap: nowrap !important; gap: 0.2rem !important; flex: 1 1 auto; justify-content: center; }
+#catalog-panel-header .sort-row-inline .sort-btn-sm { padding: 0.28rem 0.42rem !important; font-size: 0.66rem !important; white-space: nowrap; }
+#views-read-btn { min-width: 4.6rem; text-align: center; }  /* ancho fijo: el avance 🔄 66/462 no mueve el resto */
+#catalog-panel-header .export-btn { padding: 0.28rem 0.5rem !important; font-size: 0.66rem !important; white-space: nowrap; flex: 0 0 auto; }
 
 /* 3. TÍTULOS: Contraste total */
 .panel-title { 
@@ -1512,7 +1519,7 @@
             <button class="views-refresh-btn sort-btn-sm" id="views-read-btn" onclick="refreshViews(true)" title="Leer las vistas de GoatCounter de todos los catálogos">🔄</button>
             <button class="views-refresh-btn sort-btn-sm" id="views-refresh-btn" onclick="updateAndPublishViews()" title="Publicar las vistas para quienes tienen bloqueador (las vistas se leen solas al abrir el admin)">📊 Vistas</button>
           </div>
-          <button class="export-btn" style="width:auto;padding:0.3rem 0.8rem;margin:0;font-size:0.75rem;" onclick="clearAll()">🗑 Limpiar todo</button>
+          <button class="export-btn" style="width:auto;margin:0;" onclick="clearAll()">🗑 Limpiar todo</button>
         </div>
         <div class="cv-row">
           <button type="button" class="cv-btn cv-active" id="cv-btn-all" onclick="setCatalogView('all')">✨ Todo <span class="cv-n" id="cv-count-all">0</span></button>
@@ -4187,7 +4194,7 @@ async function _refreshViewsImpl(showFeedback, onProgress) {
   const btn = document.getElementById('views-read-btn');
   if (!movies.length) { if (showFeedback) showToast('No hay títulos en el catálogo.', 'info'); return; }
   const btnTextoOriginal = '🔄';
-  if (btn) btn.classList.add('loading');
+  if (btn && showFeedback) btn.classList.add('loading');   // solo se atenúa/avanza cuando tocas 🔄; la lectura al abrir es silenciosa
   if (showFeedback) showToast('Actualizando vistas… puede tardar unos minutos, no cierres la página', 'info');
   // GoatCounter limita las consultas por segundo: de 2 en 2 y con pausa entre lotes
   const BATCH = 2;
@@ -4205,7 +4212,7 @@ async function _refreshViewsImpl(showFeedback, onProgress) {
       }
     }));
     results.push(...batchRes);
-    if (btn) btn.textContent = `🔄 ${Math.min(i + BATCH, movies.length)}/${movies.length}`;
+    if (btn && showFeedback) btn.textContent = `🔄 ${Math.min(i + BATCH, movies.length)}/${movies.length}`;
     if (onProgress) onProgress(Math.min(i + BATCH, movies.length), movies.length);
     if (i + BATCH < movies.length) await new Promise(r => setTimeout(r, 600));
     if (showFeedback && i > 0 && (i % 100) < BATCH) showToast(`Actualizando vistas… ${Math.min(i + BATCH, movies.length)}/${movies.length}`, 'info');
@@ -4233,8 +4240,10 @@ async function updateAndPublishViews() {
     const token = document.getElementById('gh-token').value.trim();
     if (!owner || !repo || !token) { showViewsNotice('Configura usuario, repositorio y token (Sync GitHub) para poder publicar las vistas.', 'error'); return; }
     closeViewsNotice();
-    if (_viewsRefreshPromise) await _viewsRefreshPromise;
-    else if (Date.now() - lastViewsRefresh > 10 * 60 * 1000) await refreshViews(false);
+    if (_viewsRefreshPromise || Date.now() - lastViewsRefresh > 10 * 60 * 1000) {
+      if (btn) { btn.classList.add('loading'); btn.textContent = '📊 leyendo…'; }
+      await refreshViews(false);
+    }
     const todos = getAllItems();
     const viewsMap = {};
     todos.forEach((m, i) => { const k = viewKeyFor(m, i); if (typeof viewsCache[k] === 'number') viewsMap[k] = viewsCache[k]; });
