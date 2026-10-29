@@ -1809,6 +1809,7 @@
           <a class="side-tag" href="index.html?source=WEB-SCR">WEB-SCR</a>
           <a class="side-tag" href="index.html?source=BLU-RAY">BLU-RAY</a>
           <a class="side-tag tag-3d" href="index.html?source=BLU-RAY-3D">BLU-RAY 3D</a>
+          <a class="side-tag" href="index.html?source=DVD">DVD</a>
           <a class="side-tag" href="index.html?source=HDRIP">HDRip</a>
           <a class="side-tag" href="index.html?source=HDTS">HDTS</a>
           <a class="side-tag" href="index.html?source=DCP-RIP">DCP-RIP</a>
@@ -2200,7 +2201,7 @@ function formatUploadDate(ud) {
 // Cada categoria: key interno -> nombre EXACTO del archivo (sin .png) dentro de badges/<categoria>/
 const PELI_FILE_FOR = {
   fuente: {
-    '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','blu-ray-3d':'blu-ray-3d','brrip':'brrip','dcp-rip':'dcp-rip',
+    '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','blu-ray-3d':'blu-ray-3d','dvd':'dvd','brrip':'brrip','dcp-rip':'dcp-rip',
     'hdrip':'hdrip','hdts':'hdts','remux':'remux','web-dl':'web-dl','web-rip':'web-rip','web-scr':'web-scr','x265':'x265',
   },
   idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino','castellano':'Castellano' },
@@ -2273,7 +2274,7 @@ function getPeliBadgeKeysFromMovie(m) {
   const fuenteKey = (m.source||'').toLowerCase() && PELI_FILE_FOR.fuente[(m.source||'').toLowerCase()] ? (m.source||'').toLowerCase() : null;
   // BLU-RAY / BLU-RAY 3D traen su logo impreso justo donde va la cinta de Calidad:
   // la Calidad queda ACTIVA (m.quality sigue guardado y se muestra en la ficha) pero su cinta no se dibuja.
-  const ocultaCalidad = (fuenteKey === 'blu-ray' || fuenteKey === 'blu-ray-3d');
+  const ocultaCalidad = (fuenteKey === 'blu-ray' || fuenteKey === 'blu-ray-3d' || fuenteKey === 'dvd');
   return {
     fuente: fuenteKey,
     idioma: audioMap[m.audio] || null,
