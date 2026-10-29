@@ -681,8 +681,8 @@
     .chip.chip-master32.chip-active { color: #2a2410 !important; box-shadow: 0 0 12px rgba(232,219,160,0.6); }
     .chip.chip-master32.chip-active .chip-aft-sub { color: #4a3f1a; }
     /* Fuente/Encode → misma altura más generosa que Formato de Audio */
-    #chips-source.chip-group { gap: 0.22rem !important; flex-wrap: nowrap !important; }
-    #chips-source.chip-group .chip { padding: 0.5rem 0.3rem !important; font-size: 0.7rem !important; white-space: nowrap; flex: 1 1 0; min-width: 0; text-align: center; }
+    #chips-source.chip-group { gap: 0.14rem !important; flex-wrap: nowrap !important; }
+    #chips-source.chip-group .chip { padding: 0.5rem 0.12rem !important; font-size: 0.64rem !important; letter-spacing: 0 !important; white-space: nowrap; flex: 1 1 0; min-width: 0; text-align: center; }
     /* Calidad / Audio / HDR → una sola fila (van en columnas de 1/3, por eso los chips son más chicos que en Fuente/Encode) */
     #chips-quality.chip-group, #chips-audio.chip-group, #chips-hdr.chip-group {
       flex-wrap: nowrap;
@@ -1165,6 +1165,7 @@
                 <button type="button" class="chip" data-value="WEB-SCR" style="border-color:#2ccca4;color:#2ccca4;">WEB-SCR</button>
                 <button type="button" class="chip" data-value="BLU-RAY" style="border-color:#6ac2eb;color:#6ac2eb;">BLU-RAY</button>
                 <button type="button" class="chip" data-value="BLU-RAY-3D" style="border-color:#a06ceb;color:#a06ceb;">BLU-RAY 3D</button>
+                <button type="button" class="chip" data-value="DVD" style="border-color:#d4d4d4;color:#d4d4d4;">DVD</button>
                 <button type="button" class="chip" data-value="HDRIP" style="border-color:#f8b800;color:#f8b800;">HDRip</button>
                 <button type="button" class="chip" data-value="HDTS" style="border-color:#3330ac;color:#3330ac;">HDTS</button>
                 <button type="button" class="chip" data-value="DCP-RIP" style="border-color:#b05a00;color:#b05a00;">DCP-RIP</button>
@@ -1718,7 +1719,7 @@ function actualizarAvisoDestino() {
 // Cada categoria: key interno -> nombre EXACTO del archivo (sin .png) dentro de badges/<categoria>/
 const PELI_FILE_FOR = {
   fuente: {
-    '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','blu-ray-3d':'blu-ray-3d','brrip':'brrip','dcp-rip':'dcp-rip',
+    '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','blu-ray-3d':'blu-ray-3d','dvd':'dvd','brrip':'brrip','dcp-rip':'dcp-rip',
     'hdrip':'hdrip','hdts':'hdts','remux':'remux','web-dl':'web-dl','web-rip':'web-rip','web-scr':'web-scr','x265':'x265',
   },
   idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino','castellano':'Castellano' },
@@ -1861,9 +1862,9 @@ function getPeliBadgeKeysFromMovie(m) {
   else if (/\bFLOW\b/.test(text)) streaming = 'flow';
   else if (/\bVIX\b/.test(text)) streaming = 'vix';
   const fuenteKey = (m.source||'').toLowerCase() && PELI_FILE_FOR.fuente[(m.source||'').toLowerCase()] ? (m.source||'').toLowerCase() : null;
-  // BLU-RAY / BLU-RAY 3D traen su logo impreso justo donde va la cinta de Calidad:
+  // BLU-RAY / BLU-RAY 3D / DVD traen su logo impreso justo donde va la cinta de Calidad:
   // la Calidad queda ACTIVA (m.quality se guarda y el filtro la encuentra) pero su cinta no se dibuja.
-  const ocultaCalidad = (fuenteKey === 'blu-ray' || fuenteKey === 'blu-ray-3d');
+  const ocultaCalidad = (fuenteKey === 'blu-ray' || fuenteKey === 'blu-ray-3d' || fuenteKey === 'dvd');
   return {
     fuente: fuenteKey,
     idioma: audioMap[m.audio] || null,
@@ -2654,8 +2655,8 @@ function autoRellenarTodo() {
     setActiveChip('chips-source','HDTS');
   else if (combined.includes('HDRIP'))
     setActiveChip('chips-source','HDRIP');
-  else if (combined.includes('DVDRIP') || combined.includes('DVDRIP'))
-    setActiveChip('chips-source','HDRIP'); // mapea a HDRIP como fallback
+  else if (/\bDVD/.test(combined))
+    setActiveChip('chips-source','DVD');
   else if (/DCP/i.test(calQUp + ' ' + tituloUp))
     setActiveChip('chips-source','DCP-RIP');
   else if (combined.includes('60FPS'))
@@ -2970,6 +2971,8 @@ function autoRellenarDescarga() {
     setActiveChip('chips-source', 'HDTS');
   else if (combined2.includes('HDRIP'))
     setActiveChip('chips-source', 'HDRIP');
+  else if (/\bDVD/.test(combined2))
+    setActiveChip('chips-source', 'DVD');
   else if (combined2.includes('60FPS'))
     setActiveChip('chips-source', '60FPS');
 
@@ -4010,7 +4013,7 @@ function updatePeliBadgePreview() {
   // Si no hay chip activo, recién ahí se cae al autodetector por texto.
   const hdrManual = document.getElementById('f-hdr')?.value || '';
   const streamingManual = document.getElementById('f-streaming')?.value || '';
-  const layers = { idioma: peliIdiomaKey(), fuente: peliFuenteKey(), calidad: (['blu-ray','blu-ray-3d'].includes(peliFuenteKey())) ? null : peliCalidadKey(), hdr: hdrManual || peliHdrKey(), streaming: streamingManual || peliStreamingKey(), imax: (document.getElementById('f-imax')?.value ? 'imax' : null) };
+  const layers = { idioma: peliIdiomaKey(), fuente: peliFuenteKey(), calidad: (['blu-ray','blu-ray-3d','dvd'].includes(peliFuenteKey())) ? null : peliCalidadKey(), hdr: hdrManual || peliHdrKey(), streaming: streamingManual || peliStreamingKey(), imax: (document.getElementById('f-imax')?.value ? 'imax' : null) };
   const musicaKey = (esMusica && !isLegacyCover) ? musicaBadgeKey() : null;
   // El marco de "fuente" (películas/series) y el de "música" recortan la foto al mismo
   // hueco real del marco → misma clase has-frame para ambos casos.
@@ -4295,6 +4298,7 @@ const SOURCE_COLORS = {
   'WEB-RIP': '#ee4394',
   'BLU-RAY': '#6ac2eb',
   'BLU-RAY-3D': '#a06ceb',
+  'DVD': '#d4d4d4',
   'HDRIP': '#f8b800',
   'HDTS': '#3330ac',
   'DCP-RIP': '#b05a00'
@@ -5090,7 +5094,7 @@ function detectarChipsDesdePrivado(titulo, masInfo) {
   else if (combined.includes('BRRIP')) source = 'BRRIP';
   else if (combined.includes('HDTS')||combined.includes('TELESYNC')) source = 'HDTS';
   else if (combined.includes('HDRIP')) source = 'HDRIP';
-  else if (combined.includes('DVDRIP')) source = 'HDRIP';
+  else if (/\bDVD/.test(combined)) source = 'DVD';
   else if (/DCP/i.test(combined)) source = 'DCP-RIP';
   else if (combined.includes('60FPS')) source = '60FPS';
 
