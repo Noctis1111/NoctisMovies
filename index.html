@@ -1196,6 +1196,7 @@ header::after {
       <button class="filter-tab" data-filter="web-scr">WEB-SCR</button>
       <button class="filter-tab" data-filter="blu-ray">BLU-RAY</button>
       <button class="filter-tab tag-3d" data-filter="blu-ray-3d">BLU-RAY 3D</button>
+      <button class="filter-tab" data-filter="dvd">DVD</button>
       <button class="filter-tab" data-filter="hdrip">HDRip</button>
       <button class="filter-tab" data-filter="hdts">HDTS</button>
       <button class="filter-tab" data-filter="dcp-rip">DCP-RIP</button>
@@ -1285,6 +1286,7 @@ header::after {
           <a class="side-tag" href="index.html?source=WEB-SCR">WEB-SCR</a>
           <a class="side-tag" href="index.html?source=BLU-RAY">BLU-RAY</a>
           <a class="side-tag tag-3d" href="index.html?source=BLU-RAY-3D">BLU-RAY 3D</a>
+          <a class="side-tag" href="index.html?source=DVD">DVD</a>
           <a class="side-tag" href="index.html?source=HDRIP">HDRip</a>
           <a class="side-tag" href="index.html?source=HDTS">HDTS</a>
           <a class="side-tag" href="index.html?source=DCP-RIP">DCP-RIP</a>
@@ -1477,7 +1479,7 @@ function norm(str) {
 // Cada categoria: key interno -> nombre EXACTO del archivo (sin .png) dentro de badges/<categoria>/
 const PELI_FILE_FOR = {
   fuente: {
-    '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','blu-ray-3d':'blu-ray-3d','brrip':'brrip','dcp-rip':'dcp-rip',
+    '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','blu-ray-3d':'blu-ray-3d','dvd':'dvd','brrip':'brrip','dcp-rip':'dcp-rip',
     'hdrip':'hdrip','hdts':'hdts','remux':'remux','web-dl':'web-dl','web-rip':'web-rip','web-scr':'web-scr','x265':'x265',
   },
   idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino','castellano':'Castellano' },
@@ -1551,7 +1553,7 @@ function getPeliBadgeKeysFromMovie(m) {
   // BLU-RAY / BLU-RAY 3D traen su logo impreso justo donde va la cinta de Calidad:
   // la Calidad queda ACTIVA (m.quality sigue guardado y el filtro 4K/1080p la encuentra)
   // pero su cinta no se dibuja. (idéntico a admin.html)
-  const ocultaCalidad = (fuenteKey === 'blu-ray' || fuenteKey === 'blu-ray-3d');
+  const ocultaCalidad = (fuenteKey === 'blu-ray' || fuenteKey === 'blu-ray-3d' || fuenteKey === 'dvd');
   return {
     fuente: fuenteKey,
     idioma: audioMap[m.audio] || null,
