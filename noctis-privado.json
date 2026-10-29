@@ -7130,5 +7130,55 @@
     "audioFormat": "",
     "legacyCover": false,
     "catalogSlug": "caeras-2025-web-dl-1080p-castellano"
+  },
+  {
+    "id": "zona-cero-2026-web-dl-4k-dual-latino-ingles-mvu204o7-t6agch",
+    "titulo": "Zona Cero (2026) WEB-DL 4K Dual Latino-Inglés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/pzyIh9dTRr6nCzZ6fPvjiMr1dem.jpg",
+    "masInfo": "Audio: Español latino, Coreano\nCalidad: WEB-DL\nResolución: 3840 × 2160 (4K)\nFormato: MKV\nTamaño: 18.87 GB\nSubtítulos: N/A",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1tOirFq0Ht68e1X1NoD1vcg"
+      }
+    ],
+    "fecha": "29 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=zona-cero-2026-web-dl-4k-dual-latino-ingles",
+    "descargado": false,
+    "originalTitle": "Colony",
+    "year": "2026",
+    "country": "Corea del Sur",
+    "duration": "122 min",
+    "genre": "Terror",
+    "description": "Gira en torno a... una amenaza aterradora que transforma la vida de sus protagonistas y los obliga a luchar por sobrevivir ante una situación fuera de control.",
+    "type": "Película",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "zona-cero-2026-web-dl-4k-dual-latino-ingles"
+  },
+  {
+    "id": "mushoku-tensei-iii-op2-meibuki-no-uta-yuiko-ohara-2026-flac-24-bits-96-khz-mvu26yqi-u29tyc",
+    "titulo": "Mushoku Tensei III OP2 - Meibuki no Uta - Yuiko Ohara (2026) FLAC 24 bits 96 kHz",
+    "imagen": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/89/32/6b/89326b2d-f436-fdff-287b-52e1bc40b6c9/PA00223314_0_250476_jacket.jpg/316x316bb.webp",
+    "masInfo": "Audio: FLAC, canales no especificados, 24 bits, 96 kHz\nCalidad: FLAC 24-bit\nResolución: N/A (Álbum Musical)\nFormato: FLAC\nTamaño: 101.9 MB\nCodec: FLAC (sin pérdidas)\nSubtítulos: N/A",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1duTDwxPlg8Wf635vV-cJ2A"
+      }
+    ],
+    "fecha": "29 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=mushoku-tensei-iii-op2-meibuki-no-uta-yuiko-ohara-2026-flac-24-bits-96-khz&cat=musica",
+    "descargado": false,
+    "originalTitle": "芽吹の唄",
+    "year": "2026",
+    "country": "",
+    "duration": "N/A",
+    "genre": "Anime, Pop",
+    "description": "Gira en torno a... el segundo tema de apertura del anime *Mushoku Tensei III: Jobless Reincarnation*, interpretado por Yuiko Ohara.",
+    "type": "Música",
+    "audioFormat": "Hi-Res 24-bit",
+    "legacyCover": false,
+    "catalogSlug": "mushoku-tensei-iii-op2-meibuki-no-uta-yuiko-ohara-2026-flac-24-bits-96-khz"
   }
 ]
