@@ -70,6 +70,13 @@
     0%, 100% { opacity: 0.3; }
     50% { opacity: 1; }
   }
+
+    /* Imagen de fondo DENTRO del marco de Illustrator: esquinas RECTAS. El marco ya trae su propia forma redondeada;
+       si la imagen también va redondeada, se ven huecos en las esquinas (p. ej. junto a la franja BDRIP / WEB-DL). */
+    .poster-frame.poster-frame-fixed-ratio .poster-img.has-frame,
+    .poster-frame.poster-frame-fixed-ratio .poster-square-bg.poster-square-bg-framed,
+    .related-poster img.has-frame,
+    .related-poster .poster-square-bg.poster-square-bg-framed { border-radius: 0 !important; }
 </style>
 <script>
   (function() {
@@ -2568,7 +2575,9 @@ const SERVER_MAP = [
   { re: /fireload/i,                domain: 'fireload.com' },
   { re: /imagenetz/i,               domain: 'imagenetz.de' },
   { re: /fuckingfast/i,             domain: 'fuckingfast.co' },
-  { re: /filedot/i,                 domain: 'filedot.to' },
+  { re: /filedot/i,                 domain: 'filedot.st' },
+  { re: /frdl/i,                    domain: 'frdl.io' },
+  { re: /usersdrive/i,              domain: 'usersdrive.com' },
   { re: /mixdrop/i,                 domain: 'mixdrop.ag' },
   { re: /playmogo/i,                domain: 'playmogo.com' },
 ];
