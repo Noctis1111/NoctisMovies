@@ -70,6 +70,11 @@
     0%, 100% { opacity: 0.3; }
     50% { opacity: 1; }
   }
+
+    /* Imagen de fondo DENTRO del marco de Illustrator: esquinas RECTAS. El marco ya trae su propia forma redondeada;
+       si la imagen también va redondeada, se ven huecos en las esquinas (p. ej. junto a la franja BDRIP / WEB-DL). */
+    .card-poster img.has-frame, .s2026-poster img.has-frame,
+    .card-poster .poster-square-bg.poster-square-bg-framed, .s2026-poster .poster-square-bg.poster-square-bg-framed { border-radius: 0 !important; }
 </style>
 <script>
   (function() {
