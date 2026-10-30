@@ -982,7 +982,13 @@
     }
     .golden-pick-thumb.movie-item-poster-wrap:hover { border-color: var(--gold); }
     .golden-pick-thumb .movie-item-poster { border-radius: 0; }
-  </style>
+  
+    /* Imagen de fondo DENTRO del marco de Illustrator: esquinas RECTAS. El marco ya trae su propia forma redondeada;
+       si la imagen también va redondeada, se ven huecos en las esquinas (p. ej. junto a la franja BDRIP / WEB-DL). */
+    #img-preview.has-frame, .movie-item-poster.has-frame,
+    #poster-preview-wrap .poster-square-bg.poster-square-bg-framed,
+    .movie-item-poster-wrap .poster-square-bg.poster-square-bg-framed { border-radius: 0 !important; }
+</style>
 </head>
 <body>
 
@@ -1934,6 +1940,20 @@ function stripZonasExcluidas(raw) {
     out.push(l);
   }
   return out.join('\n');
+}
+
+// ── Orden fijo del bloque: [título] [sinopsis] [capturas + trailer] MAS INFO … Subtítulos: [ENLACES DE DESCARGA]
+// Todo lo que está ANTES de la última línea técnica (Audio/Calidad/…/Subtítulos) son capturas o trailer: nunca descargas.
+const NP_RE_URL_IMAGEN = /\.(?:jpe?g|png|webp|gif|avif|bmp)(?:[?#].*)?$/i;
+function indiceFinTecnico(lineas) {
+  let fin = -1;
+  lineas.forEach((l, i) => {
+    const ci = (l || '').indexOf(':');
+    if (ci < 0) return;
+    const key = l.slice(0, ci).toLowerCase().trim();
+    if (key.length <= 30 && NP_CAMPOS_MASINFO.some(c => key === c || key.includes(c))) fin = i;
+  });
+  return fin;
 }
 
 function parseBloqueCompleto(raw, shorteners, multiserver) {
@@ -4941,9 +4961,13 @@ function construirPrivadosEspejoDePublicos(rawBlock, publicLinksText, shorteners
   // están ya en la zona pública (esas no se repiten, se dejan donde están).
   const cola = [];
   const vistos = new Set();
-  for (const l0 of stripZonasExcluidas(rawBlock).replace(/\r\n/g, '\n').split('\n')) {
-    const l = l0.trim();
+  const lineasRaw = stripZonasExcluidas(rawBlock).replace(/\r\n/g, '\n').split('\n');
+  const finTec = indiceFinTecnico(lineasRaw.map(x => x.trim()));
+  for (let i = 0; i < lineasRaw.length; i++) {
+    const l = lineasRaw[i].trim();
     if (!l || !reUrl.test(l)) continue;
+    if (i <= finTec) continue;                 // antes de "Subtítulos:" → capturas/trailer, no descargas
+    if (NP_RE_URL_IMAGEN.test(l)) continue;    // una imagen nunca es enlace de descarga
     if (vistos.has(l)) continue;
     vistos.add(l);
     if (esDescartable(l) || esAcortador(l) || urlsEnPublicas.has(l)) continue;
@@ -4977,7 +5001,7 @@ function construirPrivadosEspejoDePublicos(rawBlock, publicLinksText, shorteners
         salida.push(url);
       } else {
         let host = '';
-        try { host = new URL(url).hostname.replace(/^www\./i, '').replace(/\.(com|net|to|org|co|io|me|app)$/i, ''); } catch {}
+        try { host = new URL(url).hostname.replace(/^www\./i, '').replace(/\.(com|net|to|org|co|io|me|app|st|cc|ag|nz)$/i, ''); } catch {}
         if (host) salida.push(host.charAt(0).toUpperCase() + host.slice(1));
         salida.push(url);
       }
@@ -5022,8 +5046,12 @@ function parseNoctisPrivadoBloque(raw, shorteners, multiserver) {
   let multiCount = 0;
   const vistos = new Set();
   const dominiosDescartar = ['gdrivelatinohd.net','identi.io','zinfinal.com','compucalitv.lol','tmdb.org','gstatic.com','youtu.be','youtube.com','imgur.com','ibb.co','postimg.cc','imgfz.com','iili.io','media-amazon.com','themoviedb.org','blogger.googleusercontent.com','blogspot.com'];
-  for (const l of lineas) {
+  const finTecnico = indiceFinTecnico(lineas);
+  for (let i = 0; i < lineas.length; i++) {
+    const l = lineas[i];
     if (!l || !reUrl.test(l)) continue;
+    if (i <= finTecnico) continue;              // antes de "Subtítulos:" → capturas/trailer, no descargas
+    if (NP_RE_URL_IMAGEN.test(l)) continue;     // una imagen nunca es enlace de descarga
     let host;
     try { host = new URL(l).hostname.replace(/^www\./i, '').toLowerCase(); } catch { continue; }
     if (vistos.has(l)) continue;
@@ -5035,7 +5063,7 @@ function parseNoctisPrivadoBloque(raw, shorteners, multiserver) {
       enlaces.push({ etiqueta: 'Multiservidor ' + multiCount, url: l });
       continue;
     }
-    const etiqueta = host.replace(/\.(com|net|to|org|co|io|me|app)$/i, '');
+    const etiqueta = host.replace(/\.(com|net|to|org|co|io|me|app|st|cc|ag|nz)$/i, '');
     enlaces.push({ etiqueta, url: l });
   }
 
