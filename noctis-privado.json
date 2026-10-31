@@ -7377,5 +7377,55 @@
     "audioFormat": "Hi-Res 24-bit",
     "legacyCover": false,
     "catalogSlug": "bokura-ja-nakya-dame-ni-natte-haku-2023-album-flac-24-bits-96-khz"
+  },
+  {
+    "id": "2026-single-flac-24-bits-96-khz-mvvidlwx-h7bts5",
+    "titulo": "決意の唄 - 大原ゆい子 (2026) Single FLAC 24 bits 96 kHz",
+    "imagen": "https://i.scdn.co/image/ab67616d0000e1a3e6e558fccc1c56fbbdaad83a",
+    "masInfo": "Tamaño: 68.7 MB\nAudio: FLAC, canales no especificados, 24 bits, 96 kHz\nCalidad: FLAC 24-bit\nResolución: N/A (Álbum Musical)\nFormato: FLAC\nTamaño: 68.7 MB\nSubtítulos: N/A",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1PMf6GjSsTRWEl9Z83-7hlw"
+      }
+    ],
+    "fecha": "30 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=2026-single-flac-24-bits-96-khz&cat=musica",
+    "descargado": false,
+    "originalTitle": "決意の唄",
+    "year": "2026",
+    "country": "",
+    "duration": "3m 50s",
+    "genre": "N/A",
+    "description": "Gira en torno a... N/A.",
+    "type": "Música",
+    "audioFormat": "Hi-Res 24-bit",
+    "legacyCover": false,
+    "catalogSlug": "2026-single-flac-24-bits-96-khz"
+  },
+  {
+    "id": "south-park-1997-2022-serie-completa-peliculas-especial-317-episodios-7-peliculas-1-especial-1080p-latino-ingles-mvvo978f-2746f2",
+    "titulo": "South Park (1997-2022) Serie Completa + Películas + Especial [317 Episodios + 7 Películas + 1 Especial] 1080p Latino-Inglés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/c6GuaxqjObdqISSXwTdHAj80Etv.jpg",
+    "masInfo": "Tamaño total: 56.56 GB\nAudio: Español (MP3 2.0) – Inglés (HE-AAC 2.0)\nCalidad: Web-DL\nResolución: 1440×1076\nFormato: MKV / MP4\nTamaño: 85 MB a 2.20 GB por archivo (Total: 56.56 GB)\nCodec: H.265 / HEVC | 8bit\nSubtítulos: Español Latino (SRT), Inglés (SRT)",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1sfbwFOErtHHqjqqKt8g4fA"
+      }
+    ],
+    "fecha": "30 Octubre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=south-park-1997-2022-serie-completa-peliculas-especial-317-episodios-7-peliculas-1-especial-1080p-latino-ingles",
+    "descargado": false,
+    "originalTitle": "South Park",
+    "year": "1997",
+    "country": "Estados Unidos",
+    "duration": "22 min.",
+    "genre": "Animación, Comedia",
+    "description": "Gira en torno a... las aventuras de Stan Marsh, Kyle Broflovski, Eric Cartman y Kenny McCormick, cuatro niños que viven en el pequeño pueblo de South Park, Colorado. La serie utiliza un humor satírico e irreverente para parodiar la política, la cultura popular, la religión y la sociedad contemporánea, convirtiéndose en una de las series animadas para adultos más influyentes de la televisión.",
+    "type": "Película | Serie",
+    "audioFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "south-park-1997-2022-serie-completa-peliculas-especial-317-episodios-7-peliculas-1-especial-1080p-latino-ingles"
   }
 ]
