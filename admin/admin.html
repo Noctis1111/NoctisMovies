@@ -1136,26 +1136,28 @@
               </div>
               </div>
 
+              <div style="display:flex;gap:1.4rem;flex-wrap:wrap;align-items:flex-start;">
               <div class="form-group">
-              <label>🎧 Formato de Audio</label>
-              <div class="chip-group" id="chips-audioformat" style="flex-wrap:wrap;gap:0.35rem;">
-                <button type="button" class="chip chip-audiofmt chip-colored" data-value="MP3" style="--chip-c:#5b8ba8;border-color:#5b8ba8;color:#5b8ba8;">
-                  <span class="chip-aft-title">MP3</span><span class="chip-aft-sub">320 kbps</span>
-                </button>
-                <button type="button" class="chip chip-audiofmt chip-colored" data-value="AAC" style="--chip-c:#2f7fe0;border-color:#2f7fe0;color:#2f7fe0;">
-                  <span class="chip-aft-title">AAC</span><span class="chip-aft-sub">Calidad Apple</span>
-                </button>
-                <button type="button" class="chip chip-audiofmt chip-colored" data-value="Lossless 16-bit" style="--chip-c:#1a4fa0;border-color:#1a4fa0;color:#1a4fa0;">
-                  <span class="chip-aft-title">Lossless 16-bit</span><span class="chip-aft-sub">16-bit / 44.1 kHz</span>
-                </button>
-                <button type="button" class="chip chip-audiofmt chip-colored" data-value="Hi-Res 24-bit" style="--chip-c:#c9a84c;border-color:#c9a84c;color:#c9a84c;">
-                  <span class="chip-aft-title">Hi-Res 24-bit</span><span class="chip-aft-sub">24-bit / 96-192 kHz</span>
-                </button>
-                <button type="button" class="chip chip-audiofmt chip-colored chip-master32" data-value="Master 32-bit" style="--chip-c:#e8dba0;border-color:#e8dba0;color:#e8dba0;">
-                  <span class="chip-aft-title">Master 32-bit</span><span class="chip-aft-sub">32-bit / 192 kHz</span>
-                </button>
+              <label>🎧 Tasa de bits</label>
+              <div class="chip-group" id="chips-tasa" style="flex-wrap:wrap;gap:0.35rem;">
+                <button type="button" class="chip chip-audiofmt chip-colored" data-value="320 kbps" style="--chip-c:#5b8ba8;border-color:#5b8ba8;color:#5b8ba8;"><span class="chip-aft-title">320 kbps</span></button>
+                <button type="button" class="chip chip-audiofmt chip-colored" data-value="16 bits" style="--chip-c:#1a4fa0;border-color:#1a4fa0;color:#1a4fa0;"><span class="chip-aft-title">16 bits</span></button>
+                <button type="button" class="chip chip-audiofmt chip-colored" data-value="24 bits" style="--chip-c:#c9a84c;border-color:#c9a84c;color:#c9a84c;"><span class="chip-aft-title">24 bits</span></button>
+                <button type="button" class="chip chip-audiofmt chip-colored chip-master32" data-value="32 bits" style="--chip-c:#e8dba0;border-color:#e8dba0;color:#e8dba0;"><span class="chip-aft-title">32 bits</span></button>
               </div>
-              <input type="hidden" id="f-audioformat" value=""/>
+              <input type="hidden" id="f-tasa" value=""/>
+              </div>
+              <div class="form-group">
+              <label>🎼 Formato</label>
+              <div class="chip-group" id="chips-musicformat" style="flex-wrap:wrap;gap:0.35rem;">
+                <button type="button" class="chip chip-audiofmt chip-colored" data-value="MP3" style="--chip-c:#5b8ba8;border-color:#5b8ba8;color:#5b8ba8;"><span class="chip-aft-title">MP3</span></button>
+                <button type="button" class="chip chip-audiofmt chip-colored" data-value="MP4" style="--chip-c:#2f7fe0;border-color:#2f7fe0;color:#2f7fe0;"><span class="chip-aft-title">MP4</span></button>
+                <button type="button" class="chip chip-audiofmt chip-colored" data-value="FLAC" style="--chip-c:#1a4fa0;border-color:#1a4fa0;color:#1a4fa0;"><span class="chip-aft-title">FLAC</span></button>
+                <button type="button" class="chip chip-audiofmt chip-colored" data-value="ALAC" style="--chip-c:#8a5cd6;border-color:#8a5cd6;color:#8a5cd6;"><span class="chip-aft-title">ALAC</span></button>
+                <button type="button" class="chip chip-audiofmt chip-colored" data-value="WAV" style="--chip-c:#2fb59a;border-color:#2fb59a;color:#2fb59a;"><span class="chip-aft-title">WAV</span></button>
+              </div>
+              <input type="hidden" id="f-musicformat" value=""/>
+              </div>
               </div>
 
               <div class="form-group">
@@ -1226,7 +1228,8 @@
                   <img id="peli-hdr" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:5;"/>
                   <img id="peli-streaming" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:6;"/>
                   <img id="peli-imax" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:6;"/>
-                  <img id="peli-musica" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:4;"/>
+                  <img id="peli-tasa" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:4;"/>
+                  <img id="peli-formato" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:5;"/>
                   <button onclick="clearPoster()" title="Quitar imagen" style="position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.7);border:1px solid var(--border);color:#fff;font-size:0.7rem;cursor:pointer;line-height:1;z-index:9;">✕</button>
                 </div>
                 <input type="file" id="f-image-file" accept="image/webp,image/jpeg,image/png" style="display:none" onchange="handleImageFile(this.files[0])"/>
@@ -1738,7 +1741,12 @@ const PELI_FILE_FOR = {
     'apple-tv-plus':'tv+','vix':'vix','movies-anywhere':'movies anywhere',
   },
   imax: { 'imax':'imax' },
-  musica: { 'mp3':'mp3', '16-bits':'16-bits', '24-bits':'24-bits', '16-24-bits':'16-24-bits', 'wav-32-bits':'wav-32-bits' },
+  musica: { 'mp3':'mp3', '16-bits':'16-bits', '24-bits':'24-bits', '16-24-bits':'16-24-bits', 'wav-32-bits':'wav-32-bits' },   // sistema viejo (se puede borrar cuando todo esté migrado)
+  // Música, sistema nuevo — dos capas independientes:
+  //   tasa    (portada principal, como "fuente"): badges/tasa/320-kbps.png, 16-bits.png, 24-bits.png, 32-bits.png, 16-24-bits.png
+  //   formato (encabezado, como "calidad"):       badges/formato/mp3.png, mp4.png, flac.png, alac.png, wav.png
+  tasa:    { '320-kbps':'320-kbps', '16-bits':'16-bits', '24-bits':'24-bits', '32-bits':'32-bits', '16-24-bits':'16-24-bits' },
+  formato: { 'mp3':'mp3', 'mp4':'mp4', 'flac':'flac', 'alac':'alac', 'wav':'wav' },
 };
 
 // Formato(s) de audio activos (ej: "Lossless 16-bit, Hi-Res 24-bit") -> qué cinta de
@@ -1756,6 +1764,81 @@ function musicaBadgeKeyFromFormats(activeList) {
 function musicaBadgeKey() {
   const raw = document.getElementById('f-audioformat')?.value || '';
   return musicaBadgeKeyFromFormats(raw.split(',').map(s => s.trim()).filter(Boolean));
+}
+
+// ───────── MÚSICA: Tasa de bits (principal) + Formato (encabezado) ─────────
+// Tasa de bits (varias a la vez): 320 kbps | 16 bits | 24 bits | 32 bits.
+//   "320 kbps" es el grupo de música CON pérdida (MP3/M4A): también se usa para 256, 192, 128 kbps…
+//   (el detalle exacto queda en la descripción).
+// Formato (uno solo): MP3 | MP4 (archivos M4A/MP4/AAC con pérdida) | FLAC | ALAC | WAV.
+// Ojo: un .m4a puede ser AAC (con pérdida → MP4) o ALAC (sin pérdida → ALAC); si el texto dice ALAC, manda ALAC.
+const MUSICA_FORMATO_KEY = { 'MP3':'mp3', 'MP4':'mp4', 'FLAC':'flac', 'ALAC':'alac', 'WAV':'wav' };
+const _lista = v => String(v || '').split(',').map(x => x.trim()).filter(Boolean);
+function musicaTasaKeyFromList(list) {
+  const has = v => list.includes(v);
+  if (has('32 bits')) return '32-bits';
+  if (has('16 bits') && has('24 bits')) return '16-24-bits';
+  if (has('24 bits')) return '24-bits';
+  if (has('16 bits')) return '16-bits';
+  if (has('320 kbps')) return '320-kbps';
+  return null;
+}
+// Títulos guardados con el sistema viejo (campo audioFormat): se convierten al vuelo.
+function musicaLegacyTasa(m) {
+  const out = [];
+  _lista(m.audioFormat).forEach(f => {
+    const t = ({ 'MP3':'320 kbps', 'AAC':'320 kbps', 'Lossless 16-bit':'16 bits', 'Hi-Res 24-bit':'24 bits', 'Master 32-bit':'32 bits' })[f];
+    if (t && !out.includes(t)) out.push(t);
+  });
+  return out;
+}
+function musicaFormatoDeTexto(t) {
+  t = String(t || '').toUpperCase();
+  if (/\bALAC\b|APPLE\s*LOSSLESS/.test(t)) return 'ALAC';
+  if (/\bFLAC\b/.test(t)) return 'FLAC';
+  if (/\bWAV\b/.test(t)) return 'WAV';
+  if (/\bM4A\b|\bMP4\b|\bAAC\b/.test(t)) return 'MP4';
+  if (/\bMP3\b/.test(t)) return 'MP3';
+  return '';
+}
+function musicaLegacyFormato(m) {
+  const deTexto = musicaFormatoDeTexto((m.title || m.titulo || '') + ' ' + (m.quality || '') + ' ' + (m.masInfo || ''));
+  if (deTexto) return deTexto;
+  const f = _lista(m.audioFormat);
+  if (f.includes('MP3')) return 'MP3';
+  if (f.includes('AAC')) return 'MP4';
+  if (f.some(x => /Lossless|Hi-Res|Master/.test(x))) return 'FLAC';   // lo más común cuando el título no lo dice
+  return '';
+}
+// Campos de música de un título (nuevo o viejo): { tasa: "16 bits, 24 bits", formato: "FLAC" }
+function musicaCamposFromItem(m) {
+  return {
+    tasa: (m.tasa !== undefined && m.tasa !== null) ? String(m.tasa) : musicaLegacyTasa(m).join(', '),
+    formato: (m.musicFormat !== undefined && m.musicFormat !== null) ? (String(m.musicFormat) === 'M4A / MP4' ? 'MP4' : String(m.musicFormat)) : musicaLegacyFormato(m),
+  };
+}
+// Claves de archivo de las dos cintas: { tasa: '24-bits', formato: 'flac' }
+function musicaCapasFromMovieData(m) {
+  const c = musicaCamposFromItem(m);
+  return { tasa: musicaTasaKeyFromList(_lista(c.tasa)), formato: MUSICA_FORMATO_KEY[c.formato] || null };
+}
+// Compatibilidad: sigue guardando el campo viejo audioFormat para que index/detalle/música actuales no se rompan
+function musicaAudioFormatLegacy(tasaStr, formato) {
+  const out = [];
+  _lista(tasaStr).forEach(t => {
+    if (t === '320 kbps') out.push(formato === 'MP4' ? 'AAC' : 'MP3');
+    else if (t === '16 bits') out.push('Lossless 16-bit');
+    else if (t === '24 bits') out.push('Hi-Res 24-bit');
+    else if (t === '32 bits') out.push('Master 32-bit');
+  });
+  if (!out.length && formato === 'MP3') out.push('MP3');
+  if (!out.length && formato === 'MP4') out.push('AAC');
+  return out.join(', ');
+}
+// Texto corto para la lista del catálogo: "FLAC · 24 bits"
+function musicaEtiquetaLista(m) {
+  const c = musicaCamposFromItem(m);
+  return [c.formato, c.tasa.replace(/,\s*/g, ' + ')].filter(Boolean).join(' · ');
 }
 
 // Portada de música "pura" (formato cuadrado 600x600), igual criterio que index.html:
@@ -1878,7 +1961,6 @@ function getPeliBadgeKeysFromMovie(m) {
     hdr: (m.hdr || hdr),
     streaming: (m.streaming || streaming),
     imax: ((m.imax !== undefined) ? !!m.imax : /\bIMAX\b/i.test(m.title || '')) ? 'imax' : null,
-    musica: (m.type||'').includes('Música') ? musicaBadgeKeyFromFormats((m.audioFormat||'').split(',').map(s=>s.trim()).filter(Boolean)) : null,
   };
 }
 
@@ -2553,7 +2635,7 @@ function autoRellenarTodo() {
     /\b(HEVC|H\.?26[45]|X26[45]|AVC|BLU-?RAY|BLURAY|REMUX|WEB-?DL|WEB-?RIP|WEB-?SCR|BDRIP|BRRIP|HDRIP|DVDRIP|UHD|2160P|1080P|720P|HDR10\+?|FPS)\b/.test(rawUp) ||
     /BITRATE\s+DE\s+VIDEO/.test(rawUp) ||
     /\b(MKV|MP4|AVI)\b/.test(formatoUp);
-  const isMusicFormat = !hayVideoSignals && /\.MP3\b|\.FLAC\b|\.WAV\b|\.M4A\b|\bMP3\b|\bFLAC\b|\bWAV\b|\bAAC\b/.test(musicaUp);
+  const isMusicFormat = !hayVideoSignals && /\.MP3\b|\.FLAC\b|\.WAV\b|\.M4A\b|\bMP3\b|\bFLAC\b|\bWAV\b|\bAAC\b|\bALAC\b/.test(musicaUp);
 
   // CALIDAD — revisa resolución, calidad, y título
   const resUp = (p.resolucion2 || '').toUpperCase();
@@ -2574,21 +2656,30 @@ function autoRellenarTodo() {
     // Música: Calidad y Audio (idioma) no aplican — se limpian (siguen siendo activables a mano)
     setActiveChip('chips-quality','');
     setActiveChip('chips-audio','');
-    // Formato de audio — multi-selección: detecta TODOS los formatos que aparezcan en el bloque pegado
-    const formatosDetectados = [];
-    // "FLAC"/"Lossless"/"WAV" por sí solos NO indican 16-bit (un FLAC puede ser 24-bit): solo se usan
-    // como respaldo cuando el bloque no menciona ninguna profundidad de bits.
-    const dice24 = /24[\s\-]?BITS?|HI[\s\-]?RES|96\s*KHZ|192\s*KHZ/.test(musicaUp);
+    // ── Formato (uno) y Tasa de bits (varias) ──
+    // El Formato se lee primero del título y de las líneas Calidad/Formato; si no aparece, del resto del bloque.
+    const formatoDet = musicaFormatoDeTexto(tituloUp + ' ' + calUp + ' ' + formatoUp) || musicaFormatoDeTexto(musicaUp);
+    // "FLAC"/"WAV" por sí solos NO indican 16 bits (un FLAC puede ser 24): solo se usan como respaldo
+    // cuando el bloque no menciona ninguna profundidad de bits.
+    const dice24Texto = /24[\s\-]?BITS?/.test(musicaUp);                        // dice "24 bits" de forma explícita
+    const dice24Pista = /HI[\s\-]?RES|96\s*KHZ|192\s*KHZ/.test(musicaUp);       // Hi-Res / 96 / 192 kHz: solo sugieren 24 bits
     const dice16 = /16[\s\-]?BITS?|44[.,]?1\s*KHZ/.test(musicaUp);
-    const dice32 = /32[\s\-]?BITS?/.test(musicaUp);
-    const diceSinBits = /\bFLAC\b|LOSSLESS|\bWAV\b/.test(musicaUp);
-    if (dice24) formatosDetectados.push('Hi-Res 24-bit');
-    if (dice16 || (diceSinBits && !dice24 && !dice32)) formatosDetectados.push('Lossless 16-bit');
-    if (/\bAAC\b|\.M4A\b/.test(musicaUp)) formatosDetectados.push('AAC');
-    if (/\bMP3\b|320\s*KBPS/.test(musicaUp)) formatosDetectados.push('MP3');
-    // Master 32-bit solo si se menciona explícitamente "32-bit"/"32 bit" (no se asume por defecto)
-    if (/32[\s\-]?BITS?/.test(musicaUp)) formatosDetectados.push('Master 32-bit');
-    setActiveChips('chips-audioformat', formatosDetectados);
+    // 32 bits es rarísimo: solo se marca si lo dicen el título o la línea Calidad (no cualquier mención en el bloque)
+    const dice32 = /32[\s\-]?BITS?/.test(tituloUp + ' ' + calUp);
+    const conPerdida = formatoDet === 'MP3' || formatoDet === 'MP4' || (!formatoDet && /\b\d{2,3}\s*KBPS\b/.test(musicaUp));
+    const tasasDet = [];
+    if (conPerdida) {
+      tasasDet.push('320 kbps');            // cualquier tasa con pérdida (320, 256, 192, 128…) usa este botón
+    } else {
+      if (dice16 || (formatoDet && !dice24Texto && !dice24Pista && !dice32)) tasasDet.push('16 bits');
+      // 24 bits es lo habitual en Hi-Res (incluso a 192 kHz): si el bloque dice "24 bits", manda aunque también
+      // aparezca "32 bits" (suele ser el contenedor / profundidad almacenada, no la real).
+      if (dice24Texto || (dice24Pista && !dice32)) tasasDet.push('24 bits');
+      // 32 bits solo cuando se dice 32 bits y NO se dice 24 bits.
+      if (dice32 && !dice24Texto) tasasDet.push('32 bits');
+    }
+    setActiveChips('chips-tasa', tasasDet);
+    setActiveChip('chips-musicformat', formatoDet);
   }
   else if (resDice4K)
     setActiveChip('chips-quality','4K');
@@ -2748,7 +2839,7 @@ function initChips() {
     const hiddenInput = document.getElementById(hiddenInputId);
     if (!hiddenInput) return;
 
-    const isMultiFormat = hiddenInputId === 'f-audioformat';
+    const isMultiFormat = hiddenInputId === 'f-tasa';
     const isMultiType = hiddenInputId === 'f-type';
 
     group.querySelectorAll('.chip').forEach(chip => {
@@ -2789,7 +2880,7 @@ function initChips() {
         const isSource = hiddenInputId === 'f-source';
         const isStreaming = hiddenInputId === 'f-streaming';
         // Fuente, HDR y Streaming permiten des-seleccionar (clickear el chip activo lo apaga)
-        const isDeselectable = isSource || hiddenInputId === 'f-hdr' || hiddenInputId === 'f-imax' || isStreaming;
+        const isDeselectable = isSource || hiddenInputId === 'f-hdr' || hiddenInputId === 'f-imax' || hiddenInputId === 'f-musicformat' || isStreaming;
 
         // Desactivar todos en el grupo
         group.querySelectorAll('.chip').forEach(c => {
@@ -3025,7 +3116,9 @@ function getFormData() {
     duration:      parsed.duration,
     genre:         parsed.genre,
     quality:       document.getElementById('f-quality').value,
-    audioFormat:   document.getElementById('f-audioformat').value,
+    tasa:          document.getElementById('f-tasa').value,
+    musicFormat:   document.getElementById('f-musicformat').value,
+    audioFormat:   musicaAudioFormatLegacy(document.getElementById('f-tasa').value, document.getElementById('f-musicformat').value),
     source:        document.getElementById('f-source').value,
     hdr:           document.getElementById('f-hdr').value,
     imax:          document.getElementById('f-imax')?.value || '',
@@ -3086,14 +3179,16 @@ function clearForm() {
   setActiveChip('chips-quality', 'Full HD');
   setActiveChip('chips-audio', 'Latino');
   setActiveChip('chips-source', '');
-  setActiveChip('chips-audioformat', '');
+  setActiveChips('chips-tasa', []);
+  setActiveChip('chips-musicformat', '');
   setActiveChip('chips-hdr', '');
   setActiveChip('chips-imax', '');
   setActiveChip('chips-streaming', '');
   document.getElementById('f-quality').value = 'Full HD';
   document.getElementById('f-source').value = '';
   document.getElementById('f-audio').value = 'Latino';
-  document.getElementById('f-audioformat').value = '';
+  document.getElementById('f-tasa').value = '';
+  document.getElementById('f-musicformat').value = '';
   
   posterDataUrl = null;
   hidePosterPreview();
@@ -3268,6 +3363,8 @@ function submitForm() {
       description: data.description || '',
       type: data.type || '',
       audioFormat: data.audioFormat || '',
+      tasa: data.tasa || '',
+      musicFormat: data.musicFormat || '',
       legacyCover: !!data.legacyCover,
       catalogSlug: data.slug || '',
     };
@@ -3401,8 +3498,8 @@ function renderGoldenPosterPicks() {
   box.innerHTML = conImagen.map(m => {
     const idx = goldenMatchesData.indexOf(m);
     const peliBadges = m.legacyCover ? null : getPeliBadgeKeysFromMovie(m);
-    const tieneMarco = !!(peliBadges && (peliBadges.fuente || peliBadges.musica));
-    const badgeLayersHtml = peliBadges ? ['idioma','fuente','calidad','hdr','streaming','imax','musica'].map(cat => {
+    const tieneMarco = !!(peliBadges && peliBadges.fuente);
+    const badgeLayersHtml = peliBadges ? ['idioma','fuente','calidad','hdr','streaming','imax'].map(cat => {
       const key = peliBadges[cat];
       if (!key) return '';
       const path = peliBadgePath(cat, key);
@@ -4034,10 +4131,12 @@ function updatePeliBadgePreview() {
   const hdrManual = document.getElementById('f-hdr')?.value || '';
   const streamingManual = document.getElementById('f-streaming')?.value || '';
   const layers = { idioma: peliIdiomaKey(), fuente: peliFuenteKey(), calidad: (['blu-ray','blu-ray-3d','dvd'].includes(peliFuenteKey())) ? null : peliCalidadKey(), hdr: hdrManual || peliHdrKey(), streaming: streamingManual || peliStreamingKey(), imax: (document.getElementById('f-imax')?.value ? 'imax' : null) };
-  const musicaKey = (esMusica && !isLegacyCover) ? musicaBadgeKey() : null;
+  const _tf = document.getElementById('f-tasa')?.value || '', _ff = document.getElementById('f-musicformat')?.value || '';
+  const tasaKey = (esMusica && !isLegacyCover) ? musicaTasaKeyFromList(_lista(_tf)) : null;
+  const formatoKey = (esMusica && !isLegacyCover) ? (MUSICA_FORMATO_KEY[_ff] || null) : null;
   // El marco de "fuente" (películas/series) y el de "música" recortan la foto al mismo
   // hueco real del marco → misma clase has-frame para ambos casos.
-  const anyFuente = !isLegacyCover && (!!layers.fuente || !!musicaKey);
+  const anyFuente = !isLegacyCover && (!!layers.fuente || !!tasaKey);
 
   imgPreview.classList.toggle('has-frame', anyFuente);
   imgPreview.classList.toggle('img-contain-music', esMusica && !isLegacyCover);
@@ -4062,13 +4161,14 @@ function updatePeliBadgePreview() {
     else { el.style.display = 'none'; }
   });
 
-  // Música: cinta propia según el/los formato(s) de audio activos (badges/musica/)
-  const musicaEl = document.getElementById('peli-musica');
-  if (musicaEl) {
-    const musicaPath = musicaKey ? peliBadgePath('musica', musicaKey) : '';
-    if (musicaPath) { musicaEl.src = musicaPath; musicaEl.style.display = 'block'; }
-    else { musicaEl.style.display = 'none'; }
-  }
+  // Música: dos cintas independientes → portada principal por Tasa de bits (badges/tasa/) y encabezado por Formato (badges/formato/)
+  [['peli-tasa', 'tasa', tasaKey], ['peli-formato', 'formato', formatoKey]].forEach(([id, cat, key]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const path = key ? peliBadgePath(cat, key) : '';
+    if (path) { el.src = path; el.style.display = 'block'; }
+    else { el.style.display = 'none'; }
+  });
 }
 
 function showPosterPreview(src) {
@@ -4363,17 +4463,11 @@ function renderList(resetPage) {
     // getPeliBadgeKeysFromMovie() devuelve null para tipo Música (es solo para
     // películas/series), así que la cinta de audio (FLAC, 16-BIT, etc.) para
     // música se calcula aparte acá, igual que hace el preview del formulario.
-    const musicaKeyList = isPureMusicCoverAdmin(m) ? musicaBadgeKeyFromMovieData(m) : null;
-    const tieneMarco = !!(peliBadges && (peliBadges.fuente || peliBadges.musica)) || !!musicaKeyList;
-    const badgeLayersHtml = (peliBadges ? ['idioma','fuente','calidad','hdr','streaming','imax','musica'].map(cat => {
-      const key = peliBadges[cat];
-      if (!key) return '';
-      const path = peliBadgePath(cat, key);
-      return path ? `<img class="movie-item-badge-overlay" src="${path}" alt="" onerror="this.style.display='none'"/>` : '';
-    }).join('') : '') + (musicaKeyList ? (() => {
-      const path = peliBadgePath('musica', musicaKeyList);
-      return path ? `<img class="movie-item-badge-overlay" src="${path}" alt="" onerror="this.style.display='none'"/>` : '';
-    })() : '');
+    const musicaCapas = isPureMusicCoverAdmin(m) ? musicaCapasFromMovieData(m) : null;
+    const tieneMarco = !!(peliBadges && peliBadges.fuente) || !!(musicaCapas && musicaCapas.tasa);
+    const _capa = (cat, key) => { if (!key) return ''; const path = peliBadgePath(cat, key); return path ? `<img class="movie-item-badge-overlay" src="${path}" alt="" onerror="this.style.display='none'"/>` : ''; };
+    const badgeLayersHtml = (peliBadges ? ['idioma','fuente','calidad','hdr','streaming','imax'].map(cat => _capa(cat, peliBadges[cat])).join('') : '')
+      + (musicaCapas ? _capa('tasa', musicaCapas.tasa) + _capa('formato', musicaCapas.formato) : '');
     return `
     <div class="movie-item">
       <div class="movie-item-poster-wrap">
@@ -4385,7 +4479,7 @@ function renderList(resetPage) {
         <div class="movie-item-title">${m.title}</div>
         <div class="movie-item-meta">
           ${(m.type||'').includes('Música') ? `
-          ${m.audioFormat ? `<span class="badge-source" style="color:#8ab4c9;border-color:#8ab4c9;">🎧 ${m.audioFormat}</span>` : ''}
+          ${musicaEtiquetaLista(m) ? `<span class="badge-source" style="color:#8ab4c9;border-color:#8ab4c9;">🎧 ${musicaEtiquetaLista(m)}</span>` : ''}
           <span class="badge-source" style="color:#1db954;border-color:#1db954;">🎵 ${m.type}</span>
           <span>${m.year||''}</span>
           ` : `
@@ -4485,13 +4579,16 @@ function editMovie(idx) {
   setActiveChip('chips-hdr', m.hdr||'');
   setActiveChip('chips-imax', m.imax||'');
   setActiveChip('chips-streaming', m.streaming||'');
-  setActiveChips('chips-audioformat', (m.audioFormat||'').split(',').map(s=>s.trim()).filter(Boolean));
+  const _mc = (m.type||'').includes('Música') ? musicaCamposFromItem(m) : { tasa: '', formato: '' };
+  setActiveChips('chips-tasa', _lista(_mc.tasa));
+  setActiveChip('chips-musicformat', _mc.formato);
   document.getElementById('f-quality').value = esMusicaEdit ? (m.quality||'') : (m.quality||'Full HD');
   document.getElementById('f-source').value = m.source||'';
   document.getElementById('f-hdr').value = m.hdr||'';
   document.getElementById('f-streaming').value = m.streaming||'';
   document.getElementById('f-audio').value = esMusicaEdit ? (m.audio||'') : (m.audio||'Latino');
-  document.getElementById('f-audioformat').value = m.audioFormat||'';
+  document.getElementById('f-tasa').value = _mc.tasa;
+  document.getElementById('f-musicformat').value = _mc.formato;
   document.getElementById('f-image').value = m.image||'';
   const legacyEl = document.getElementById('f-legacy-cover'); if (legacyEl) legacyEl.checked = !!m.legacyCover;
   document.getElementById('f-screenshot').value = m.screenshot||'';
@@ -5212,6 +5309,8 @@ function sincronizarPrivadoConCatalogo() {
     if (m.image && item.imagen !== m.image)                   { item.imagen = m.image; cambios++; }
     if ((m.type || '') !== (item.type || ''))                 { item.type = m.type || ''; cambios++; }
     if ((m.audioFormat || '') !== (item.audioFormat || ''))   { item.audioFormat = m.audioFormat || ''; cambios++; }
+    if ((m.tasa || '') !== (item.tasa || ''))                 { item.tasa = m.tasa || ''; cambios++; }
+    if ((m.musicFormat || '') !== (item.musicFormat || ''))   { item.musicFormat = m.musicFormat || ''; cambios++; }
     if (!!m.legacyCover !== !!item.legacyCover)               { item.legacyCover = !!m.legacyCover; cambios++; }
     CAMPOS_FICHA.forEach(c => { if (m[c] && String(m[c]).trim() && item[c] !== m[c]) { item[c] = m[c]; cambios++; } });
   });
@@ -5230,18 +5329,16 @@ function privadoPosterHtml(item, sizeClass) {
   const refType = _cm ? (_cm.type || '') : (item.type || '');
   const legacy = !!(_cm && _cm.legacyCover);
   const esMusica = isPureMusicCoverAdmin({ type: refType, legacyCover: legacy });
-  const musicaKey = esMusica
-    ? musicaBadgeKeyFromMovieData({ audioFormat: _cm ? (_cm.audioFormat || '') : (item.audioFormat || '') })
-    : null;
+  const musicaCapas = esMusica ? musicaCapasFromMovieData(Object.assign({ title: item.titulo, masInfo: item.masInfo }, _cm || item)) : null;
   const badges = (legacy || esMusica) ? null : getPrivadoBadgeKeys(item);
-  const tieneMarco = !!(badges && badges.fuente) || !!musicaKey;
+  const tieneMarco = !!(badges && badges.fuente) || !!(musicaCapas && musicaCapas.tasa);
   const layer = (cat, key) => {
     if (!key) return '';
     const path = peliBadgePath(cat, key);
     return path ? `<img class="movie-item-badge-overlay" src="${path}" alt="" onerror="this.style.display='none'"/>` : '';
   };
   const badgeLayersHtml = (badges ? ['idioma','fuente','calidad','hdr','streaming','imax'].map(cat => layer(cat, badges[cat])).join('') : '')
-    + (musicaKey ? layer('musica', musicaKey) : '');
+    + (musicaCapas ? layer('tasa', musicaCapas.tasa) + layer('formato', musicaCapas.formato) : '');
   const sqBg = esMusica ? posterSquareBgHtmlAdmin({ type: refType, legacyCover: legacy, image: item.imagen }, true) : '';
   const npFallback = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='108' height='62'%3E%3Crect fill='%23161b24' width='108' height='62'/%3E%3C/svg%3E`;
   return `
