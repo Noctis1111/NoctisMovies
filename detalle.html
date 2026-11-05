@@ -1790,15 +1790,26 @@
         </div>
       </div>
     </div>
-    <div class="side-box"><svg class="sb-trace-svg"><rect class="sb-trace-rect" x="1" y="1" width="100%" height="100%" rx="11" ry="11"/></svg>
-      <div class="side-box-title">🎧 FORMATO DE AUDIO</div>
+    <div class="side-box music-filter-box"><svg class="sb-trace-svg"><rect class="sb-trace-rect" x="1" y="1" width="100%" height="100%" rx="11" ry="11"/></svg>
+      <div class="side-box-title">🎧 TASA DE BITS</div>
+      <div class="side-filter-group">
+        <div class="side-tags">
+          <a class="side-tag" href="index.html?filter=320+kbps">320 KBPS</a>
+          <a class="side-tag" href="index.html?filter=16+bits">16 BITS</a>
+          <a class="side-tag" href="index.html?filter=24+bits">24 BITS</a>
+          <a class="side-tag" href="index.html?filter=32+bits">32 BITS</a>
+        </div>
+      </div>
+    </div>
+    <div class="side-box music-filter-box"><svg class="sb-trace-svg"><rect class="sb-trace-rect" x="1" y="1" width="100%" height="100%" rx="11" ry="11"/></svg>
+      <div class="side-box-title">🎼 FORMATO</div>
       <div class="side-filter-group">
         <div class="side-tags">
           <a class="side-tag" href="index.html?filter=mp3">MP3</a>
-          <a class="side-tag" href="index.html?filter=aac">AAC</a>
-          <a class="side-tag" href="index.html?filter=lossless+16-bit">LOSSLESS 16-BIT</a>
-          <a class="side-tag" href="index.html?filter=hi-res+24-bit">HI-RES 24-BIT</a>
-          <a class="side-tag" href="index.html?filter=master+32-bit">MASTER 32-BIT</a>
+          <a class="side-tag" href="index.html?filter=mp4">MP4</a>
+          <a class="side-tag" href="index.html?filter=flac">FLAC</a>
+          <a class="side-tag" href="index.html?filter=alac">ALAC</a>
+          <a class="side-tag" href="index.html?filter=wav">WAV</a>
         </div>
       </div>
     </div>
@@ -2221,7 +2232,9 @@ const PELI_FILE_FOR = {
     'apple-tv-plus':'tv+','vix':'vix','movies-anywhere':'movies anywhere',
   },
   imax: { 'imax':'imax' },
-  musica: { 'mp3':'mp3', '16-bits':'16-bits', '24-bits':'24-bits', '16-24-bits':'16-24-bits', 'wav-32-bits':'wav-32-bits' },
+  musica: { 'mp3':'mp3', '16-bits':'16-bits', '24-bits':'24-bits', '16-24-bits':'16-24-bits', 'wav-32-bits':'wav-32-bits' },   // sistema viejo
+  tasa:    { '320-kbps':'320-kbps', '16-bits':'16-bits', '24-bits':'24-bits', '32-bits':'32-bits', '16-24-bits':'16-24-bits' },
+  formato: { 'mp3':'mp3', 'mp4':'mp4', 'flac':'flac', 'alac':'alac', 'wav':'wav' },
 };
 // detalle.html vive en la raíz del repo, igual que la carpeta badges/ -> sin subir nivel
 function peliBadgePath(cat, key) {
@@ -2230,17 +2243,58 @@ function peliBadgePath(cat, key) {
   return `badges/${cat}/${encodeURIComponent(file)}.png`;
 }
 
-// Formato(s) de audio activos (ej: "Lossless 16-bit, Hi-Res 24-bit") -> qué cinta de
-// badges/musica/ corresponde. Si hay 16-bit Y 24-bit a la vez, se usa la cinta combinada
-// "16-24-bits" en vez de superponer las dos por separado. (idéntico a admin.html/index.html)
-function musicaBadgeKeyFromFormats(activeList) {
-  const has = v => activeList.includes(v);
-  if (has('Master 32-bit')) return 'wav-32-bits';
-  if (has('Lossless 16-bit') && has('Hi-Res 24-bit')) return '16-24-bits';
-  if (has('Hi-Res 24-bit')) return '24-bits';
-  if (has('Lossless 16-bit')) return '16-bits';
-  if (has('MP3')) return 'mp3';
+// ───────── MÚSICA: Tasa de bits (portada principal) + Formato (encabezado) — idéntico a admin ─────────
+// Tasa de bits: 320 kbps (grupo "con pérdida": MP3/MP4 de cualquier tasa) | 16 bits | 24 bits | 32 bits.
+// Formato (uno): MP3 | MP4 (M4A/AAC) | FLAC | ALAC | WAV.  Cintas: badges/tasa/ y badges/formato/
+const MUSICA_FORMATO_KEY = { 'MP3':'mp3', 'MP4':'mp4', 'FLAC':'flac', 'ALAC':'alac', 'WAV':'wav' };
+const _lista = v => String(v || '').split(',').map(x => x.trim()).filter(Boolean);
+function musicaTasaKeyFromList(list) {
+  const has = v => list.includes(v);
+  if (has('32 bits')) return '32-bits';
+  if (has('16 bits') && has('24 bits')) return '16-24-bits';
+  if (has('24 bits')) return '24-bits';
+  if (has('16 bits')) return '16-bits';
+  if (has('320 kbps')) return '320-kbps';
   return null;
+}
+// Títulos guardados con el sistema viejo (campo audioFormat): se convierten al vuelo.
+function musicaLegacyTasa(m) {
+  const out = [];
+  _lista(m.audioFormat).forEach(f => {
+    const t = ({ 'MP3':'320 kbps', 'AAC':'320 kbps', 'Lossless 16-bit':'16 bits', 'Hi-Res 24-bit':'24 bits', 'Master 32-bit':'32 bits' })[f];
+    if (t && !out.includes(t)) out.push(t);
+  });
+  return out;
+}
+function musicaFormatoDeTexto(t) {
+  t = String(t || '').toUpperCase();
+  if (/\bALAC\b|APPLE\s*LOSSLESS/.test(t)) return 'ALAC';
+  if (/\bFLAC\b/.test(t)) return 'FLAC';
+  if (/\bWAV\b/.test(t)) return 'WAV';
+  if (/\bM4A\b|\bMP4\b|\bAAC\b/.test(t)) return 'MP4';
+  if (/\bMP3\b/.test(t)) return 'MP3';
+  return '';
+}
+function musicaLegacyFormato(m) {
+  const deTexto = musicaFormatoDeTexto((m.title || '') + ' ' + (m.quality || '') + ' ' + (m.masInfo || ''));
+  if (deTexto) return deTexto;
+  const f = _lista(m.audioFormat);
+  if (f.includes('MP3')) return 'MP3';
+  if (f.includes('AAC')) return 'MP4';
+  if (f.some(x => /Lossless|Hi-Res|Master/.test(x))) return 'FLAC';
+  return '';
+}
+// Campos de música de un título (nuevo o viejo): { tasa: "16 bits, 24 bits", formato: "FLAC" }
+function musicaCamposFromItem(m) {
+  return {
+    tasa: (m.tasa !== undefined && m.tasa !== null) ? String(m.tasa) : musicaLegacyTasa(m).join(', '),
+    formato: (m.musicFormat !== undefined && m.musicFormat !== null) ? (String(m.musicFormat) === 'M4A / MP4' ? 'MP4' : String(m.musicFormat)) : musicaLegacyFormato(m),
+  };
+}
+// Claves de archivo de las dos cintas: { tasa: '24-bits', formato: 'flac' }
+function musicaCapasFromMovieData(m) {
+  const c = musicaCamposFromItem(m);
+  return { tasa: musicaTasaKeyFromList(_lista(c.tasa)), formato: MUSICA_FORMATO_KEY[c.formato] || null };
 }
 
 function getPeliBadgeKeysFromMovie(m) {
@@ -2248,7 +2302,7 @@ function getPeliBadgeKeysFromMovie(m) {
   if (isMusica) {
     return {
       fuente: null, idioma: null, calidad: null, hdr: null, streaming: null, imax: null,
-      musica: musicaBadgeKeyFromFormats((m.audioFormat||'').split(',').map(s=>s.trim()).filter(Boolean)),
+      tasa: musicaCapasFromMovieData(m).tasa, formato: musicaCapasFromMovieData(m).formato,
     };
   }
   const map = { '4K':'4k', 'Full HD':'full-hd', '1080p':'1080p', '720p':'720p', '480p':'480p' };
@@ -2301,7 +2355,7 @@ function getPeliBadgeKeysFromMovie(m) {
 function hasFrame(m) {
   if (m && m.legacyCover) return false;
   const badges = getPeliBadgeKeysFromMovie(m);
-  return !!(badges && (badges.fuente || badges.musica));
+  return !!(badges && (badges.fuente || badges.tasa));
 }
 
 // Arma el HTML de las cintas superpuestas para una portada, con la clase indicada
@@ -2309,7 +2363,7 @@ function badgeOverlayHtml(m, cssClass) {
   if (m && m.legacyCover) return '';
   const badges = getPeliBadgeKeysFromMovie(m);
   if (!badges) return '';
-  return ['idioma','fuente','calidad','hdr','streaming','imax','musica'].map(cat => {
+  return ['idioma','fuente','calidad','hdr','streaming','imax','tasa','formato'].map(cat => {
     const key = badges[cat];
     if (!key) return '';
     const path = peliBadgePath(cat, key);
@@ -2829,6 +2883,8 @@ async function init() {
   const musicChanged = (window.NOCTIS_MUSIC !== isMusicCat);
   window.NOCTIS_MUSIC = isMusicCat;
   document.body.classList.toggle('is-music-detail', isMusicCat);   // capturas de música sin recorte
+  // En una ficha de música, los filtros TASA DE BITS y FORMATO llevan al catálogo de música
+  if (isMusicCat) document.querySelectorAll('.music-filter-box a').forEach(a => a.setAttribute('href', a.getAttribute('href').replace('index.html', 'musica.html')));
   buildGenreBox(movies, isMusicCat);                               // filtro GÉNERO del lateral
   if (isMusicCat) {
     const spSub = document.getElementById('sp-sub'); if (spSub) spSub.textContent = 'MÚSICA';
@@ -2938,7 +2994,7 @@ async function init() {
   if (posterFrameElEarly) {
     posterFrameElEarly.querySelectorAll('.poster-cintas-overlay').forEach(el => el.remove());
     const peliBadgesActive = getPeliBadgeKeysFromMovie(m);
-    const anyPeliBadge = !m.legacyCover && !!(peliBadgesActive && ['idioma','fuente','calidad','hdr','streaming','imax','musica'].some(k => peliBadgesActive[k]));
+    const anyPeliBadge = !m.legacyCover && !!(peliBadgesActive && ['idioma','fuente','calidad','hdr','streaming','imax','tasa','formato'].some(k => peliBadgesActive[k]));
     posterEl.classList.toggle('has-frame', hasFrame(m));
     if (anyPeliBadge) posterFrameElEarly.insertAdjacentHTML('beforeend', badgeOverlayHtml(m, 'poster-cintas-overlay'));
 
