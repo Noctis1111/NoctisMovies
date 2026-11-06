@@ -2049,7 +2049,7 @@ function parseBloqueCompleto(raw, shorteners, multiserver) {
   const r = {
     titulo:'', originalTitle:'', year:'', country:'', duration:'', genre:'', artista:'', sinopsis:'',
     infoDescarga:'', enlaces:'', screenshots:'', trailer:'',
-    audio2:'', calidad2:'', resolucion2:'', formato2:'MKV', size2:'', codec2:'H264', subtitles2:''
+    audio2:'', calidad2:'', resolucion2:'', formato2:'MKV', size2:'', codec2:'', subtitles2:''
   };
   if (!raw || !raw.trim()) return r;
 
@@ -2663,7 +2663,8 @@ function autoRellenarTodo() {
     // cuando el bloque no menciona ninguna profundidad de bits.
     const dice24Texto = /24[\s\-]?BITS?/.test(musicaUp);                        // dice "24 bits" de forma explícita
     const dice24Pista = /HI[\s\-]?RES|96\s*KHZ|192\s*KHZ/.test(musicaUp);       // Hi-Res / 96 / 192 kHz: solo sugieren 24 bits
-    const dice16 = /16[\s\-]?BITS?|44[.,]?1\s*KHZ/.test(musicaUp);
+    const dice16Texto = /16[\s\-]?BITS?/.test(musicaUp);                         // dice "16 bits" de forma explícita
+    const dice16Pista = /44[.,]?1\s*KHZ/.test(musicaUp);                          // 44.1 kHz solo sugiere 16 bits (existen FLAC de 24 bits a 44.1 kHz)
     // 32 bits es rarísimo: solo se marca si lo dicen el título o la línea Calidad (no cualquier mención en el bloque)
     const dice32 = /32[\s\-]?BITS?/.test(tituloUp + ' ' + calUp);
     const conPerdida = formatoDet === 'MP3' || formatoDet === 'MP4' || (!formatoDet && /\b\d{2,3}\s*KBPS\b/.test(musicaUp));
@@ -2671,7 +2672,7 @@ function autoRellenarTodo() {
     if (conPerdida) {
       tasasDet.push('320 kbps');            // cualquier tasa con pérdida (320, 256, 192, 128…) usa este botón
     } else {
-      if (dice16 || (formatoDet && !dice24Texto && !dice24Pista && !dice32)) tasasDet.push('16 bits');
+      if (dice16Texto || (dice16Pista && !dice24Texto && !dice24Pista && !dice32) || (formatoDet && !dice16Pista && !dice24Texto && !dice24Pista && !dice32)) tasasDet.push('16 bits');
       // 24 bits es lo habitual en Hi-Res (incluso a 192 kHz): si el bloque dice "24 bits", manda aunque también
       // aparezca "32 bits" (suele ser el contenedor / profundidad almacenada, no la real).
       if (dice24Texto || (dice24Pista && !dice32)) tasasDet.push('24 bits');
@@ -2991,7 +2992,7 @@ function setActiveChips(groupId, values) {
 
 
 function parseDescargaRaw(raw) {
-  const result = { audio2: '', calidad2: '', resolucion2: '', formato2: 'MKV', size2: '', codec2: 'H264', subtitles2: '', uploader2: '' };
+  const result = { audio2: '', calidad2: '', resolucion2: '', formato2: 'MKV', size2: '', codec2: '', subtitles2: '', uploader2: '' };
   if (!raw) return result;
   const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
   for (const line of lines) {
@@ -3125,10 +3126,11 @@ function getFormData() {
     streaming:     document.getElementById('f-streaming').value,
     yearFilter:    document.getElementById('f-year-filter').value.trim(),
     audio:         document.getElementById('f-audio').value,
-    resolution:    dp.resolucion2 || parsed.resolucion2 || '',
+    resolution:    dp.resolucion2 || parsed.resolucion2 || ((document.getElementById('f-type').value || '').includes('Música') ? 'N/A (Álbum Musical)' : ''),
     format:        dp.formato2    || parsed.formato2    || 'MKV',
     size:          dp.size2       || parsed.size2       || '',
-    codec:         dp.codec2      || parsed.codec2      || 'H264',
+    // En música NO se inventa el códec: si la ficha no trae la línea Codec, queda vacío (en video se mantiene H264 por defecto)
+    codec:         dp.codec2      || parsed.codec2      || ((document.getElementById('f-type').value || '').includes('Música') ? '' : 'H264'),
     subtitles:     dp.subtitles2  || parsed.subtitles2  || '',
     uploader:      dp.uploader2   || '',
     image:         posterDataUrl || document.getElementById('f-image').value.trim(),
