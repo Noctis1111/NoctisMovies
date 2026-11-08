@@ -8014,5 +8014,87 @@
     "musicFormat": "ALAC",
     "legacyCover": false,
     "catalogSlug": "en-el-palacio-de-bellas-artes-theatrical-mix-juan-gabriel-2026-album-alac-24-bits-48-khz"
+  },
+  {
+    "id": "el-grito-del-tiempo-1987-duncan-dhu-1998-flac-16-bits-44-1-khz-mw747o52-jppkr1",
+    "titulo": "El Grito del Tiempo (1987) - Duncan Dhu [1998] FLAC 16 bits 44.1 kHz",
+    "imagen": "https://i.discogs.com/ymATsJWjPO_Z6rOxCyniATDCEpzhtAWE3PuAMiA9TGI/rs:fit/g:sm/q:90/h:595/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTEyNzcx/MTQyLTE2NDE1Njc2/MTctMTg0Ny5qcGVn.jpeg",
+    "masInfo": "Audio: FLAC, 2 canales (estéreo), 16 bits, 44.1 kHz\nCalidad: FLAC 16-bit\nResolución: N/A (Álbum Musical)\nFormato: FLAC\nTamaño: 350MB\nCodec: FLAC (sin pérdidas)\nSubtítulos: N/A",
+    "enlaces": [
+      {
+        "etiqueta": "mediafire",
+        "url": "https://www.mediafire.com/file/uqy8soiv5e9r7gh/DD_EGDT.7z/file"
+      }
+    ],
+    "fecha": "7 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=el-grito-del-tiempo-1987-duncan-dhu-1998-flac-16-bits-441-khz&cat=musica",
+    "descargado": false,
+    "originalTitle": "El Grito del Tiempo",
+    "year": "1987",
+    "country": "",
+    "duration": "47 min",
+    "genre": "Pop Rock, Rockabilly",
+    "description": "Gira en torno al cuarto álbum de estudio de la banda española Duncan Dhu, considerado uno de los discos más emblemáticos del pop español de los años 80. Incluye grandes éxitos como «En Algún Lugar» y «Una Calle de París», fusionando su característico sonido pop acústico con toques de rockabilly.",
+    "type": "Música",
+    "audioFormat": "Lossless 16-bit",
+    "tasa": "16 bits",
+    "musicFormat": "FLAC",
+    "legacyCover": false,
+    "catalogSlug": "el-grito-del-tiempo-1987-duncan-dhu-1998-flac-16-bits-441-khz"
+  },
+  {
+    "id": "la-masacre-en-texas-coleccion-1974-2017-web-dl-1080p-vose-mw77j5vd-fhh00e",
+    "titulo": "La masacre en Texas - Colección (1974-2017) WEB-DL 1080p VOSE",
+    "imagen": "https://1.bp.blogspot.com/-C-LodMlcMwY/X4iHTd9PArI/AAAAAAAAIDw/CS3n08Q5IesW4xEzsDnj_eim-SmLR1noACLcBGAsYHQ/w640-h408/z2.jpg",
+    "masInfo": "◽ Tamaño total: ~13.2 GiB\nAudio: Inglés AAC 2.0\nCalidad: WEB-DL\nResolución: 1920 × 1080 (Variable por film)\nFormato: MP4\nTamaño: 13.2 GiB\nSubtítulos: Español (VOSE) en SRT aparte.",
+    "enlaces": [
+      {
+        "etiqueta": "The Texas Chain Saw Massacre (1974)",
+        "url": "https://mega.nz/folder/8CAlEaSZ#gJE8p6FMG_UnGlA6P2xHsw"
+      },
+      {
+        "etiqueta": "The Texas Chainsaw Massacre 2 (1986)",
+        "url": "https://mega.nz/folder/oXwQSKQB#nBhcJrDx8trjnxxphpKOrg"
+      },
+      {
+        "etiqueta": "Leatherface: The Texas Chainsaw Massacre III (1990)",
+        "url": "https://mega.nz/folder/gWAFFQ6K#ZHakOMwueJEU3joeWn7fTQ"
+      },
+      {
+        "etiqueta": "Texas Chainsaw Massacre: The Next Generation (1994)",
+        "url": "https://mega.nz/folder/tDZVSZzJ#6QH4xQ2eZZ2z5uaPKRCXJg"
+      },
+      {
+        "etiqueta": "The Texas Chainsaw Massacre (2003)",
+        "url": "https://mega.nz/folder/NTAhVL4D#-rrsRblx6xUOdvR9MDQRaw"
+      },
+      {
+        "etiqueta": "The Texas Chainsaw Massacre: The Beginning (2006)",
+        "url": "https://mega.nz/folder/NSxSEYTQ#mPXwm-s1ddw2WRvnkQmjEw"
+      },
+      {
+        "etiqueta": "Texas Chainsaw 3D (2013)",
+        "url": "https://mega.nz/folder/FH42FBIa#pauiQRwlUTPNtLdqjDdFXQ"
+      },
+      {
+        "etiqueta": "Leatherface (2017)",
+        "url": "https://mega.nz/folder/QHZ33YxL#ySsdTs3Yr1UMlhtYp4ghNQ"
+      }
+    ],
+    "fecha": "7 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=la-masacre-en-texas-coleccion-1974-2017-web-dl-1080p-vose",
+    "descargado": false,
+    "originalTitle": "The Texas Chain Saw Massacre - Collection",
+    "year": "1974-2017",
+    "country": "Estados Unidos",
+    "duration": "± 90 min (por película)",
+    "genre": "Terror, Slasher",
+    "description": "Gira en torno a la emblemática y sanguinaria saga de terror slasher iniciada por Tobe Hooper en 1974, siguiendo las pesadillas de diversos grupos de jóvenes que cruzan las desiertas carreteras de Texas y caen en las garras de la macabra familia de caníbales y del infame asesino de la motosierra, Leatherface.",
+    "type": "Película",
+    "audioFormat": "",
+    "tasa": "",
+    "musicFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "la-masacre-en-texas-coleccion-1974-2017-web-dl-1080p-vose"
   }
 ]
