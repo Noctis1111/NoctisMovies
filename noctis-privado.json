@@ -8640,5 +8640,36 @@
     "musicFormat": "FLAC",
     "legacyCover": false,
     "catalogSlug": "yes-discografia-estudio-y-seleccion-1969-2026-coleccion-flac-16-bit"
+  },
+  {
+    "id": "perdiendo-mi-virginidad-2019-540p-web-dl-espanol-mw9jhqaj-idsn79",
+    "titulo": "Perdiendo Mi Virginidad (2019) 540p WEB-DL Español",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/jtWfb5wlvVIywofRNXL37We2R73.jpg",
+    "masInfo": "Audio: Español AAC 2.0\nCalidad: WEB-DL\nResolución: 960 × 540\nFormato: MKV\nTamaño: 1.13 GiB\nCodec: H.264\nSubtítulos: N/A",
+    "enlaces": [
+      {
+        "etiqueta": "mediafire",
+        "url": "https://www.mediafire.com/file/ve7mw2t5pzo3o1h/Perdiendo_Mi_Virginidad.mp4/file"
+      },
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/159tM99nd44f67irvFZX7tg"
+      }
+    ],
+    "fecha": "9 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=perdiendo-mi-virginidad-2019-540p-web-dl-espanol",
+    "descargado": false,
+    "originalTitle": "Perdiendo Mi Virginidad",
+    "year": "2019",
+    "country": "N/A",
+    "duration": "90 min (1 h 30 min)",
+    "genre": "N/A",
+    "description": "Gira en torno a la obra cinematográfica que aborda la temática central de su título, explorando vivencias y relatos personales de sus protagonistas.",
+    "type": "Erótico",
+    "audioFormat": "",
+    "tasa": "",
+    "musicFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "perdiendo-mi-virginidad-2019-540p-web-dl-espanol"
   }
 ]
