@@ -8613,5 +8613,32 @@
     "musicFormat": "",
     "legacyCover": false,
     "catalogSlug": "star-wars-coleccion-1977-2019-4k-uhd-blu-ray-hdr10-dual-latino-ingles"
+  },
+  {
+    "id": "yes-discografia-estudio-y-seleccion-1969-2026-coleccion-flac-16-bit-mw9gxcw6-ndhqi0",
+    "titulo": "Yes Discografía Estudio y Selección (1969-2026) Colección FLAC 16-bit",
+    "imagen": "https://i.discogs.com/EbXtSOoDORpFrK67HbqmApPuGNGWZ-p2kAj-7hyXJRk/rs:fit/g:sm/q:90/h:487/w:460/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9BLTUwMjYz/LTE1MDEyOTY1MjEt/Nzc1OS5qcGVn.jpeg",
+    "masInfo": "◽ Tamaño total: 5.79 GB\nAudio: FLAC, 2 canales (estéreo), 16 bits, 44.1 kHz\nCalidad: FLAC 16-bit\nResolución: N/A (Álbum Musical)\nFormato: FLAC lossless - CD RIP\nTamaño: 5.79 GB\nCodec: FLAC\nSubtítulos: N/A",
+    "enlaces": [
+      {
+        "etiqueta": "drive",
+        "url": "https://drive.google.com/drive/folders/1x6p4IivUnG0zZt52mnhYu4IuaSPjWPfb?usp=sharing"
+      }
+    ],
+    "fecha": "9 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=yes-discografia-estudio-y-seleccion-1969-2026-coleccion-flac-16-bit&cat=musica",
+    "descargado": false,
+    "originalTitle": "Yes Discography",
+    "year": "1969-2026",
+    "country": "",
+    "duration": "N/A",
+    "genre": "Rock progresivo",
+    "description": "Gira en torno a una cuidada selección de 15 álbumes de estudio y directos de la legendaria banda de rock progresivo Yes, optimizada en calidad FLAC 16-bit / 44.1 kHz para ofrecer la máxima portabilidad en reproductores DAP y teléfonos móviles sin sacrificar la exquisitez sonora que caracteriza al grupo.",
+    "type": "Música",
+    "audioFormat": "Lossless 16-bit",
+    "tasa": "16 bits",
+    "musicFormat": "FLAC",
+    "legacyCover": false,
+    "catalogSlug": "yes-discografia-estudio-y-seleccion-1969-2026-coleccion-flac-16-bit"
   }
 ]
