@@ -8559,5 +8559,59 @@
     "musicFormat": "",
     "legacyCover": false,
     "catalogSlug": "la-odisea-2026-imax-bdremux-4k-hdr10-dual-latino-ingles"
+  },
+  {
+    "id": "marilyn-manson-the-pale-emperor-2015-edicion-japonesa-flac-16-bit-mw9emj9a-sc2r20",
+    "titulo": "Marilyn Manson - The Pale Emperor (2015) Edición Japonesa FLAC 16-bit",
+    "imagen": "https://i.discogs.com/nJGL9PnqY6gF4ltTm33Ggm5wXxBBdcAcUyE0JEADe6I/rs:fit/g:sm/q:90/h:526/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTY1NjEz/NDMtMTQyMjAzNzgz/NC02MTY1LmpwZWc.jpeg",
+    "masInfo": "Audio: FLAC, 2 canales (estéreo), 16 bits, 44.1 kHz\nCalidad: FLAC 16-bit\nResolución: N/A (Álbum Musical)\nFormato: FLAC\nTamaño: 557.6 MB\nCodec: FLAC\nSubtítulos: N/A",
+    "enlaces": [
+      {
+        "etiqueta": "filedot",
+        "url": "https://filedot.st/64ulonv1frb1"
+      }
+    ],
+    "fecha": "9 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=marilyn-manson-the-pale-emperor-2015-edicion-japonesa-flac-16-bit&cat=musica",
+    "descargado": false,
+    "originalTitle": "The Pale Emperor",
+    "year": "2015",
+    "country": "",
+    "duration": "N/A",
+    "genre": "Rock, Rock industrial",
+    "description": "Gira en torno al noveno álbum de estudio del músico estadounidense Marilyn Manson, presentando un sonido renovado con influencias del blues rock y el rock industrial, en esta edición japonesa especial.",
+    "type": "Música",
+    "audioFormat": "Lossless 16-bit",
+    "tasa": "16 bits",
+    "musicFormat": "FLAC",
+    "legacyCover": false,
+    "catalogSlug": "marilyn-manson-the-pale-emperor-2015-edicion-japonesa-flac-16-bit"
+  },
+  {
+    "id": "star-wars-coleccion-1977-2019-4k-uhd-blu-ray-hdr10-dual-latino-ingles-mw9fkqq4-jmik89",
+    "titulo": "Star Wars Colección (1977-2019) 4K UHD BLU-RAY HDR10 Dual Latino-Inglés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/itH1Wlzwf6yTNa7fVkYMVUwXlhR.jpg",
+    "masInfo": "Audio: Español Latino E-AC-3 / AC-3, Inglés Dolby TrueHD / DTS-HD MA\nCalidad: BLU-RAY\nResolución: 3840 × 2160\nFormato: MKV\nTamaño: 439.4 GB (Total)\nCodec: H265 | 10bit\nSubtítulos: Español, Inglés",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1h9CRzDl_kZI9FaJ_SbRCfQ"
+      }
+    ],
+    "fecha": "9 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=star-wars-coleccion-1977-2019-4k-uhd-blu-ray-hdr10-dual-latino-ingles",
+    "descargado": false,
+    "originalTitle": "Star Wars Saga",
+    "year": "1977-2019",
+    "country": "Estados Unidos",
+    "duration": "1199 min (Total)",
+    "genre": "Ciencia ficción, Aventura, Acción",
+    "description": "Gira en torno a la épica lucha entre la luz y la oscuridad, el ascenso y caída de imperios estelares, y el destino de la Fuerza a través de las generaciones en toda la galaxia.",
+    "type": "Película",
+    "audioFormat": "",
+    "tasa": "",
+    "musicFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "star-wars-coleccion-1977-2019-4k-uhd-blu-ray-hdr10-dual-latino-ingles"
   }
 ]
