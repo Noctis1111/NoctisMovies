@@ -75,6 +75,15 @@
        si la imagen también va redondeada, se ven huecos en las esquinas (p. ej. junto a la franja BDRIP / WEB-DL). */
     .card-poster img.has-frame, .s2026-poster img.has-frame,
     .card-poster .poster-square-bg.poster-square-bg-framed, .s2026-poster .poster-square-bg.poster-square-bg-framed { border-radius: 0 !important; }
+
+    /* ═══ Portada cuadrada de MÚSICA dentro del marco ═══
+       Se muestra un poco más pequeña y más abajo, para que la cinta de arriba (FLAC, MP3…) y la franja lateral
+       no recorten la imagen. AJUSTA SOLO ESTOS DOS NÚMEROS (valen para toda esta página):
+         --music-cover-scale    1 = tamaño anterior · 0.86 = 14% más pequeña · 0.80 = 20% más pequeña
+         --music-cover-shift-y  cuánto baja la imagen (% de su propio alto); súbelo si la cinta aún tapa la cabeza */
+    :root { --music-cover-scale: 0.86; --music-cover-shift-y: 4%; }
+    .card-poster img.img-contain-music.has-frame,
+    .s2026-poster img.img-contain-music.has-frame { transform: translateY(var(--music-cover-shift-y)) scale(var(--music-cover-scale)) !important; transform-origin: center center !important; }
 </style>
 <script>
   (function() {
