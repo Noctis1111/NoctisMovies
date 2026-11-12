@@ -8833,5 +8833,59 @@
     "musicFormat": "",
     "legacyCover": false,
     "catalogSlug": "la-guerra-de-los-mundos-2005-bdrip-4k-dv-hdr10-latino-ingles"
+  },
+  {
+    "id": "moonwalker-1988-1080p-60fps-web-dl-latino-ingles-noctismovies-mwcupdhc-tuu2w7",
+    "titulo": "Moonwalker (1988) 1080p 60FPS WEB-DL Latino-Inglés NoctisMovies",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/dHxxA6iiUO4WUDj1ZazZfAUr8ZJ.jpg",
+    "masInfo": "Audio: Español Latino AC-3 2.0, Inglés AC-3 5.1\nCalidad: 60FPS WEB-DL\nResolución: 1920 × 1080\nFormato: MKV\nTamaño: 7.71 GiB\nCodec: H.264\nSubtítulos: N/A",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/18oD9OzChpf4JYCWqQfUkrQ"
+      }
+    ],
+    "fecha": "11 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=moonwalker-1988-1080p-60fps-web-dl-latino-ingles-noctismovies",
+    "descargado": false,
+    "originalTitle": "Moonwalker",
+    "year": "1988",
+    "country": "Estados Unidos",
+    "duration": "92 min (1 h 32 min)",
+    "genre": "Musical, Fantasía, Biografía",
+    "description": "Una recopilación de cortometrajes y secuencias musicales protagonizadas por la superestrella del pop Michael Jackson, que mezcla actuaciones en directo, fragmentos de su carrera y una historia de acción donde se enfrenta al malvado Mr. Big para salvar a unos niños huérfanos.",
+    "type": "Película",
+    "audioFormat": "",
+    "tasa": "",
+    "musicFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "moonwalker-1988-1080p-60fps-web-dl-latino-ingles-noctismovies"
+  },
+  {
+    "id": "el-corazon-de-la-bestia-2026-1080p-web-dl-latino-ingles-mwcv7lwl-1b6j20",
+    "titulo": "El corazón de la bestia (2026) 1080p WEB-DL Latino-Inglés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/mOdezxPZDLAu0dSjo1tLQEfVzWE.jpg",
+    "masInfo": "Audio: Español Latino E-AC-3 5.1[cite: 6], Inglés E-AC-3 5.1[cite: 6], Portugués (Brasil) E-AC-3 5.1\nCalidad: WEB-DL\nResolución: 1920 × 800\nFormato: MKV\nTamaño: 6.89 GiB\nCodec: H.264\nSubtítulos: Forzados, Español Latino, Inglés, Portugués (Brasil)",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1QbQM7EGClxa1UAhLAcXNig"
+      }
+    ],
+    "fecha": "11 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=el-corazon-de-la-bestia-2026-1080p-web-dl-latino-ingles",
+    "descargado": false,
+    "originalTitle": "The Heart of the Beast",
+    "year": "2026",
+    "country": "Estados Unidos",
+    "duration": "104 min (1 h 44 min)",
+    "genre": "Acción, Suspenso, Drama",
+    "description": "Un intenso thriller que sigue una peligrosa travesía de supervivencia y rescate en entornos extremos, donde los límites humanos son llevados al extremo frente a la amenaza de la naturaleza y circunstancias implacables.",
+    "type": "Película",
+    "audioFormat": "",
+    "tasa": "",
+    "musicFormat": "",
+    "legacyCover": false,
+    "catalogSlug": "el-corazon-de-la-bestia-2026-1080p-web-dl-latino-ingles"
   }
 ]
