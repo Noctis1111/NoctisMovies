@@ -1089,11 +1089,22 @@
                 <div class="form-group" style="margin-bottom:0;min-width:80px;">
                   <label>Año</label>
                   <input type="text" id="f-year-filter" placeholder="2024" maxlength="4" style="text-align:center;letter-spacing:2px;width:80px;"/>
-                  <label style="margin-top:0.55rem;">IMAX</label>
-                  <div class="chip-group" id="chips-imax">
-                    <button type="button" class="chip" data-value="IMAX">IMAX</button>
+                  <div style="display:flex;gap:1.4rem;align-items:flex-start;margin-top:0.55rem;">
+                    <div>
+                      <label>IMAX</label>
+                      <div class="chip-group" id="chips-imax">
+                        <button type="button" class="chip" data-value="IMAX">IMAX</button>
+                      </div>
+                      <input type="hidden" id="f-imax" value=""/>
+                    </div>
+                    <div>
+                      <label title="Mientras esté activo, este título queda anclado arriba en las listas del admin (públicos y privados). En el sitio no cambia nada. Al desactivarlo se re-sube: pasa a ser el más reciente.">ESTRENO</label>
+                      <div class="chip-group" id="chips-emision">
+                        <button type="button" class="chip" data-value="EMISIÓN" title="En emisión: anclado arriba en el admin hasta que lo desactives">EMISIÓN</button>
+                      </div>
+                      <input type="hidden" id="f-emision" value=""/>
+                    </div>
                   </div>
-                  <input type="hidden" id="f-imax" value=""/>
                 </div>
               </div>
 
@@ -1231,6 +1242,7 @@
                 <div id="poster-preview-wrap" style="display:none;position:relative;width:100%;aspect-ratio:1280/740;overflow:hidden;border-radius:10px;border:1px solid var(--border);">
                   <div id="poster-square-bg" class="poster-square-bg" style="display:none;"><div id="poster-square-bg-img" class="poster-square-bg-img"></div></div>
                   <img id="img-preview" src="" alt="Preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block;z-index:1;"/>
+                  <img id="peli-emision" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:1;"/>
                   <img id="peli-idioma" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:2;"/>
                   <img id="peli-fuente" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:3;"/>
                   <img id="peli-calidad" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:4;"/>
@@ -1750,6 +1762,7 @@ const PELI_FILE_FOR = {
     'apple-tv-plus':'tv+','vix':'vix','movies-anywhere':'movies anywhere',
   },
   imax: { 'imax':'imax' },
+  emision: { 'emision':'emision' },   // badges/emision/emision.png — capa entre la imagen de la URL y la portada principal
   musica: { 'mp3':'mp3', '16-bits':'16-bits', '24-bits':'24-bits', '16-24-bits':'16-24-bits', 'wav-32-bits':'wav-32-bits' },   // sistema viejo (se puede borrar cuando todo esté migrado)
   // Música, sistema nuevo — dos capas independientes:
   //   tasa    (portada principal, como "fuente"): badges/tasa/320-kbps.png, 16-bits.png, 24-bits.png, 32-bits.png, 16-24-bits.png
@@ -2909,7 +2922,7 @@ function initChips() {
         const isSource = hiddenInputId === 'f-source';
         const isStreaming = hiddenInputId === 'f-streaming';
         // Fuente, HDR y Streaming permiten des-seleccionar (clickear el chip activo lo apaga)
-        const isDeselectable = isSource || hiddenInputId === 'f-hdr' || hiddenInputId === 'f-imax' || hiddenInputId === 'f-musicformat' || isStreaming;
+        const isDeselectable = isSource || hiddenInputId === 'f-hdr' || hiddenInputId === 'f-imax' || hiddenInputId === 'f-emision' || hiddenInputId === 'f-musicformat' || isStreaming;
 
         // Desactivar todos en el grupo
         group.querySelectorAll('.chip').forEach(c => {
@@ -3152,6 +3165,7 @@ function getFormData() {
     source:        document.getElementById('f-source').value,
     hdr:           document.getElementById('f-hdr').value,
     imax:          document.getElementById('f-imax')?.value || '',
+    emision:       !!(document.getElementById('f-emision')?.value),   // en emisión: anclado arriba en las listas del admin
     streaming:     document.getElementById('f-streaming').value,
     yearFilter:    document.getElementById('f-year-filter').value.trim(),
     audio:         document.getElementById('f-audio').value,
@@ -3214,6 +3228,7 @@ function clearForm() {
   setActiveChip('chips-musicformat', '');
   setActiveChip('chips-hdr', '');
   setActiveChip('chips-imax', '');
+  setActiveChip('chips-emision', '');
   setActiveChip('chips-streaming', '');
   document.getElementById('f-quality').value = 'Full HD';
   document.getElementById('f-source').value = '';
@@ -3315,6 +3330,7 @@ function submitForm() {
   const targetList = toMusic ? music : movies;
   const existing = isEdit ? origList[editingIndex] : null;
   const sameStore = isEdit && ((editingStore === 'music') === toMusic);
+  let resubido = false;   // true cuando se desactiva EMISIÓN (ver más abajo)
 
   // Generar slug: conservar el existente si ya tiene uno (al editar)
   const _excluir = isEdit ? { store: editingStore === 'music' ? 'music' : 'movies', i: editingIndex } : null;
@@ -3326,8 +3342,13 @@ function submitForm() {
     // viejo importado sin este campo), se le asigna ahora.
     data.uploadDate = (existing && existing.uploadDate) || currentUploadDate();
     if (existing && existing.uploadTs) data.uploadTs = existing.uploadTs;
+    // EMISIÓN desactivada: se re-sube ahora, como si lo hubieras publicado en este momento
+    // (fecha y hora nuevas + vuelve al inicio de su catálogo). Desde ahí sigue el orden normal de subida.
+    resubido = !!(existing && existing.emision && !data.emision);
+    if (resubido) { data.uploadDate = currentUploadDate(); data.uploadTs = Date.now(); }
     if (sameStore) {
-      targetList[editingIndex] = data;
+      if (resubido) { targetList.splice(editingIndex, 1); targetList.unshift(data); }
+      else targetList[editingIndex] = data;
     } else {
       // Cambió el tipo (ej. de Película a Música pura): sale de un catálogo y entra al otro
       origList.splice(editingIndex, 1);
@@ -3399,7 +3420,8 @@ function submitForm() {
       legacyCover: !!data.legacyCover,
       catalogSlug: data.slug || '',
     };
-    if (idxPrivExistente >= 0) privList[idxPrivExistente] = entrada;
+    if (idxPrivExistente >= 0 && resubido) { privList.splice(idxPrivExistente, 1); privList.push(entrada); }   // re-subido: pasa a ser el último guardado
+    else if (idxPrivExistente >= 0) privList[idxPrivExistente] = entrada;
     else privList.push(entrada);
     savePrivado(privList);
     privadoGuardado = true;
@@ -3530,7 +3552,7 @@ function renderGoldenPosterPicks() {
     const idx = goldenMatchesData.indexOf(m);
     const peliBadges = m.legacyCover ? null : getPeliBadgeKeysFromMovie(m);
     const tieneMarco = !!(peliBadges && peliBadges.fuente);
-    const badgeLayersHtml = peliBadges ? ['idioma','fuente','calidad','hdr','streaming','imax'].map(cat => {
+    const badgeLayersHtml = peliBadges ? (m.emision ? `<img class="movie-item-badge-overlay" src="${peliBadgePath('emision','emision')}" alt="" onerror="this.style.display='none'"/>` : '') + ['idioma','fuente','calidad','hdr','streaming','imax'].map(cat => {
       const key = peliBadges[cat];
       if (!key) return '';
       const path = peliBadgePath(cat, key);
@@ -4165,6 +4187,8 @@ function updatePeliBadgePreview() {
   const _tf = document.getElementById('f-tasa')?.value || '', _ff = document.getElementById('f-musicformat')?.value || '';
   const tasaKey = (esMusica && !isLegacyCover) ? musicaTasaKeyFromList(_lista(_tf)) : null;
   const formatoKey = (esMusica && !isLegacyCover) ? (MUSICA_FORMATO_KEY[_ff] || null) : null;
+  // EMISIÓN: capa propia entre la imagen de la URL (abajo) y la portada principal (arriba); no se dibuja en portadas ya diseñadas
+  layers.emision = (!isLegacyCover && document.getElementById('f-emision')?.value) ? 'emision' : null;
   // El marco de "fuente" (películas/series) y el de "música" recortan la foto al mismo
   // hueco real del marco → misma clase has-frame para ambos casos.
   const anyFuente = !isLegacyCover && (!!layers.fuente || !!tasaKey);
@@ -4183,7 +4207,7 @@ function updatePeliBadgePreview() {
     if (showBg) sqBgImg.style.backgroundImage = `url("${imgPreview.src}")`;
   }
 
-  ['idioma','fuente','calidad','hdr','streaming','imax'].forEach(cat => {
+  ['emision','idioma','fuente','calidad','hdr','streaming','imax'].forEach(cat => {
     const el = document.getElementById('peli-' + cat);
     if (!el) return;
     const key = (esMusica || isLegacyCover) ? null : layers[cat];
@@ -4463,7 +4487,7 @@ function renderList(resetPage) {
   const empty = document.getElementById('list-empty');
   const paginationEl = document.getElementById('pagination');
   document.getElementById('count-badge').textContent = movies.length;
-  const filtered = movies.filter(m => {
+  let filtered = movies.filter(m => {
     const matchQ = !q || (m.title||'').toLowerCase().includes(q) || (m.year||'').includes(q);
     const itemTypes = (m.type||'').split('|').map(s=>s.trim());
     const matchType = !adminTypeFilter || itemTypes.includes(adminTypeFilter);
@@ -4475,6 +4499,10 @@ function renderList(resetPage) {
   if (sortMode === 'views_desc' || sortMode === 'views_asc') {
     const getViews = (m) => viewsCache[viewKeyFor(m, movies.indexOf(m))] ?? 0;
     filtered.sort((a, b) => sortMode === 'views_desc' ? getViews(b) - getViews(a) : getViews(a) - getViews(b));
+  } else {
+    // En "Orden de subida": los títulos en EMISIÓN quedan anclados arriba (solo en el admin; en el sitio se ordenan normal).
+    // Entre ellos y entre el resto se respeta el orden de subida de siempre.
+    filtered = filtered.filter(m => m.emision).concat(filtered.filter(m => !m.emision));
   }
 
   if (filtered.length === 0) { list.innerHTML = ''; empty.style.display = 'block'; paginationEl.style.display = 'none'; updateStats(); return; }
@@ -4497,7 +4525,8 @@ function renderList(resetPage) {
     const musicaCapas = isPureMusicCoverAdmin(m) ? musicaCapasFromMovieData(m) : null;
     const tieneMarco = !!(peliBadges && peliBadges.fuente) || !!(musicaCapas && musicaCapas.tasa);
     const _capa = (cat, key) => { if (!key) return ''; const path = peliBadgePath(cat, key); return path ? `<img class="movie-item-badge-overlay" src="${path}" alt="" onerror="this.style.display='none'"/>` : ''; };
-    const badgeLayersHtml = (peliBadges ? ['idioma','fuente','calidad','hdr','streaming','imax'].map(cat => _capa(cat, peliBadges[cat])).join('') : '')
+    const badgeLayersHtml = ((m.emision && (peliBadges || musicaCapas)) ? _capa('emision', 'emision') : '')   // EMISIÓN: la capa más baja (justo sobre la imagen)
+      + (peliBadges ? ['idioma','fuente','calidad','hdr','streaming','imax'].map(cat => _capa(cat, peliBadges[cat])).join('') : '')
       + (musicaCapas ? _capa('tasa', musicaCapas.tasa) + _capa('formato', musicaCapas.formato) : '');
     return `
     <div class="movie-item">
@@ -4510,7 +4539,7 @@ function renderList(resetPage) {
         <div class="movie-item-title">${m.title}</div>
         <div class="movie-item-meta">
           ${(m.type||'').includes('Música') ? `
-          ${musicaEtiquetaLista(m) ? `<span class="badge-source" style="color:#8ab4c9;border-color:#8ab4c9;">🎧 ${musicaEtiquetaLista(m)}</span>` : ''}
+          ${m.emision ? `<span class="badge-source" style="color:#ff7a7a;border-color:#ff7a7a;" title="En emisión: anclado arriba hasta que lo desactives">📡 EMISIÓN</span>` : ''}${musicaEtiquetaLista(m) ? `<span class="badge-source" style="color:#8ab4c9;border-color:#8ab4c9;">🎧 ${musicaEtiquetaLista(m)}</span>` : ''}
           <span class="badge-source" style="color:#1db954;border-color:#1db954;">🎵 ${m.type}</span>
           <span>${m.year||''}</span>
           ` : `
@@ -4609,6 +4638,7 @@ function editMovie(idx) {
   setActiveChip('chips-source', m.source||'');
   setActiveChip('chips-hdr', m.hdr||'');
   setActiveChip('chips-imax', m.imax||'');
+  setActiveChip('chips-emision', m.emision ? 'EMISIÓN' : '');
   setActiveChip('chips-streaming', m.streaming||'');
   const _mc = (m.type||'').includes('Música') ? musicaCamposFromItem(m) : { tasa: '', formato: '' };
   setActiveChips('chips-tasa', _lista(_mc.tasa));
@@ -5368,7 +5398,8 @@ function privadoPosterHtml(item, sizeClass) {
     const path = peliBadgePath(cat, key);
     return path ? `<img class="movie-item-badge-overlay" src="${path}" alt="" onerror="this.style.display='none'"/>` : '';
   };
-  const badgeLayersHtml = (badges ? ['idioma','fuente','calidad','hdr','streaming','imax'].map(cat => layer(cat, badges[cat])).join('') : '')
+  const badgeLayersHtml = ((_cm && _cm.emision && (badges || musicaCapas)) ? layer('emision', 'emision') : '')
+    + (badges ? ['idioma','fuente','calidad','hdr','streaming','imax'].map(cat => layer(cat, badges[cat])).join('') : '')
     + (musicaCapas ? layer('tasa', musicaCapas.tasa) + layer('formato', musicaCapas.formato) : '');
   const sqBg = esMusica ? posterSquareBgHtmlAdmin({ type: refType, legacyCover: legacy, image: item.imagen }, true) : '';
   const npFallback = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='108' height='62'%3E%3Crect fill='%23161b24' width='108' height='62'/%3E%3C/svg%3E`;
@@ -5409,7 +5440,11 @@ function renderPrivadoSavedList() {
 
   // Más reciente primero (lo último que guardaste arriba, lo más viejo al final) —
   // guardamos con push() así que invertimos solo para mostrar, sin tocar el array real.
-  const orden = lista.map((item, realIdx) => ({ item, realIdx })).reverse();
+  let orden = lista.map((item, realIdx) => ({ item, realIdx })).reverse();
+  // Los títulos en EMISIÓN (según su título público, por catalogSlug) van anclados arriba.
+  const _slugsEmision = new Set(getAllItems().filter(m => m.emision && m.slug).map(m => m.slug));
+  const _enEmision = it => !!(it.catalogSlug && _slugsEmision.has(it.catalogSlug));
+  orden = orden.filter(o => _enEmision(o.item)).concat(orden.filter(o => !_enEmision(o.item)));
 
   const totalPages = Math.max(1, Math.ceil(orden.length / NP_PAGE_SIZE));
   if (npPage > totalPages) npPage = totalPages;
@@ -5421,7 +5456,7 @@ function renderPrivadoSavedList() {
   wrap.innerHTML = pageItems.map(({ item, realIdx }) => `
     <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;border-bottom:1px solid var(--border);">
       ${privadoPosterHtml(item)}
-      <div style="flex:1;font-size:0.78rem;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.titulo}</div>
+      <div style="flex:1;font-size:0.78rem;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${_enEmision(item) ? '<span title="En emisión" style="color:#ff7a7a;">📡</span> ' : ''}${item.titulo}</div>
       <div style="font-size:0.68rem;color:var(--muted);flex-shrink:0;">${(item.enlaces||[]).length} enlace(s)</div>
       <button class="export-btn" style="width:auto;padding:0.25rem 0.5rem;margin:0;flex-shrink:0;" onclick="borrarPrivadoItem(${realIdx})">🗑</button>
     </div>
