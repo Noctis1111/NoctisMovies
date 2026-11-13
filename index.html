@@ -1159,6 +1159,7 @@ header::after {
     <nav>
       <a href="index.html" class="active">Catálogo</a>
       <a href="musica.html">Música</a>
+      <a href="index.html?filter=emision">Emisión</a>
       <div class="nav-search">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="search-input" placeholder="Buscar película o serie..." autocomplete="off"/>
@@ -1517,6 +1518,7 @@ const PELI_FILE_FOR = {
     'apple-tv-plus':'tv+','vix':'vix','movies-anywhere':'movies anywhere',
   },
   imax: { 'imax':'imax' },
+  emision: { 'emision':'emision' },   // badges/emision/emision.png — capa entre la imagen y la portada principal
   musica: { 'mp3':'mp3', '16-bits':'16-bits', '24-bits':'24-bits', '16-24-bits':'16-24-bits', 'wav-32-bits':'wav-32-bits' },   // sistema viejo
   tasa:    { '320-kbps':'320-kbps', '16-bits':'16-bits', '24-bits':'24-bits', '32-bits':'32-bits', '16-24-bits':'16-24-bits' },
   formato: { 'mp3':'mp3', 'mp4':'mp4', 'flac':'flac', 'alac':'alac', 'wav':'wav' },
@@ -1630,6 +1632,7 @@ function getPeliBadgeKeysFromMovie(m) {
     streaming: (m.streaming || streaming),
     // IMAX: si el título guardado tiene el campo, manda; si es un título viejo sin el campo, se detecta por el título
     imax: ((m.imax !== undefined) ? !!m.imax : /\bIMAX\b/i.test(m.title || '')) ? 'imax' : null,
+    emision: m.emision ? 'emision' : null,   // en emisión (solo películas/series)
     musica: null,
   };
 }
@@ -1649,7 +1652,7 @@ function badgeOverlayHtml(m, cssClass) {
   if (m && m.legacyCover) return '';
   const badges = getPeliBadgeKeysFromMovie(m);
   if (!badges) return '';
-  return ['idioma','fuente','calidad','hdr','streaming','imax','tasa','formato'].map(cat => {
+  return ['emision','idioma','fuente','calidad','hdr','streaming','imax','tasa','formato'].map(cat => {
     const key = badges[cat];
     if (!key) return '';
     const path = peliBadgePath(cat, key);
@@ -1666,6 +1669,8 @@ async function loadMovies() {
   // Leer parámetros URL
   const params = new URLSearchParams(window.location.search);
   const filterParam = params.get('filter');
+  // Barra superior: con ?filter=emision se marca "Emisión" en lugar de "Catálogo"
+  if (norm(filterParam || '') === 'emision') document.querySelectorAll('nav a').forEach(a => a.classList.toggle('active', (a.getAttribute('href') || '').includes('filter=emision')));
   const sourceParam = params.get('source');
   const yearParam   = params.get('year');
   const searchParam = params.get('search');
@@ -1769,7 +1774,9 @@ function renderGrid() {
       const sourceMatch = norm(m.source).includes(f);
       // IMAX: campo guardado, o (títulos viejos sin el campo) la palabra IMAX en el título
       const imaxMatch = f === 'imax' && ((m.imax !== undefined) ? !!m.imax : /\bIMAX\b/i.test(m.title || ''));
-      matchFilter = typeMatch || qualMatch || audioMatch || audioFormatMatch || tasaMatch || formatoMatch || sourceMatch || imaxMatch;
+      // EMISIÓN (solo películas/series): títulos que están en emisión
+      const emisionMatch = f === 'emision' && !!m.emision;
+      matchFilter = typeMatch || qualMatch || audioMatch || audioFormatMatch || tasaMatch || formatoMatch || sourceMatch || imaxMatch || emisionMatch;
     }
 
     // FILTRO FUENTE exacta (desde sidebar o URL ?source=)
