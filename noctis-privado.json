@@ -8926,5 +8926,32 @@
     "musicFormat": "",
     "legacyCover": false,
     "catalogSlug": "la-emperatriz-divorciada-2026-temporada-1-04-10-1080p-web-dl-latino"
+  },
+  {
+    "id": "el-amanecer-de-los-muertos-2004-open-matte-edicion-especial-bdrip-1080p-latino-ingles-mwe71uoj-5ih6sg",
+    "titulo": "El Amanecer de los Muertos (2004) [OPEN MATTE] edición-especial BDRip 1080p Latino-Inglés",
+    "imagen": "https://i.ibb.co/BKjHd4dr/2-FULL-HD.png",
+    "masInfo": "",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1qz7tZf13UngAs2VQRrnHsw"
+      }
+    ],
+    "fecha": "12 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=el-amanecer-de-los-muertos-2004-open-matte-bdrip-1080p-latino-ingles",
+    "descargado": false,
+    "originalTitle": "Dawn of the Dead",
+    "year": "2004",
+    "country": "United States, Canada, Japan, France",
+    "duration": "1 h 49 min",
+    "genre": "Terror, Acción, Suspenso",
+    "description": "Un inexplicable plague ha diezmado a la población mundial, convirtiendo a los muertos en crueles zombis que persiguen y devoran a los vivos. En Estados Unidos, un grupo reducido de supervivientes busca refugio en un centro comercial fortificado, donde deberán aprender a convivir mientras resisten el asedio constante de las hordas de muertos vivientes.",
+    "type": "Película",
+    "audioFormat": "",
+    "tasa": "",
+    "musicFormat": "",
+    "legacyCover": true,
+    "catalogSlug": "el-amanecer-de-los-muertos-2004-open-matte-bdrip-1080p-latino-ingles"
   }
 ]
