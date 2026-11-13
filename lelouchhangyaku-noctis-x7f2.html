@@ -2857,11 +2857,13 @@ function getPeliBadgeKeysFromMovie(m) {
   const hasPlus = /HDR\s*10\s*\+/.test(text);
   const hasDV = /\bDV\b|DOLBY\s*VISION/.test(text);
   const hasHdr10 = /HDR\s*10/.test(text);
+  // \"HDR\" a secas (ej. título con \"DV HDR\", sin el 10) cuenta como HDR10, igual que en admin.
+  const hasHdrSolo = /\bHDR\b(?!\s*10)(?!\+)/.test(text);
   let hdr = null;
   if (hasPlus && hasDV) hdr = 'hdr10-plus-dv';
   else if (hasPlus) hdr = 'hdr10-plus';
-  else if (hasHdr10 && hasDV) hdr = 'hdr10-dv';
-  else if (hasHdr10) hdr = 'hdr10';
+  else if ((hasHdr10 || hasHdrSolo) && hasDV) hdr = 'hdr10-dv';
+  else if (hasHdr10 || hasHdrSolo) hdr = 'hdr10';
   else if (/\bSDR\b/.test(text)) hdr = 'sdr';
   let streaming = null;
   if (/ITUNES/.test(text)) streaming = 'itunes';
@@ -4033,6 +4035,36 @@ function toggleEnlaces() {
 
 <script>
 /* ======================== Adaptador: item de Noctis Privado -> objeto "película" ======================== */
+// Fuente / encode de un título privado. Mismo criterio y MISMO ORDEN que admin.html: se decide solo
+// con el título + la línea "Calidad:" del Más Info — nunca con el resto del texto, porque ahí el
+// "Codec: x265 / HEVC" de un Blu-ray lo hacía pasar por X265 y no cargaba su portada de Blu-ray.
+// Blu-ray 3D manda sobre REMUX y sobre Blu-ray normal. TELESYNC se considera HDTS.
+function detectarFuentePrivado(tituloUp, masInfoUp) {
+  const calMatch = masInfoUp.match(/CALIDAD:\s*([^\n\r]+)/);
+  const combined = (calMatch ? calMatch[1] : '') + ' ' + tituloUp;
+  const rawUpTodo = tituloUp + ' ' + masInfoUp;
+  const es3DBluray =
+    /3D[\s\-]*BLU[\s\-]?RAY|BLU[\s\-]?RAY[\s\-]*3D|BLURAY3D/.test(combined) ||
+    (/(^|[^A-Z0-9])3D([^A-Z0-9]|$)/.test(tituloUp) && /BLU[\s\-]?RAY|REMUX/.test(combined)) ||
+    (/\bMVC\b|MULTIVIEW|FRAME[\s\-]?PACKED|\(3D\)/.test(rawUpTodo) && /BLU[\s\-]?RAY|REMUX|\bISO\b/.test(rawUpTodo));
+  if (combined.includes('X265') || combined.includes('X 265') || combined.includes('HEVC')) return 'X265';
+  if (es3DBluray) return 'BLU-RAY-3D';
+  if (combined.includes('REMUX')) return 'REMUX';
+  if (combined.includes('WEBDL') || combined.includes('WEB-DL') || combined.includes('WEB DL')) return 'WEB-DL';
+  if (combined.includes('WEBRIP') || combined.includes('WEB-RIP')) return 'WEB-RIP';
+  if (combined.includes('WEBSCR') || combined.includes('WEB-SCR') || combined.includes('WEB SCR')) return 'WEB-SCR';
+  if (combined.includes('BLURAY') || combined.includes('BLU-RAY') || combined.includes('BLU RAY')) return 'BLU-RAY';
+  if (combined.includes('PLACEBO')) return 'BLU-RAY';
+  if (combined.includes('BDRIP')) return 'BDRIP';
+  if (combined.includes('BRRIP')) return 'BRRIP';
+  if (combined.includes('HDTS') || combined.includes('TELESYNC')) return 'HDTS';
+  if (combined.includes('HDRIP')) return 'HDRIP';
+  if (combined.includes('DVDRIP')) return 'HDRIP';
+  if (/DCP/i.test(combined)) return 'DCP-RIP';
+  if (combined.includes('60FPS')) return '60FPS';
+  return '';
+}
+
 function privadoToMovie(item) {
   const tituloUp = (item.titulo || '').toUpperCase();
   const masInfoUp = (item.masInfo || '').toUpperCase();
@@ -4058,19 +4090,9 @@ function privadoToMovie(item) {
   else if (masInfoUp.includes('KOREAN') || masInfoUp.includes('COREANO')) audio = 'Koreano';
 
   const combined = tituloUp + ' ' + masInfoUp;
-  let source = '';
-  if (combined.includes('X265') || combined.includes('HEVC')) source = 'X265';
-  else if (combined.includes('REMUX')) source = 'REMUX';
-  else if (combined.includes('WEBSCR') || combined.includes('WEB-SCR')) source = 'WEB-SCR';
-  else if (combined.includes('WEBDL') || combined.includes('WEB-DL')) source = 'WEB-DL';
-  else if (combined.includes('WEBRIP') || combined.includes('WEB-RIP')) source = 'WEB-RIP';
-  else if (combined.includes('BLURAY') || combined.includes('BLU-RAY')) source = 'BLU-RAY';
-  else if (combined.includes('BDRIP')) source = 'BDRIP';
-  else if (combined.includes('BRRIP')) source = 'BRRIP';
-  else if (combined.includes('HDTS')) source = 'HDTS';
-  else if (combined.includes('HDRIP')) source = 'HDRIP';
-  else if (/DCP/i.test(combined)) source = 'DCP-RIP';
-  else if (combined.includes('60FPS')) source = '60FPS';
+  let source = detectarFuentePrivado(tituloUp, masInfoUp);
+  // Último recurso (como antes): si el título y la línea Calidad no dicen nada, mirar el Codec.
+  if (!source && (combined.includes('X265') || combined.includes('HEVC'))) source = 'X265';
 
   const esSerie = /temporada\s*\d+|\[\d+\s*\/\s*\d+\]|cap[íi]tulo/i.test(item.titulo || '');
 
