@@ -3417,6 +3417,8 @@ function submitForm() {
       audioFormat: data.audioFormat || '',
       tasa: data.tasa || '',
       musicFormat: data.musicFormat || '',
+      imax: data.imax || '',            // la página privada dibuja la cinta IMAX y filtra por IMAX
+      emision: !!data.emision,          // y la cinta/filtro EMISIÓN (en el admin además ancla arriba)
       legacyCover: !!data.legacyCover,
       catalogSlug: data.slug || '',
     };
@@ -5371,6 +5373,8 @@ function sincronizarPrivadoConCatalogo() {
     if ((m.type || '') !== (item.type || ''))                 { item.type = m.type || ''; cambios++; }
     if ((m.audioFormat || '') !== (item.audioFormat || ''))   { item.audioFormat = m.audioFormat || ''; cambios++; }
     if ((m.tasa || '') !== (item.tasa || ''))                 { item.tasa = m.tasa || ''; cambios++; }
+    if ((m.imax || '') !== (item.imax || ''))                 { item.imax = m.imax || ''; cambios++; }
+    if (!!m.emision !== !!item.emision)                       { item.emision = !!m.emision; cambios++; }
     if ((m.musicFormat || '') !== (item.musicFormat || ''))   { item.musicFormat = m.musicFormat || ''; cambios++; }
     if (!!m.legacyCover !== !!item.legacyCover)               { item.legacyCover = !!m.legacyCover; cambios++; }
     CAMPOS_FICHA.forEach(c => { if (m[c] && String(m[c]).trim() && item[c] !== m[c]) { item[c] = m[c]; cambios++; } });
