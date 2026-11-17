@@ -70,6 +70,14 @@
     0%, 100% { opacity: 0.3; }
     50% { opacity: 1; }
   }
+
+    /* Imagen de fondo DENTRO del marco: esquinas RECTAS (el marco ya trae su forma redondeada) */
+    .card-poster img.has-frame, .s2026-poster img.has-frame,
+    .card-poster .poster-square-bg.poster-square-bg-framed, .s2026-poster .poster-square-bg.poster-square-bg-framed { border-radius: 0 !important; }
+    /* Portada cuadrada de MÚSICA dentro del marco: un poco más pequeña y más abajo (ajusta SOLO estos dos números) */
+    :root { --music-cover-scale: 0.86; --music-cover-shift-y: 4%; }
+    .card-poster img.img-contain-music.has-frame,
+    .s2026-poster img.img-contain-music.has-frame { transform: translateY(var(--music-cover-shift-y)) scale(var(--music-cover-scale)) !important; transform-origin: center center !important; }
 </style>
 <script>
   (function() {
@@ -2542,6 +2550,21 @@ header::after {
   }
   .np-modal-close:hover { border-color: var(--gold); color: var(--gold); }
 </style>
+<style id="genre-style">
+  .genre-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 6px 10px; border-radius: 6px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-family: inherit; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; text-align: left; cursor: pointer; transition: all 0.2s; }
+  .genre-btn:hover, .genre-btn.active, .genre-btn[aria-expanded="true"] { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+  .genre-caret { font-size: 0.7rem; transition: transform 0.2s; }
+  .genre-btn[aria-expanded="true"] .genre-caret { transform: rotate(180deg); }
+  .genre-panel { margin-top: 0.5rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface2); overflow: hidden; }
+  .genre-panel[hidden] { display: none; }
+  #genre-search { width: 100%; box-sizing: border-box; padding: 7px 10px; background: transparent; border: 0; border-bottom: 1px solid var(--border); color: var(--white); outline: none; font-size: 0.78rem; font-family: inherit; }
+  #genre-search::placeholder { color: var(--muted); }
+  .genre-list { max-height: 240px; overflow-y: auto; padding: 0.25rem; scrollbar-width: thin; }
+  .genre-item { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; padding: 5px 8px; border-radius: 5px; color: var(--muted); font-size: 0.74rem; font-weight: 600; letter-spacing: 0.4px; text-decoration: none; transition: all 0.15s; }
+  .genre-item:hover, .genre-item.active { color: var(--gold); background: rgba(201,168,76,0.1); }
+  .genre-count { font-size: 0.65rem; opacity: 0.7; }
+  .genre-empty { padding: 0.7rem; color: var(--muted); font-size: 0.74rem; text-align: center; }
+</style>
 </head>
 <body>
 <div id="login-screen">
@@ -2586,6 +2609,7 @@ header::after {
     </a>
     <nav>
       <a href="index.html" class="active">Catálogo</a>
+      <a href="?filter=emision">Emisión</a>
       <div class="nav-search">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="search-input" placeholder="Buscar película o serie..." autocomplete="off"/>
@@ -2651,6 +2675,7 @@ header::after {
       <button class="filter-tab" data-filter="web-scr">WEB-SCR</button>
       <button class="filter-tab" data-filter="blu-ray">BLU-RAY</button>
       <button class="filter-tab tag-3d" data-filter="blu-ray-3d">BLU-RAY 3D</button>
+      <button class="filter-tab" data-filter="dvd">DVD</button>
       <button class="filter-tab" data-filter="hdrip">HDRip</button>
       <button class="filter-tab" data-filter="hdts">HDTS</button>
       <button class="filter-tab" data-filter="dcp-rip">DCP-RIP</button>
@@ -2683,6 +2708,16 @@ header::after {
         </div>
       </div>
     </div>
+    <div class="side-box genre-box"><svg class="sb-trace-svg"><rect class="sb-trace-rect" x="1" y="1" width="100%" height="100%" rx="11" ry="11"/></svg>
+      <div class="side-box-title">GÉNERO</div>
+      <div class="side-filter-group">
+        <button type="button" id="genre-btn" class="genre-btn" aria-haspopup="listbox" aria-expanded="false"><span id="genre-btn-label">Seleccionar género</span><span class="genre-caret">▾</span></button>
+        <div id="genre-panel" class="genre-panel" hidden>
+          <input type="text" id="genre-search" placeholder="Buscar género..." autocomplete="off"/>
+          <div id="genre-list" class="genre-list"></div>
+        </div>
+      </div>
+    </div>
     <div class="side-box">
       <div class="side-box-title">CALIDAD</div>
       <div class="side-filter-group">
@@ -2692,19 +2727,37 @@ header::after {
           <a class="side-tag" href="?filter=1080p">1080P</a>
           <a class="side-tag" href="?filter=720p">720P</a>
           <a class="side-tag" href="?filter=480p">480P</a>
-          <a class="side-tag" href="?filter=cam">CAM</a>
         </div>
       </div>
     </div>
     <div class="side-box">
-      <div class="side-box-title">🎧 FORMATO DE AUDIO</div>
+      <div class="side-box-title">IMAX</div>
+      <div class="side-filter-group">
+        <div class="side-tags">
+          <a class="side-tag" href="?filter=imax">IMAX</a>
+        </div>
+      </div>
+    </div>
+    <div class="side-box music-filter-box">
+      <div class="side-box-title">🎧 TASA DE BITS</div>
+      <div class="side-filter-group">
+        <div class="side-tags">
+          <a class="side-tag" href="?filter=320+kbps">320 KBPS</a>
+          <a class="side-tag" href="?filter=16+bits">16 BITS</a>
+          <a class="side-tag" href="?filter=24+bits">24 BITS</a>
+          <a class="side-tag" href="?filter=32+bits">32 BITS</a>
+        </div>
+      </div>
+    </div>
+    <div class="side-box music-filter-box">
+      <div class="side-box-title">🎼 FORMATO</div>
       <div class="side-filter-group">
         <div class="side-tags">
           <a class="side-tag" href="?filter=mp3">MP3</a>
-          <a class="side-tag" href="?filter=aac">AAC</a>
-          <a class="side-tag" href="?filter=lossless+16-bit">LOSSLESS 16-BIT</a>
-          <a class="side-tag" href="?filter=hi-res+24-bit">HI-RES 24-BIT</a>
-          <a class="side-tag" href="?filter=master+32-bit">MASTER 32-BIT</a>
+          <a class="side-tag" href="?filter=mp4">MP4</a>
+          <a class="side-tag" href="?filter=flac">FLAC</a>
+          <a class="side-tag" href="?filter=alac">ALAC</a>
+          <a class="side-tag" href="?filter=wav">WAV</a>
         </div>
       </div>
     </div>
@@ -2722,6 +2775,7 @@ header::after {
           <a class="side-tag" href="?source=WEB-SCR">WEB-SCR</a>
           <a class="side-tag" href="?source=BLU-RAY">BLU-RAY</a>
           <a class="side-tag tag-3d" href="?source=BLU-RAY-3D">BLU-RAY 3D</a>
+          <a class="side-tag" href="?source=DVD">DVD</a>
           <a class="side-tag" href="?source=HDRIP">HDRip</a>
           <a class="side-tag" href="?source=HDTS">HDTS</a>
           <a class="side-tag" href="?source=DCP-RIP">DCP-RIP</a>
@@ -2737,6 +2791,7 @@ header::after {
           <a class="side-tag" href="?filter=japonés">JAPONÉS</a>
           <a class="side-tag" href="?filter=koreano">KOREANO</a>
           <a class="side-tag" href="?filter=chino">CHINO</a>
+          <a class="side-tag" href="?filter=castellano">CASTELLANO</a>
         </div>
       </div>
     </div>
@@ -2800,6 +2855,111 @@ let activeSource = '';
 let activeYear = '';
 let searchQuery = '';
 
+// ── FILTRO POR GÉNERO: se arma solo con el campo "Género" de cada título ──
+// (Documental NO cuenta como género: ya tiene su propio filtro en TIPO)
+const GENRE_PAGE = location.pathname;   // esta misma página privada
+const GENRE_ALIASES = {
+  'sci-fi':'ciencia ficcion','scifi':'ciencia ficcion','sci fi':'ciencia ficcion',
+  'science fiction':'ciencia ficcion','ciencia-ficcion':'ciencia ficcion',
+  'action':'accion','adventure':'aventura','animation':'animacion','comedy':'comedia',
+  'crime':'crimen','fantasy':'fantasia','history':'historia','horror':'terror',
+  'mystery':'misterio','family':'familia','war':'belica','guerra':'belica','aventuras':'aventura'
+};
+const GENRE_EXCLUDE = ['documental', 'documentary'];
+let activeGenre = '';
+let GENRE_INDEX = [];
+
+function genreKey(g) {
+  const k = norm(g).replace(/\s+/g, ' ').trim();
+  return GENRE_ALIASES[k] || k;
+}
+function prettyGenre(s) {
+  s = String(s || '').trim();
+  // Si ya viene bien escrito ("II Guerra Mundial") se respeta; solo se arregla TODO MAYÚSCULAS o todo minúsculas
+  if (s !== s.toUpperCase() && s !== s.toLowerCase()) return s;
+  return s.toLowerCase().replace(/(^|[\s\-])(\S)/g, (m0, a, b) => a + b.toUpperCase());
+}
+function escGenre(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+// Géneros de un título (sin repetir y sin "Documental")
+function genresOf(m) {
+  const out = [];
+  String(m.genre || '').split(/[,;\/|]|\.(?=\s|$)|\s[–—-]\s/).forEach(raw => {
+    const t = raw.trim();
+    if (!t) return;
+    const k = genreKey(t);
+    if (!k || GENRE_EXCLUDE.includes(k)) return;
+    if (!out.some(o => o.key === k)) out.push({ key: k, label: t });
+  });
+  return out;
+}
+function genreLabel(key) {
+  const f = GENRE_INDEX.find(g => g.key === key);
+  return f ? f.label : prettyGenre(key);
+}
+
+function buildGenreUI() {
+  const btn   = document.getElementById('genre-btn');
+  const panel = document.getElementById('genre-panel');
+  const list  = document.getElementById('genre-list');
+  const input = document.getElementById('genre-search');
+  const lbl   = document.getElementById('genre-btn-label');
+  if (!btn || !panel || !list) return;
+
+  // Contar géneros reales del catálogo cargado
+  const map = {};
+  allMovies.forEach(m => genresOf(m).forEach(g => {
+    const e = map[g.key] || (map[g.key] = { key: g.key, count: 0, variants: {} });
+    e.count++;
+    e.variants[g.label] = (e.variants[g.label] || 0) + 1;
+  }));
+  GENRE_INDEX = Object.values(map).map(e => {
+    const v = Object.keys(e.variants);
+    const pref = v.find(x => norm(x).replace(/\s+/g, ' ').trim() === e.key)
+              || v.sort((a, b) => e.variants[b] - e.variants[a])[0];
+    return { key: e.key, count: e.count, label: prettyGenre(pref) };
+  }).sort((a, b) => a.label.localeCompare(b.label, 'es'));
+
+  if (lbl) lbl.textContent = activeGenre ? genreLabel(activeGenre) : 'Seleccionar género';
+  btn.classList.toggle('active', !!activeGenre);
+
+  function renderItems(q) {
+    const qn = norm(q || '').trim();
+    let html = '';
+    if (activeGenre) html += `<a class="genre-item genre-clear" href="${GENRE_PAGE}">✕ Quitar filtro de género</a>`;
+    const items = GENRE_INDEX.filter(g => !qn || norm(g.label).includes(qn));
+    if (!GENRE_INDEX.length) html += '<div class="genre-empty">Aún no hay géneros</div>';
+    else if (!items.length) html += '<div class="genre-empty">Sin resultados</div>';
+    html += items.map(g =>
+      `<a class="genre-item${g.key === activeGenre ? ' active' : ''}" href="${GENRE_PAGE}?genre=${encodeURIComponent(g.key)}">` +
+      `<span>${escGenre(g.label)}</span><span class="genre-count">${g.count}</span></a>`
+    ).join('');
+    list.innerHTML = html;
+  }
+  renderItems('');
+
+  function setOpen(open) {
+    panel.hidden = !open;
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open && input) { input.value = ''; renderItems(''); try { input.focus({ preventScroll: true }); } catch (e) {} }
+  }
+  btn.onclick = () => setOpen(panel.hidden);
+  if (input) input.oninput = () => renderItems(input.value);
+  if (!buildGenreUI._bound) {
+    buildGenreUI._bound = true;
+    document.addEventListener('click', e => {
+      const box = document.querySelector('.genre-box');
+      if (box && !box.contains(e.target)) { const p = document.getElementById('genre-panel'); if (p && !p.hidden) { p.hidden = true; const b = document.getElementById('genre-btn'); if (b) b.setAttribute('aria-expanded', 'false'); } }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { const p = document.getElementById('genre-panel'); if (p && !p.hidden) { p.hidden = true; const b = document.getElementById('genre-btn'); if (b) b.setAttribute('aria-expanded', 'false'); } }
+    });
+  }
+}
+
+
+
 // Normaliza texto para comparación sin acento, minúsculas
 function norm(str) {
   return (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
@@ -2810,9 +2970,9 @@ function norm(str) {
 const PELI_FILE_FOR = {
   fuente: {
     '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','blu-ray-3d':'blu-ray-3d','brrip':'brrip','dcp-rip':'dcp-rip',
-    'hdrip':'hdrip','hdts':'hdts','remux':'remux','web-dl':'web-dl','web-rip':'web-rip','web-scr':'web-scr','x265':'x265',
+    'hdrip':'hdrip','hdts':'hdts','remux':'remux','web-dl':'web-dl','web-rip':'web-rip','web-scr':'web-scr','x265':'x265','dvd':'dvd',
   },
-  idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino' },
+  idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino','castellano':'Castellano' },
   calidad: { '480p':'420p','720p':'720p','1080p':'1080p','full-hd':'full hd','4k':'4k' },
   hdr: { 'sdr':'SDR','hdr10':'HDR 10','hdr10-plus':'HDR 10+','hdr10-dv':'HDR 10 DV','hdr10-plus-dv':'HDR 10+ DV' },
   streaming: {
@@ -2821,7 +2981,11 @@ const PELI_FILE_FOR = {
     'paramount-plus':'paramount+','peacock':'peacock','prime-video':'primevideo','star-plus':'star+',
     'apple-tv-plus':'tv+','vix':'vix','movies-anywhere':'movies anywhere',
   },
-  musica: { 'mp3':'mp3', '16-bits':'16-bits', '24-bits':'24-bits', '16-24-bits':'16-24-bits', 'wav-32-bits':'wav-32-bits' },
+  musica: { 'mp3':'mp3', '16-bits':'16-bits', '24-bits':'24-bits', '16-24-bits':'16-24-bits', 'wav-32-bits':'wav-32-bits' },   // sistema viejo
+  imax: { 'imax':'imax' },
+  emision: { 'emision':'emision' },   // capa entre la imagen y la portada principal
+  tasa:    { '320-kbps':'320-kbps', '16-bits':'16-bits', '24-bits':'24-bits', '32-bits':'32-bits', '16-24-bits':'16-24-bits' },
+  formato: { 'mp3':'mp3', 'mp4':'mp4', 'flac':'flac', 'alac':'alac', 'wav':'wav' },
 };
 // index.html vive en la raíz del repo, igual que la carpeta badges/ -> sin subir nivel
 function peliBadgePath(cat, key) {
@@ -2830,29 +2994,71 @@ function peliBadgePath(cat, key) {
   return `badges/${cat}/${encodeURIComponent(file)}.png`;
 }
 
-// Formato(s) de audio activos (ej: "Lossless 16-bit, Hi-Res 24-bit") -> qué cinta de
-// badges/musica/ corresponde. Si hay 16-bit Y 24-bit a la vez, se usa la cinta combinada
-// "16-24-bits" en vez de superponer las dos por separado. (idéntico a admin.html)
-function musicaBadgeKeyFromFormats(activeList) {
-  const has = v => activeList.includes(v);
-  if (has('Master 32-bit')) return 'wav-32-bits';
-  if (has('Lossless 16-bit') && has('Hi-Res 24-bit')) return '16-24-bits';
-  if (has('Hi-Res 24-bit')) return '24-bits';
-  if (has('Lossless 16-bit')) return '16-bits';
-  if (has('MP3')) return 'mp3';
+// ───────── MÚSICA: Tasa de bits (portada principal) + Formato (encabezado) — idéntico a admin ─────────
+// Tasa de bits: 320 kbps (grupo "con pérdida": MP3/MP4 de cualquier tasa) | 16 bits | 24 bits | 32 bits.
+// Formato (uno): MP3 | MP4 (M4A/AAC) | FLAC | ALAC | WAV.  Cintas: badges/tasa/ y badges/formato/
+const MUSICA_FORMATO_KEY = { 'MP3':'mp3', 'MP4':'mp4', 'FLAC':'flac', 'ALAC':'alac', 'WAV':'wav' };
+const _lista = v => String(v || '').split(',').map(x => x.trim()).filter(Boolean);
+function musicaTasaKeyFromList(list) {
+  const has = v => list.includes(v);
+  if (has('32 bits')) return '32-bits';
+  if (has('16 bits') && has('24 bits')) return '16-24-bits';
+  if (has('24 bits')) return '24-bits';
+  if (has('16 bits')) return '16-bits';
+  if (has('320 kbps')) return '320-kbps';
   return null;
 }
+// Títulos guardados con el sistema viejo (campo audioFormat): se convierten al vuelo.
+function musicaLegacyTasa(m) {
+  const out = [];
+  _lista(m.audioFormat).forEach(f => {
+    const t = ({ 'MP3':'320 kbps', 'AAC':'320 kbps', 'Lossless 16-bit':'16 bits', 'Hi-Res 24-bit':'24 bits', 'Master 32-bit':'32 bits' })[f];
+    if (t && !out.includes(t)) out.push(t);
+  });
+  return out;
+}
+function musicaFormatoDeTexto(t) {
+  t = String(t || '').toUpperCase();
+  if (/\bALAC\b|APPLE\s*LOSSLESS/.test(t)) return 'ALAC';
+  if (/\bFLAC\b/.test(t)) return 'FLAC';
+  if (/\bWAV\b/.test(t)) return 'WAV';
+  if (/\bM4A\b|\bMP4\b|\bAAC\b/.test(t)) return 'MP4';
+  if (/\bMP3\b/.test(t)) return 'MP3';
+  return '';
+}
+function musicaLegacyFormato(m) {
+  const deTexto = musicaFormatoDeTexto((m.title || '') + ' ' + (m.quality || '') + ' ' + (m.masInfo || ''));
+  if (deTexto) return deTexto;
+  const f = _lista(m.audioFormat);
+  if (f.includes('MP3')) return 'MP3';
+  if (f.includes('AAC')) return 'MP4';
+  if (f.some(x => /Lossless|Hi-Res|Master/.test(x))) return 'FLAC';
+  return '';
+}
+// Campos de música de un título (nuevo o viejo): { tasa: "16 bits, 24 bits", formato: "FLAC" }
+function musicaCamposFromItem(m) {
+  return {
+    tasa: (m.tasa !== undefined && m.tasa !== null) ? String(m.tasa) : musicaLegacyTasa(m).join(', '),
+    formato: (m.musicFormat !== undefined && m.musicFormat !== null) ? (String(m.musicFormat) === 'M4A / MP4' ? 'MP4' : String(m.musicFormat)) : musicaLegacyFormato(m),
+  };
+}
+// Claves de archivo de las dos cintas: { tasa: '24-bits', formato: 'flac' }
+function musicaCapasFromMovieData(m) {
+  const c = musicaCamposFromItem(m);
+  return { tasa: musicaTasaKeyFromList(_lista(c.tasa)), formato: MUSICA_FORMATO_KEY[c.formato] || null };
+}
+
 
 function getPeliBadgeKeysFromMovie(m) {
   const isMusica = (m.type || '').includes('Música');
   if (isMusica) {
     return {
-      fuente: null, idioma: null, calidad: null, hdr: null, streaming: null,
-      musica: musicaBadgeKeyFromFormats((m.audioFormat||'').split(',').map(s=>s.trim()).filter(Boolean)),
+      fuente: null, idioma: null, calidad: null, hdr: null, streaming: null, imax: null, emision: null,
+      tasa: musicaCapasFromMovieData(m).tasa, formato: musicaCapasFromMovieData(m).formato,
     };
   }
   const map = { '4K':'4k', 'Full HD':'full-hd', '1080p':'1080p', '720p':'720p', '480p':'480p' };
-  const audioMap = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino' };
+  const audioMap = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino', 'Castellano':'castellano' };
   const text = ((m.title||'') + ' ' + (m.descargaRaw||'')).toUpperCase();
   const hasPlus = /HDR\s*10\s*\+/.test(text);
   const hasDV = /\bDV\b|DOLBY\s*VISION/.test(text);
@@ -2883,14 +3089,16 @@ function getPeliBadgeKeysFromMovie(m) {
   const fuenteKey = (m.source||'').toLowerCase() && PELI_FILE_FOR.fuente[(m.source||'').toLowerCase()] ? (m.source||'').toLowerCase() : null;
   // BLU-RAY / BLU-RAY 3D traen su logo impreso justo donde va la cinta de Calidad:
   // la Calidad queda ACTIVA (m.quality sigue guardado y el filtro la encuentra) pero su cinta no se dibuja.
-  const ocultaCalidad = (fuenteKey === 'blu-ray' || fuenteKey === 'blu-ray-3d');
+  const ocultaCalidad = (fuenteKey === 'blu-ray' || fuenteKey === 'blu-ray-3d' || fuenteKey === 'dvd');
   return {
     fuente: fuenteKey,
     idioma: audioMap[m.audio] || null,
     calidad: ocultaCalidad ? null : (map[m.quality] || null),
     hdr: (m.hdr || hdr),
     streaming: (m.streaming || streaming),
-    musica: null,
+    // IMAX: campo guardado, o (títulos viejos sin el campo) la palabra IMAX en el título
+    imax: ((m.imax !== undefined) ? !!m.imax : /\bIMAX\b/i.test(m.title || '')) ? 'imax' : null,
+    emision: m.emision ? 'emision' : null,   // en emisión (solo películas/series)
   };
 }
 
@@ -2901,7 +3109,7 @@ function getPeliBadgeKeysFromMovie(m) {
 function hasFrame(m) {
   if (m && m.legacyCover) return false;
   const badges = getPeliBadgeKeysFromMovie(m);
-  return !!(badges && (badges.fuente || badges.musica));
+  return !!(badges && (badges.fuente || badges.tasa));
 }
 
 // Arma el HTML de las cintas superpuestas para una portada, con la clase indicada
@@ -2909,7 +3117,7 @@ function badgeOverlayHtml(m, cssClass) {
   if (m && m.legacyCover) return '';
   const badges = getPeliBadgeKeysFromMovie(m);
   if (!badges) return '';
-  return ['idioma','fuente','calidad','hdr','streaming','musica'].map(cat => {
+  return ['emision','idioma','fuente','calidad','hdr','streaming','imax','tasa','formato'].map(cat => {
     const key = badges[cat];
     if (!key) return '';
     const path = peliBadgePath(cat, key);
@@ -2930,6 +3138,10 @@ async function loadMovies() {
   const sourceParam = params.get('source');
   const yearParam   = params.get('year');
   const searchParam = params.get('search');
+  const genreParam  = params.get('genre');
+  if (genreParam) activeGenre = genreKey(genreParam);
+  // Barra superior: con ?filter=emision se marca "Emisión" en lugar de "Catálogo"
+  if (norm(filterParam || '') === 'emision') document.querySelectorAll('nav a').forEach(a => a.classList.toggle('active', (a.getAttribute('href') || '').includes('filter=emision')));
 
   if (searchParam) {
     searchQuery = norm(searchParam.trim());
@@ -2966,13 +3178,14 @@ async function loadMovies() {
 
   // Generar años en sidebar
   buildYearSidebar();
+  buildGenreUI();
   renderGrid();
   build2026(allMovies);
 
   // Si llegamos con una búsqueda ya cargada en la URL (ej. desde detalle.html
   // al presionar Enter en el buscador), replicamos el mismo scroll automático
   // hacia los resultados que ocurre cuando se escribe directamente acá.
-  if (searchParam) {
+  if (searchParam || genreParam) {
     const tabsEl = document.querySelector('.filter-tabs');
     if (tabsEl) {
       setTimeout(() => tabsEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
@@ -3017,7 +3230,15 @@ function renderGrid() {
       const audioFormatMatch = norm(m.audioFormat).includes(f);
       // Fuente/encode: web-dl, remux, x265…
       const sourceMatch = norm(m.source).includes(f);
-      matchFilter = typeMatch || qualMatch || audioMatch || audioFormatMatch || sourceMatch;
+      // IMAX: campo guardado, o (entradas viejas sin el campo) la palabra IMAX en el título
+      const imaxMatch = f === 'imax' && ((m.imax !== undefined) ? !!m.imax : /\bIMAX\b/i.test(m.title || ''));
+      // Música (sistema nuevo): TASA DE BITS y FORMATO; las entradas viejas se convierten al vuelo
+      const _mus = (m.type || '').includes('Música') ? musicaCamposFromItem(m) : null;
+      const tasaMatch = !!_mus && _lista(_mus.tasa).some(t => norm(t) === f);
+      const formatoMatch = !!_mus && norm(_mus.formato) === f;
+      // EMISIÓN (solo películas/series)
+      const emisionMatch = f === 'emision' && !!m.emision;
+      matchFilter = typeMatch || qualMatch || audioMatch || audioFormatMatch || tasaMatch || formatoMatch || sourceMatch || imaxMatch || emisionMatch;
     }
 
     // FILTRO FUENTE exacta (desde sidebar o URL ?source=)
@@ -3037,11 +3258,13 @@ function renderGrid() {
       norm(m.title).includes(searchQuery) ||
       String(m.year || '').includes(searchQuery);
 
-    return matchFilter && matchSource && matchYear && matchSearch;
+    const matchGenre = !activeGenre || genresOf(m).some(g => g.key === activeGenre);
+    return matchFilter && matchSource && matchYear && matchSearch && matchGenre;
   });
 
   // Label dinámico
-  if (activeYear) label.textContent = `Año ${activeYear}`;
+  if (activeGenre) label.textContent = 'Género: ' + genreLabel(activeGenre);
+  else if (activeYear) label.textContent = `Año ${activeYear}`;
   else if (activeSource) label.textContent = activeSource;
   else if (activeFilter !== 'all') label.textContent = activeFilter.toUpperCase();
   else label.textContent = 'Últimos Aportes';
@@ -4059,7 +4282,7 @@ function detectarFuentePrivado(tituloUp, masInfoUp) {
   if (combined.includes('BRRIP')) return 'BRRIP';
   if (combined.includes('HDTS') || combined.includes('TELESYNC')) return 'HDTS';
   if (combined.includes('HDRIP')) return 'HDRIP';
-  if (combined.includes('DVDRIP')) return 'HDRIP';
+  if (/\bDVD/.test(combined)) return 'DVD';
   if (/DCP/i.test(combined)) return 'DCP-RIP';
   if (combined.includes('60FPS')) return '60FPS';
   return '';
@@ -4083,8 +4306,12 @@ function privadoToMovie(item) {
   else if (resDice720) quality = '720p';
   else if (resDice480) quality = '480p';
 
+  // Prioridad (igual que el admin): Latino explícito > Castellano > "Español" solo (= Latino) > Inglés > Japonés > Koreano
+  const audioLinea = (masInfoUp.match(/AUDIO:\s*([^\n\r]+)/) || [])[1] || '';
   let audio = '';
-  if (tituloUp.includes('LATINO')) audio = 'Latino';
+  if (tituloUp.includes('LATINO') || audioLinea.includes('LATINO')) audio = 'Latino';
+  else if (/CASTELLANO|ESPA[ÑN]A|SPAIN/.test(tituloUp + ' ' + audioLinea)) audio = 'Castellano';
+  else if (/ESPA[ÑN]OL/.test(audioLinea)) audio = 'Latino';
   else if (tituloUp.includes('INGLES') || tituloUp.includes('INGLÉS')) audio = 'Inglés';
   else if (masInfoUp.includes('JAPON')) audio = 'Japonés';
   else if (masInfoUp.includes('KOREAN') || masInfoUp.includes('COREANO')) audio = 'Koreano';
@@ -4120,7 +4347,8 @@ function privadoToMovie(item) {
 
   return {
     title: item.titulo, image: item.imagen, quality, audio, source,
-    hdr: '', streaming: '', descargaRaw: item.masInfo, type: tipoFinal, audioFormat,
+    hdr: '', streaming: '', descargaRaw: item.masInfo, masInfo: item.masInfo, type: tipoFinal, audioFormat,
+    imax: item.imax, emision: !!item.emision, tasa: item.tasa, musicFormat: item.musicFormat,
     legacyCover: !!item.legacyCover, slug: item.id, uploadDate: null,
     originalTitle: item.originalTitle || '', year: item.year || '', country: item.country || '',
     duration: item.duration || '', genre: item.genre || '', description: item.description || '',
