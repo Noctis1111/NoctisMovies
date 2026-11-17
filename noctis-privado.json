@@ -4898,7 +4898,8 @@
     "type": "Película",
     "audioFormat": "",
     "legacyCover": false,
-    "catalogSlug": "proyecto-fin-del-mundo-2026-imax-bdremux-1080p-latino-ingles"
+    "catalogSlug": "proyecto-fin-del-mundo-2026-imax-bdremux-1080p-latino-ingles",
+    "imax": "IMAX"
   },
   {
     "id": "proyecto-fin-del-mundo-2026-imax-bdrip-1080p-latino-ingles-mu8p9yz9-9wdk22",
@@ -4921,7 +4922,8 @@
     "genre": "Ciencia ficción, Aventura",
     "description": "El profesor de ciencias Ryland Grace despierta en una nave espacial a años luz de su hogar sin recordar quién es ni cómo llegó allí. A medida que recupera la memoria, comienza a descubrir su misión: resolver el enigma de la misteriosa sustancia que está causando la extinción del sol.",
     "catalogSlug": "proyecto-fin-del-mundo-2026-imax-bdremux-1080p-latino-ingles",
-    "type": "Película"
+    "type": "Película",
+    "imax": "IMAX"
   },
   {
     "id": "proyecto-fin-del-mundo-2026-imax-bdrip-x265-1080p-latino-ingles-mu8pa53h-627ojb",
@@ -4944,7 +4946,8 @@
     "genre": "Ciencia ficción, Aventura",
     "description": "El profesor de ciencias Ryland Grace despierta en una nave espacial a años luz de su hogar sin recordar quién es ni cómo llegó allí. A medida que recupera la memoria, comienza a descubrir su misión: resolver el enigma de la misteriosa sustancia que está causando la extinción del sol.",
     "catalogSlug": "proyecto-fin-del-mundo-2026-imax-bdremux-1080p-latino-ingles",
-    "type": "Película"
+    "type": "Película",
+    "imax": "IMAX"
   },
   {
     "id": "proyecto-fin-del-mundo-2026-imax-bdremux-1080p-latino-ingles-mu8paggn-1x48az",
@@ -4967,7 +4970,8 @@
     "genre": "Ciencia ficción, Aventura",
     "description": "El profesor de ciencias Ryland Grace despierta en una nave espacial a años luz de su hogar sin recordar quién es ni cómo llegó allí. A medida que recupera la memoria, comienza a descubrir su misión: resolver el enigma de la misteriosa sustancia que está causando la extinción del sol.",
     "catalogSlug": "proyecto-fin-del-mundo-2026-imax-bdremux-1080p-latino-ingles",
-    "type": "Película"
+    "type": "Película",
+    "imax": "IMAX"
   },
   {
     "id": "proyecto-fin-del-mundo-2026-imax-bdrip-4k-dv-hdr10-latino-ingles-mu8paqra-6snqnq",
@@ -4992,7 +4996,8 @@
     "type": "Película",
     "audioFormat": "",
     "legacyCover": false,
-    "catalogSlug": "proyecto-fin-del-mundo-2026-imax-bdrip-4k-dv-hdr10-latino-ingles"
+    "catalogSlug": "proyecto-fin-del-mundo-2026-imax-bdrip-4k-dv-hdr10-latino-ingles",
+    "imax": "IMAX"
   },
   {
     "id": "resident-evil-noche-cero-2026-telesync-1080p-multilenguaje-mu8pwnpe-ghp5g0",
@@ -6529,7 +6534,8 @@
     "type": "Película",
     "audioFormat": "",
     "legacyCover": false,
-    "catalogSlug": "spider-man-un-nuevo-dia-2026-imax-4k-uhd-hdr10-dual-latino-ingles"
+    "catalogSlug": "spider-man-un-nuevo-dia-2026-imax-4k-uhd-hdr10-dual-latino-ingles",
+    "imax": "IMAX"
   },
   {
     "id": "spider-man-un-nuevo-dia-2026-imax-4k-ligero-web-rip-2160p-hdr10-dual-latino-ingles-mvmr0mff-k2fonw",
@@ -6570,7 +6576,8 @@
     "type": "Película",
     "audioFormat": "",
     "legacyCover": false,
-    "catalogSlug": "spider-man-un-nuevo-dia-2026-imax-4k-ligero-web-rip-2160p-hdr10-dual-latino-ingles"
+    "catalogSlug": "spider-man-un-nuevo-dia-2026-imax-4k-ligero-web-rip-2160p-hdr10-dual-latino-ingles",
+    "imax": "IMAX"
   },
   {
     "id": "spider-man-un-nuevo-dia-2026-imax-webrip-1080p-hevc-10-bit-dual-latino-ingles-mvmr6j9b-g70pvy",
@@ -6595,7 +6602,8 @@
     "type": "Película",
     "audioFormat": "",
     "legacyCover": false,
-    "catalogSlug": "spider-man-un-nuevo-dia-2026-imax-webrip-1080p-hevc-10-bit-dual-latino-ingles"
+    "catalogSlug": "spider-man-un-nuevo-dia-2026-imax-webrip-1080p-hevc-10-bit-dual-latino-ingles",
+    "imax": "IMAX"
   },
   {
     "id": "spider-man-un-nuevo-dia-2026-imax-4k-uhd-web-dl-hdr10-dual-latino-ingles-mvmr9ng7-6r7i3d",
@@ -6620,7 +6628,8 @@
     "type": "Película",
     "audioFormat": "",
     "legacyCover": false,
-    "catalogSlug": "spider-man-un-nuevo-dia-2026-imax-4k-uhd-web-dl-hdr10-dual-latino-ingles"
+    "catalogSlug": "spider-man-un-nuevo-dia-2026-imax-4k-uhd-web-dl-hdr10-dual-latino-ingles",
+    "imax": "IMAX"
   },
   {
     "id": "hell-s-paradise-jigokuraku-2023-2026-temporada-1-2-25-25-web-dl-1080p-dual-latino-japones-ingles-mvplwpe2-d5g2ta",
@@ -8558,7 +8567,8 @@
     "tasa": "",
     "musicFormat": "",
     "legacyCover": false,
-    "catalogSlug": "la-odisea-2026-imax-bdremux-4k-hdr10-dual-latino-ingles"
+    "catalogSlug": "la-odisea-2026-imax-bdremux-4k-hdr10-dual-latino-ingles",
+    "imax": "IMAX"
   },
   {
     "id": "marilyn-manson-the-pale-emperor-2015-edicion-japonesa-flac-16-bit-mw9emj9a-sc2r20",
@@ -8925,7 +8935,8 @@
     "tasa": "",
     "musicFormat": "",
     "legacyCover": false,
-    "catalogSlug": "la-emperatriz-divorciada-2026-temporada-1-04-10-1080p-web-dl-latino"
+    "catalogSlug": "la-emperatriz-divorciada-2026-temporada-1-04-10-1080p-web-dl-latino",
+    "emision": true
   },
   {
     "id": "el-amanecer-de-los-muertos-2004-open-matte-edicion-especial-bdrip-1080p-latino-ingles-mwe71uoj-5ih6sg",
@@ -9018,6 +9029,7 @@
     "tasa": "",
     "musicFormat": "",
     "legacyCover": false,
-    "catalogSlug": "la-emperatriz-divorciada-temporada-1-06-10-1080p-web-dl-coreano-ingles"
+    "catalogSlug": "la-emperatriz-divorciada-temporada-1-06-10-1080p-web-dl-coreano-ingles",
+    "emision": true
   }
 ]
