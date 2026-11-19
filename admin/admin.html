@@ -2140,6 +2140,17 @@ function parseBloqueCompleto(raw, shorteners, multiserver) {
     } catch { return false; }
   }
 
+  // ── Orden fijo del bloque: los enlaces de descarga van DESPUÉS de la última línea técnica (Subtítulos).
+  // Una URL que aparece antes de ese punto (p. ej. el enlace de Spotify dentro de CONTENIDO → "Listado de canciones")
+  // es INFORMACIÓN del álbum, no una descarga: no debe cortar la lectura del MAS INFO técnico.
+  let finTecnicoIdx = -1;
+  lineas.forEach((l, i) => {
+    if (!l) return;
+    const c = l.indexOf(':'); if (c < 0) return;
+    const k = l.slice(0, c).toLowerCase().trim();
+    if (k.length <= 30 && camposDescarga.some(x => k === x || k.includes(x))) finTecnicoIdx = i;
+  });
+
   // ── Detectar índice de inicio de zona descarga y zona enlaces ──
   let idxDescarga = -1;
   let idxEnlaces  = -1;
@@ -2176,6 +2187,7 @@ function parseBloqueCompleto(raw, shorteners, multiserver) {
         screenshotsArr.push(l);
         continue;
       }
+      if (i < finTecnicoIdx) continue;   // URL dentro de MAS INFO/CONTENIDO (antes de Subtítulos): información, no descarga
       if (idxEnlaces < 0 && (camposOk || idxDescarga >= 0)) {
         // buscar línea de servidor antes (línea no-técnica inmediatamente anterior)
         let srv = i;
@@ -2195,7 +2207,8 @@ function parseBloqueCompleto(raw, shorteners, multiserver) {
       continue;
     }
     // línea de nombre de servidor (texto libre en zona de descarga, con siguiente línea URL)
-    if (idxDescarga >= 0 && i > idxDescarga && idxEnlaces < 0) {
+    // (solo después de la última línea técnica: antes de "Subtítulos:" una línea seguida de una URL —p. ej. "• Listado de canciones:"— es información)
+    if (idxDescarga >= 0 && i > idxDescarga && i > finTecnicoIdx && idxEnlaces < 0) {
       const next = lineas.slice(i + 1).find(x => x);
       if (next && /^https?:\/\//i.test(next)) { idxEnlaces = i; }
     }
