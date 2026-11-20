@@ -9197,10 +9197,10 @@
     "descargado": false,
     "originalTitle": "Apocalipsis Z: Nuevo mundo",
     "year": "2026",
-    "country": "N/A",
+    "country": "España",
     "duration": "01Hr 38mins",
-    "genre": "N/A",
-    "description": "Gira en torno a Apocalipsis Z: Nuevo mundo.",
+    "genre": "Acción, Aventura",
+    "description": "Gira en torno a las Islas Canarias como el último refugio de Europa tras el brote del virus TSJ, donde una misión viaja a Madrid en busca de suministros y Roberto se une al equipo con dudosas intenciones, enfrentándose a infectados, desconfianzas y lealtades divididas en un dilema moral por sobrevivir o arriesgarlo todo por lo que queda de humanidad.",
     "type": "Película",
     "audioFormat": "",
     "tasa": "",
@@ -9209,5 +9209,132 @@
     "emision": false,
     "legacyCover": false,
     "catalogSlug": "apocalipsis-z-nuevo-mundo-2026-web-dl-1080p-dual-castellano-ingles"
+  },
+  {
+    "id": "saint-seiya-the-lost-canvas-2009-2011-temporada-1-a-2-26-26-dual-latino-japones-mwoboqcq-ixlntg",
+    "titulo": "Saint Seiya: The Lost Canvas (2009-2011) Temporada 1 a 2 [26/26] Dual Latino-Japonés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/7WPbfcAmiR9ytwpcqiU4GJZzSZX.jpg",
+    "masInfo": "Audio: Español Latino, Japonés\nCalidad: N/A\nResolución: 2560 × 1440\nFormato: MKV\nTamaño: 1 GB Por Cap. (Total 30 GB)\nCodec: H264\nSubtítulos: Español",
+    "enlaces": [
+      {
+        "etiqueta": "Part-1",
+        "url": "https://www.mediafire.com/folder/rx8285rwzyt0a/LC+2009-2011+Color+V3+byxXTynchuXx+Pt1"
+      },
+      {
+        "etiqueta": "Part-2",
+        "url": "https://www.mediafire.com/folder/in7iyj9vc4z0x/LC+2009-2011+Color+V3+byxXTynchuXx+Pt2"
+      },
+      {
+        "etiqueta": "Part-3",
+        "url": "https://www.mediafire.com/folder/ybwqwge1bauq2/LC+2009-2011+Color+V3+byxXTynchuXx+Pt3"
+      },
+      {
+        "etiqueta": "Part-4",
+        "url": "https://www.mediafire.com/folder/9a36x4gtx2z17/LC+2009-2011+Color+V3+byxXTynchuXx+Pt4"
+      }
+    ],
+    "fecha": "19 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=saint-seiya-the-lost-canvas-2009-2011-temporada-1-a-2-26-26-dual-latino-japones",
+    "descargado": false,
+    "originalTitle": "SAINT SEIYA : THE LOST CANVAS (EL LIENZO PERDIDO)",
+    "year": "2009-2011",
+    "country": "Japón",
+    "duration": "± 26 min (por episodio)",
+    "genre": "Animación, Acción, Aventura, Fantasía",
+    "description": "Gira en torno a la batalla épica entre la diosa Athena y el Señor del Inframundo, Hades, que ocurre cada doscientos años en la Tierra; esta historia adapta el manga de Shiori Teshirogi durante la guerra santa del siglo XVIII, situándose como precuela años antes de los hechos de la serie original.",
+    "type": "Serie",
+    "audioFormat": "",
+    "tasa": "",
+    "musicFormat": "",
+    "imax": "",
+    "emision": false,
+    "legacyCover": false,
+    "catalogSlug": "saint-seiya-the-lost-canvas-2009-2011-temporada-1-a-2-26-26-dual-latino-japones"
+  },
+  {
+    "id": "hermanastras-2026-web-dl-1080p-dual-latino-ingles-mwp7z46p-5crfdg",
+    "titulo": "Hermanastras (2026) WEB-DL 1080p Dual Latino-Inglés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/kwXrOZX6NqqS7eUG6Fue5jhqId.jpg",
+    "masInfo": "Audio: Español Latino E-AC-3 Atmos 5.1, Inglés E-AC-3 Atmos 5.1\nCalidad: WEB-DL\nResolución: 1920 × 1080\nFormato: MKV\nTamaño: 4.70 GiB\nCodec: H264\nSubtítulos: Español Latino, Inglés",
+    "enlaces": [
+      {
+        "etiqueta": "mediafire",
+        "url": "https://www.mediafire.com/file/hvifqbqf0earirc/Steps.2026.1080p.NF.WEB-DL.DUAL.DDP5.1.Atmos.H.264.mkv/file"
+      }
+    ],
+    "fecha": "20 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=hermanastras-2026-web-dl-1080p-dual-latino-ingles",
+    "descargado": false,
+    "originalTitle": "Hermanastras",
+    "year": "2026",
+    "country": "US",
+    "duration": "1 h 46 min",
+    "genre": "Animación, Fantasía, Comedia, Familia y Aventura",
+    "description": "Gira en torno a la hermanastra Lilith, quien tras ser culpada de hacer travesuras mágicas en el Royal Ball y convertir a su hermana en una rana, debe trabajar con Cenicienta y un troll para salvar el reino y demostrar que los villanos también merecen un final feliz.",
+    "type": "Película",
+    "audioFormat": "",
+    "tasa": "",
+    "musicFormat": "",
+    "imax": "",
+    "emision": false,
+    "legacyCover": false,
+    "catalogSlug": "hermanastras-2026-web-dl-1080p-dual-latino-ingles"
+  },
+  {
+    "id": "el-camino-azul-2026-temporada-1-08-08-web-dl-1080p-latino-ingles-coreano-mwpac8l5-if0vhi",
+    "titulo": "El Camino Azul (2026) Temporada 1 [08/08] WEB-DL 1080p Latino-Inglés-Coreano",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/puDBxk7hmFf03mxJqN0b81hV1PH.jpg",
+    "masInfo": "Audio: Español Latino E-AC-3 5.1, Inglés E-AC-3 5.1, Coreano E-AC-3 Atmos 5.1\nCalidad: WEB-DL\nResolución: 1920 × 1080\nFormato: MKV\nTamaño: 3.36 GB X Capitulo\nCodec: H264\nSubtítulos: Español Latino, Inglés",
+    "enlaces": [
+      {
+        "etiqueta": "CAP 1",
+        "url": "https://www.mediafire.com/file/gnqzojpt2y9iu1c/The.Blue.Road.S01E011080p.NF.WEB-DL.H.264.mkv/file"
+      },
+      {
+        "etiqueta": "CAP 2",
+        "url": "https://www.mediafire.com/file/un3gcszz3r3yzn7/The.Blue.Road.S01E021080p.NF.WEB-DL.H.264.mkv/file"
+      },
+      {
+        "etiqueta": "CAP 3",
+        "url": "https://www.mediafire.com/file/f9lo4cb32ly36jh/The.Blue.Road.S01E031080p.NF.WEB-DL.H.264.mkv/file"
+      },
+      {
+        "etiqueta": "CAP 4",
+        "url": "https://www.mediafire.com/file/nfi5cj6ftmckrxd/The.Blue.Road.S01E041080p.NF.WEB-DL.H.264.mkv/file"
+      },
+      {
+        "etiqueta": "CAP 5",
+        "url": "https://www.mediafire.com/file/rwrrrjovdhaqkb4/The.Blue.Road.S01E051080p.NF.WEB-DL.H.264.mkv/file"
+      },
+      {
+        "etiqueta": "CAP 6",
+        "url": "https://www.mediafire.com/file/100oq2s6bqi3rhi/The.Blue.Road.S01E061080p.NF.WEB-DL.H.264.mkv/file"
+      },
+      {
+        "etiqueta": "CAP 7",
+        "url": "https://www.mediafire.com/file/gzx6yri9mhr5r26/The.Blue.Road.S01E071080p.NF.WEB-DL.H.264.mkv/file?action=check"
+      },
+      {
+        "etiqueta": "CAP 8",
+        "url": "https://www.mediafire.com/file/j9wzxqkp2erqwta/The.Blue.Road.S01E081080p.NF.WEB-DL.H.264.mkv/file"
+      }
+    ],
+    "fecha": "20 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=el-camino-azul-2026-temporada-1-08-08-web-dl-1080p-latino-ingles-coreano",
+    "descargado": false,
+    "originalTitle": "El Camino Azul",
+    "year": "2026",
+    "country": "N/A",
+    "duration": "± 49 min (por episodio)",
+    "genre": "N/A",
+    "description": "Dos detectives persiguen a un asesino dejando cuerpos mutilados y mensajes crípticos en Japón y Corea. Aparece texto coreano con víctimas de Tokio, japonés con víctimas coreanas, lo que lleva a una cacería internacional.",
+    "type": "Serie",
+    "audioFormat": "",
+    "tasa": "",
+    "musicFormat": "",
+    "imax": "",
+    "emision": false,
+    "legacyCover": false,
+    "catalogSlug": "el-camino-azul-2026-temporada-1-08-08-web-dl-1080p-latino-ingles-coreano"
   }
 ]
