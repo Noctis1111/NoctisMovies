@@ -2792,6 +2792,7 @@ header::after {
           <a class="side-tag" href="?filter=koreano">KOREANO</a>
           <a class="side-tag" href="?filter=chino">CHINO</a>
           <a class="side-tag" href="?filter=castellano">CASTELLANO</a>
+          <a class="side-tag" href="?filter=otros" title="Audio en otro idioma, con subtítulos en español">OTROS</a>
         </div>
       </div>
     </div>
@@ -2972,7 +2973,7 @@ const PELI_FILE_FOR = {
     '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','blu-ray-3d':'blu-ray-3d','brrip':'brrip','dcp-rip':'dcp-rip',
     'hdrip':'hdrip','hdts':'hdts','remux':'remux','web-dl':'web-dl','web-rip':'web-rip','web-scr':'web-scr','x265':'x265','dvd':'dvd',
   },
-  idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino','castellano':'Castellano' },
+  idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino','castellano':'Castellano','otros':'Otros' },
   calidad: { '480p':'420p','720p':'720p','1080p':'1080p','full-hd':'full hd','4k':'4k' },
   hdr: { 'sdr':'SDR','hdr10':'HDR 10','hdr10-plus':'HDR 10+','hdr10-dv':'HDR 10 DV','hdr10-plus-dv':'HDR 10+ DV' },
   streaming: {
@@ -3058,7 +3059,7 @@ function getPeliBadgeKeysFromMovie(m) {
     };
   }
   const map = { '4K':'4k', 'Full HD':'full-hd', '1080p':'1080p', '720p':'720p', '480p':'480p' };
-  const audioMap = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino', 'Castellano':'castellano' };
+  const audioMap = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino', 'Castellano':'castellano', 'Otros':'otros' };
   const text = ((m.title||'') + ' ' + (m.descargaRaw||'')).toUpperCase();
   const hasPlus = /HDR\s*10\s*\+/.test(text);
   const hasDV = /\bDV\b|DOLBY\s*VISION/.test(text);
@@ -4288,6 +4289,11 @@ function detectarFuentePrivado(tituloUp, masInfoUp) {
   return '';
 }
 
+// "Otros": audio en otro idioma (alemán, francés, hindi…) con subtítulos en español. Se marca solo si NO coincide ninguno de los 6 botones.
+const RE_IDIOMAS_OTROS = /ALEM[AÁ]N|GERMAN|DEUTSCH|FRANC[EÉ]S|FRENCH|ITALIANO|ITALIAN|PORTUGU[EÉ]S|PORTUGUESE|\bRUSO\b|RUSSIAN|HINDI|TAILAND|\bTHAI\b|TURCO|TURKISH|[AÁ]RABE|ARABIC|POLACO|POLISH|HOLAND[EÉ]S|DUTCH|SUECO|SWEDISH|NORUEGO|DAN[EÉ]S|FINLAND[EÉ]S|HEBREO|HEBREW|VIETNAMIT|INDONESI|CATAL[AÁ]N|TAMIL|TELUGU|GRIEGO|H[UÚ]NGARO|CHECO|RUMANO|UCRANIANO|PERSA|FILIPINO|TAGALOG|MALAYO|BENGAL[IÍ]|URDU/;
+const RE_SUBTITULADO  = /SUBTITULAD|\bVOSE\b|SUB[- ]?ESP/;
+function esIdiomaOtro(textoUp) { return RE_IDIOMAS_OTROS.test(textoUp || '') || RE_SUBTITULADO.test(textoUp || ''); }
+
 function privadoToMovie(item) {
   const tituloUp = (item.titulo || '').toUpperCase();
   const masInfoUp = (item.masInfo || '').toUpperCase();
@@ -4315,6 +4321,8 @@ function privadoToMovie(item) {
   else if (tituloUp.includes('INGLES') || tituloUp.includes('INGLÉS')) audio = 'Inglés';
   else if (masInfoUp.includes('JAPON')) audio = 'Japonés';
   else if (masInfoUp.includes('KOREAN') || masInfoUp.includes('COREANO')) audio = 'Koreano';
+  else if (/CHIN|MANDAR|CANTON/.test(audioLinea)) audio = 'Chino';
+  else if (esIdiomaOtro(audioLinea + ' ' + tituloUp)) audio = 'Otros';   // otro idioma, con subtítulos en español
 
   const combined = tituloUp + ' ' + masInfoUp;
   let source = detectarFuentePrivado(tituloUp, masInfoUp);
