@@ -997,6 +997,13 @@
     :root { --music-cover-scale: 0.86; --music-cover-shift-y: 4%; }
     #img-preview.img-contain-music.has-frame,
     .movie-item-poster.img-contain-music.has-frame { transform: translateY(var(--music-cover-shift-y)) scale(var(--music-cover-scale)) !important; transform-origin: center center !important; }
+
+    /* Fila FILTRADO a 1920×1080: con el botón "Otros" el grupo Audio mide 414 px (antes ~361) y empujaba al grupo HDR fuera de la
+       columna (se salía ~59 px). Se achican un poco los botones de Audio y de HDR para que todo quepa en una sola fila.
+       Ajusta SOLO estos tres valores si hace falta (letra y margen lateral de cada botón). */
+    :root { --audio-chip-font: 0.68rem; --audio-chip-padx: 0.35rem; --hdr-chip-padx: 0.42rem; }
+    html body #chips-audio .chip { font-size: var(--audio-chip-font) !important; padding-left: var(--audio-chip-padx) !important; padding-right: var(--audio-chip-padx) !important; }
+    html body #chips-hdr .chip { padding-left: var(--hdr-chip-padx) !important; padding-right: var(--hdr-chip-padx) !important; }
 </style>
 </head>
 <body>
@@ -1139,6 +1146,7 @@
                 <button type="button" class="chip" data-value="Koreano">Koreano</button>
                 <button type="button" class="chip" data-value="Chino">Chino</button>
                 <button type="button" class="chip" data-value="Castellano">Castellano</button>
+                <button type="button" class="chip" data-value="Otros" title="Audio en otro idioma con subtítulos en español">Otros</button>
               </div>
               <input type="hidden" id="f-audio" value="Latino"/>
               </div>
@@ -1484,6 +1492,7 @@
                   <button type="button" class="chip" data-value="Koreano" onclick="setGoldenAudioChip(this)">Koreano</button>
                   <button type="button" class="chip" data-value="Chino" onclick="setGoldenAudioChip(this)">Chino</button>
                   <button type="button" class="chip" data-value="Castellano" onclick="setGoldenAudioChip(this)">Castellano</button>
+                  <button type="button" class="chip" data-value="Otros" onclick="setGoldenAudioChip(this)">Otros</button>
                 </div>
                 <input type="hidden" id="golden-audio" value=""/>
               </div>
@@ -1752,7 +1761,7 @@ const PELI_FILE_FOR = {
     '60fps':'60fps','bdrip':'bdrip','blu-ray':'blu-ray','blu-ray-3d':'blu-ray-3d','dvd':'dvd','brrip':'brrip','dcp-rip':'dcp-rip',
     'hdrip':'hdrip','hdts':'hdts','remux':'remux','web-dl':'web-dl','web-rip':'web-rip','web-scr':'web-scr','x265':'x265',
   },
-  idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino','castellano':'Castellano' },
+  idioma: { 'latino':'Latino','ingles':'Inglés','japones':'Japonés','koreano':'Koreano','chino':'Chino','castellano':'Castellano','otros':'Otros' },
   calidad: { '480p':'420p','720p':'720p','1080p':'1080p','full-hd':'full hd','4k':'4k' },
   hdr: { 'sdr':'SDR','hdr10':'HDR 10','hdr10-plus':'HDR 10+','hdr10-dv':'HDR 10 DV','hdr10-plus-dv':'HDR 10+ DV' },
   streaming: {
@@ -1899,9 +1908,16 @@ function peliCalidadKey() {
 }
 function peliIdiomaKey() {
   const v = document.getElementById('f-audio')?.value || '';
-  const map = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino', 'Castellano':'castellano' };
+  const map = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino', 'Castellano':'castellano', 'Otros':'otros' };
   return map[v] || null;
 }
+// "Otros": el audio es de otro idioma (alemán, francés, hindi…) y lleva subtítulos en español. Se marca solo cuando
+// NO coincide ninguno de los 6 botones (Latino, Inglés, Japonés, Koreano, Chino, Castellano).
+// "Audio: MULTi" (sin idioma reconocible) se deja sin marcar, como antes.
+const RE_IDIOMAS_OTROS = /alem[aá]n|german|deutsch|franc[eé]s|french|italiano|italian|portugu[eé]s|portuguese|\bruso\b|russian|hindi|tailand|\bthai\b|turco|turkish|[aá]rabe|arabic|polaco|polish|holand[eé]s|dutch|sueco|swedish|noruego|dan[eé]s|finland[eé]s|hebreo|hebrew|vietnamit|indonesi|catal[aá]n|tamil|telugu|griego|h[uú]ngaro|checo|rumano|ucraniano|persa|filipino|tagalog|malayo|bengal[ií]|urdu/i;
+const RE_SUBTITULADO  = /subtitulad|\bvose\b|sub[- ]?esp/i;
+function esIdiomaOtro(texto) { return RE_IDIOMAS_OTROS.test(texto || '') || RE_SUBTITULADO.test(texto || ''); }
+
 // HDR y streaming no tienen chip propio: se detectan del texto ya escrito (titulo + datos + descarga)
 function peliDetectText() {
   return (
@@ -1944,7 +1960,7 @@ function peliStreamingKey() {
 function getPeliBadgeKeysFromMovie(m) {
   if ((m.type || '').includes('Música')) return null; // esto es solo para peliculas/series
   const map = { '4K':'4k', 'Full HD':'full-hd', '1080p':'1080p', '720p':'720p', '480p':'480p' };
-  const audioMap = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino', 'Castellano':'castellano' };
+  const audioMap = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino', 'Castellano':'castellano', 'Otros':'otros' };
   const text = ((m.title||'') + ' ' + (m.descargaRaw||'')).toUpperCase();
   const hasPlus = /HDR\s*10\s*\+/.test(text);
   const hasDV = /\bDV\b|DOLBY\s*VISION/.test(text);
@@ -2773,8 +2789,10 @@ function autoRellenarTodo() {
       setActiveChip('chips-audio','Japonés');
     else if (audLow.includes('korean')||audLow.includes('coreano')||audLow.includes('koreano'))
       setActiveChip('chips-audio','Koreano');
-    else if (audLow.includes('chino')||audLow.includes('chinese')||audLow.includes('mandarin'))
+    else if (audLow.includes('chino')||audLow.includes('chinese')||audLow.includes('mandarin')||audLow.includes('cantones')||audLow.includes('cantonese'))
       setActiveChip('chips-audio','Chino');
+    else if (esIdiomaOtro(audLow + ' ' + tituloUp))
+      setActiveChip('chips-audio','Otros');   // otro idioma, con subtítulos en español
     else
       // Sin ninguna pista de idioma (ej. "Audio: MULTi") → se deja SIN seleccionar, en vez de
       // quedar pegado en "Latino" (el valor por defecto al abrir el formulario).
@@ -3107,7 +3125,8 @@ function autoRellenarDescarga() {
     else if (aud.includes('ingles') || aud.includes('inglés') || aud.includes('english')) setActiveChip('chips-audio', 'Inglés');
     else if (aud.includes('japón') || aud.includes('japon') || aud.includes('japanese')) setActiveChip('chips-audio', 'Japonés');
     else if (aud.includes('korean') || aud.includes('coreano') || aud.includes('koreano')) setActiveChip('chips-audio', 'Koreano');
-    else if (aud.includes('chino') || aud.includes('chinese') || aud.includes('mandarin')) setActiveChip('chips-audio', 'Chino');
+    else if (aud.includes('chino') || aud.includes('chinese') || aud.includes('mandarin') || aud.includes('cantones') || aud.includes('cantonese')) setActiveChip('chips-audio', 'Chino');
+    else if (esIdiomaOtro(aud + ' ' + (document.getElementById('f-title')?.value || ''))) setActiveChip('chips-audio', 'Otros');
     else setActiveChip('chips-audio', '');
   }
 
@@ -3756,7 +3775,7 @@ function previewGoldenPosterUrl(url) {
 
 // ── 🎧 Audio de la sección Golden Quality — TOTALMENTE APARTE del chip Audio del
 // formulario "Agregar Película" de arriba. No lee ni escribe f-audio en ningún momento.
-const GOLDEN_AUDIO_KEY = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino', 'Castellano':'castellano' };
+const GOLDEN_AUDIO_KEY = { 'Latino':'latino', 'Inglés':'ingles', 'Japonés':'japones', 'Koreano':'koreano', 'Chino':'chino', 'Castellano':'castellano', 'Otros':'otros' };
 
 function setGoldenAudioChip(btn) {
   const group = document.getElementById('chips-golden-audio');
