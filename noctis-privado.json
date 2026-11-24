@@ -9594,6 +9594,10 @@
       {
         "etiqueta": "mediafire",
         "url": "https://www.mediafire.com/folder/e68dpp7m8gwjs"
+      },
+      {
+        "etiqueta": "terabox",
+        "url": "https://www.terabox.com/spanish/sharing/link?surl=lYPLG3XwsgJ1OQQZemguDQ"
       }
     ],
     "fecha": "24 Noviembre 2026",
@@ -9613,5 +9617,42 @@
     "emision": false,
     "legacyCover": false,
     "catalogSlug": "pobres-criaturas-2023-web-dl-1080p-latino-ingles"
+  },
+  {
+    "id": "pobres-criaturas-2023-web-dl-1080p-dual-latino-ingles-mwv0rag9-6353ma",
+    "titulo": "Pobres criaturas (2023) WEB-DL 1080p Dual Latino-Inglés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/jwHSZ6z8maZV3DU6PSX46TIw5yj.jpg",
+    "masInfo": "Audio: Español Latino DD 5.1, Inglés DD 5.1\nCalidad: WEB-DL\nResolución: 1790 × 1080\nFormato: MKV\nTamaño: 3.63 GB\nCodec: N/A\nSubtítulos: Español Latino (Forced + Full)",
+    "enlaces": [
+      {
+        "etiqueta": "teraboxapp",
+        "url": "https://teraboxapp.com/s/18N9KR8EuziabHwQ2Gsfp4w"
+      },
+      {
+        "etiqueta": "teraboxapp",
+        "url": "https://teraboxapp.com/s/17gLNBikn6qc6fbgSsPblaw"
+      },
+      {
+        "etiqueta": "Teraboxapp",
+        "url": "https://teraboxapp.com/s/1A-ScFhCclQ0M2CMAhZbh0Q"
+      }
+    ],
+    "fecha": "24 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=pobres-criaturas-2023-web-dl-1080p-dual-latino-ingles",
+    "descargado": false,
+    "originalTitle": "Poor Things",
+    "year": "2023",
+    "country": "N/A",
+    "duration": "2 h 21 min",
+    "genre": "N/A",
+    "description": "Gira en torno a... N/A",
+    "type": "Película",
+    "audioFormat": "",
+    "tasa": "",
+    "musicFormat": "",
+    "imax": "",
+    "emision": false,
+    "legacyCover": false,
+    "catalogSlug": "pobres-criaturas-2023-web-dl-1080p-dual-latino-ingles"
   }
 ]
