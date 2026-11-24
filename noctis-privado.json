@@ -9654,5 +9654,50 @@
     "emision": false,
     "legacyCover": false,
     "catalogSlug": "pobres-criaturas-2023-web-dl-1080p-dual-latino-ingles"
+  },
+  {
+    "id": "la-saga-crepusculo-2008-2012-coleccion-web-dl-1080p-dual-latino-ingles-mwv19k41-d50w5b",
+    "titulo": "La Saga Crepúsculo (2008-2012) Colección WEB-DL 1080p Dual Latino-Inglés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/pXTDC0zKpebX52fwIRb4DsXJTXm.jpg",
+    "masInfo": "• Tamaño total: 18.49 GB\nAudio: Español Latino 5.1, Inglés 5.1\nCalidad: WEB-DL\nResolución: 1920 × 1080\nFormato: MKV\nTamaño: 18.49 GB\nCodec: N/A\nSubtítulos: Español Latino, Inglés",
+    "enlaces": [
+      {
+        "etiqueta": "Crepúsculo (2008)",
+        "url": "https://www.mediafire.com/file/rdqcr3pg6qjj8t7/Crep%C3%BAsculo_1.zip/file"
+      },
+      {
+        "etiqueta": "Luna nueva (2009)",
+        "url": "https://www.mediafire.com/file/pom5djfyfgvexh6/CR3PUSCUL0_2_by_Cipper.zip/file"
+      },
+      {
+        "etiqueta": "Eclipse (2010)",
+        "url": "https://www.mediafire.com/file/qktdt69pm3aqbnu/CR3PUSCUL0_3_by_Cipper.zip/file"
+      },
+      {
+        "etiqueta": "Amanecer - Parte 1 (2011)",
+        "url": "https://www.mediafire.com/file/awe2urj5hu9l794/CR3PUSCUL0_4_by_Cipper.zip/file"
+      },
+      {
+        "etiqueta": "Amanecer - Parte 2 (2012)",
+        "url": "https://www.mediafire.com/file/lstdkpqtxx10evl/CR3PUSCUL0_5_by_Cipper.zip/file"
+      }
+    ],
+    "fecha": "24 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=la-saga-crepusculo-2008-2012-coleccion-web-dl-1080p-dual-latino-ingles",
+    "descargado": false,
+    "originalTitle": "The Twilight Saga",
+    "year": "2008-2012",
+    "country": "Estados Unidos",
+    "duration": "N/A",
+    "genre": "Fantástico, Romance, Terror, Vampiros",
+    "description": "Gira en torno a... la historia de Bella Swan y su relación con el vampiro Edward Cullen y el hombre lobo Jacob Black a lo largo de las cinco películas que conforman la saga cinematográfica basada en las novelas de Stephenie Meyer.",
+    "type": "Película",
+    "audioFormat": "",
+    "tasa": "",
+    "musicFormat": "",
+    "imax": "",
+    "emision": false,
+    "legacyCover": false,
+    "catalogSlug": "la-saga-crepusculo-2008-2012-coleccion-web-dl-1080p-dual-latino-ingles"
   }
 ]
