@@ -9584,5 +9584,34 @@
     "emision": false,
     "legacyCover": false,
     "catalogSlug": "la-odisea-2026-dvdremux-imax-1080p-hdr10-dual-latino-ingles"
+  },
+  {
+    "id": "pobres-criaturas-2023-web-dl-1080p-latino-ingles-mwv0e3b6-t2dxuh",
+    "titulo": "Pobres Criaturas (2023) WEB-DL 1080p Latino-Inglés",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/jwHSZ6z8maZV3DU6PSX46TIw5yj.jpg",
+    "masInfo": "Audio: Español Latino AC-3 5.1, Inglés E-AC-3 Atmos 5.1\nCalidad: WEB-DL\nResolución: 1790 × 1080\nFormato: MKV\nTamaño: 11,1 GiB\nCodec: H264\nSubtítulos: Español Latino, Inglés",
+    "enlaces": [
+      {
+        "etiqueta": "mediafire",
+        "url": "https://www.mediafire.com/folder/e68dpp7m8gwjs"
+      }
+    ],
+    "fecha": "24 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=pobres-criaturas-2023-web-dl-1080p-latino-ingles",
+    "descargado": false,
+    "originalTitle": "Poor Things",
+    "year": "2023",
+    "country": "N/A",
+    "duration": "2 h 21 min",
+    "genre": "Fantasía, Drama, Ciencia ficción",
+    "description": "Gira en torno a Bella Baxter, una joven revivida por el brillante y poco ortodoxo científico Dr. Godwin Baxter bajo cuya protección está ansiosa por aprender, hasta que hambrienta de la mundanidad que le falta se escapa con Duncan Wedderburn, un sofisticado y perverso abogado, en una aventura vertiginosa a través de los continentes donde, libre de los prejuicios de su época, se vuelve firme en su propósito de defender la igualdad y la liberación.",
+    "type": "Película",
+    "audioFormat": "",
+    "tasa": "",
+    "musicFormat": "",
+    "imax": "",
+    "emision": false,
+    "legacyCover": false,
+    "catalogSlug": "pobres-criaturas-2023-web-dl-1080p-latino-ingles"
   }
 ]
