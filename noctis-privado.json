@@ -9851,5 +9851,71 @@
     "emision": false,
     "legacyCover": false,
     "catalogSlug": "blade-runner-2099-2026-temporada-1-8-8-web-dl-1080p-latino-ingles"
+  },
+  {
+    "id": "la-emperatriz-divorciada-2026-temporada-1-08-10-web-dl-1080p-dual-latino-coreano-mwwp6emo-6brrgp",
+    "titulo": "La emperatriz divorciada (2026) Temporada 1 [08/10] WEB-DL 1080p Dual Latino-Coreano",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/cgLVWRtytMVXeqOMLu17HitKw3K.jpg",
+    "masInfo": "Audio: Español Latino E-AC-3 5.1, Coreano E-AC-3 5.1\nCalidad: WEB-DL\nResolución: 1920 × 1080\nFormato: Matroska\nTamaño: 1.2 GB a 1.5 GB Por Cap. (Total 10.9 GB)\nCodec: H265 | 10bit\nSubtítulos: Español Latino (Forzados), Español (Forzados), Español Latino, Español",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/1t6Pjh3H0Q8F8n5YAoqY4tg"
+      },
+      {
+        "etiqueta": "drive",
+        "url": "https://drive.google.com/drive/folders/1avv77g-pC4SldyG6aW13NddHxjZ2dQys?usp=sharing"
+      }
+    ],
+    "fecha": "25 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=la-emperatriz-divorciada-2026-temporada-1-08-10-web-dl-1080p-dual-latino-coreano",
+    "descargado": false,
+    "originalTitle": "재혼 황후 (The Remarried Empress)",
+    "year": "2026",
+    "country": "N/A",
+    "duration": "49 min (Episodio 1)",
+    "genre": "Histórico, Romance, Fantasía",
+    "description": "Gira en torno a... Navier, la emperatriz perfecta del Imperio Dongdae, quien decide divorciarse de su marido emperador tras enterarse de que él quiere convertir a su amante en emperatriz, optando por buscar convertirse en emperatriz en otro lugar.",
+    "type": "Serie",
+    "audioFormat": "",
+    "tasa": "",
+    "musicFormat": "",
+    "imax": "",
+    "emision": true,
+    "legacyCover": false,
+    "catalogSlug": "la-emperatriz-divorciada-2026-temporada-1-08-10-web-dl-1080p-dual-latino-coreano"
+  },
+  {
+    "id": "la-emperatriz-divorciada-2026-temporada-1-08-10-web-dl-4k-dovi-hdr10-multi-audio-mwwpbuqf-rrkmth",
+    "titulo": "La emperatriz divorciada (2026) Temporada 1 [08/10] WEB-DL 4K DoVi HDR10 Multi-Audio",
+    "imagen": "https://media.themoviedb.org/t/p/w500_and_h282_face/oipuCylR2GktRVsDcJq0Lz4AvMg.jpg",
+    "masInfo": "Audio: Español Latino E-AC-3 5.1, Español E-AC-3 5.1, Coreano E-AC-3 5.1, Inglés E-AC-3 5.1\nCalidad: WEB-DL\nResolución: 4K (3840 × 2160)\nFormato: N/A\nTamaño: 42.95 GB (Total 8 episodios)\nCodec: H265 | 10bit\nSubtítulos: Español (Forzados), Español",
+    "enlaces": [
+      {
+        "etiqueta": "1024terabox",
+        "url": "https://1024terabox.com/s/15uWdOvyHaBVzsGySIOyISw"
+      },
+      {
+        "etiqueta": "transfer",
+        "url": "https://transfer.it/t/fR1l2V4EmLoI"
+      }
+    ],
+    "fecha": "25 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=la-emperatriz-divorciada-2026-temporada-1-08-10-web-dl-4k-dovi-hdr10-multi-audio",
+    "descargado": false,
+    "originalTitle": "The Remarried Empress",
+    "year": "2026",
+    "country": "N/A",
+    "duration": "N/A",
+    "genre": "N/A",
+    "description": "Gira en torno a... Navier, la emperatriz del Imperio Oriental que gobierna junto al emperador Sovieshu y que, tras la petición de divorcio de él por enamorarse de una esclava fugitiva, acepta bajo la condición de casarse con el príncipe Heinrey del Reino Occidental.",
+    "type": "Serie",
+    "audioFormat": "",
+    "tasa": "",
+    "musicFormat": "",
+    "imax": "",
+    "emision": true,
+    "legacyCover": false,
+    "catalogSlug": "la-emperatriz-divorciada-2026-temporada-1-08-10-web-dl-4k-dovi-hdr10-multi-audio"
   }
 ]
