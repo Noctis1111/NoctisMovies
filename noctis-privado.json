@@ -9954,5 +9954,63 @@
     "emision": false,
     "legacyCover": false,
     "catalogSlug": "grand-theft-auto-vi-the-album-2026-album-flac-24-bits"
+  },
+  {
+    "id": "smooth-jazz-silent-hill-2-soundtrack-heavymachinegun-2026-album-flac-16-bits-44-1-khz-mwwu118m-91xydi",
+    "titulo": "Smooth Jazz Silent Hill 2 Soundtrack - Heavymachinegun (2026) Álbum FLAC 16 bits 44.1 kHz",
+    "imagen": "https://storage.ko-fi.com/cdn/useruploads/display/e53bae77-9392-4645-b688-a77e7fdfeb0f_cover.png",
+    "masInfo": "• Tamaño total: 396,5 MiB\nAudio: FLAC, 2 canales (estéreo), 16 bits, 44.1 kHz\nCalidad: FLAC 16-bit\nResolución: N/A (Álbum Musical)\nFormato: FLAC\nTamaño: 396,5 MiB\nCodec: FLAC (sin pérdidas)\nSubtítulos: N/A",
+    "enlaces": [
+      {
+        "etiqueta": "pixeldrain",
+        "url": "https://pixeldrain.com/u/TFnnWF9z"
+      }
+    ],
+    "fecha": "25 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=smooth-jazz-silent-hill-2-soundtrack-heavymachinegun-2026-album-flac-16-bits-441-khz&cat=musica",
+    "descargado": false,
+    "originalTitle": "Smooth Jazz Silent Hill 2 Soundtrack",
+    "year": "2026",
+    "country": "",
+    "duration": "N/A",
+    "genre": "Smooth jazz, Banda sonora tributo",
+    "description": "Gira en torno a... una reinterpretación en clave de smooth jazz de temas de la banda sonora de Silent Hill 2 a cargo de Heavymachinegun, presentada en archivos FLAC sin pérdidas a 16 bits y 44,1 kHz.",
+    "type": "Música",
+    "audioFormat": "Lossless 16-bit",
+    "tasa": "16 bits",
+    "musicFormat": "FLAC",
+    "imax": "",
+    "emision": false,
+    "legacyCover": false,
+    "catalogSlug": "smooth-jazz-silent-hill-2-soundtrack-heavymachinegun-2026-album-flac-16-bits-441-khz"
+  },
+  {
+    "id": "the-80-s-collection-volume-two-various-artists-1990-album-flac-16-bits-44-1-khz-mwwuawf9-h4gyhl",
+    "titulo": "The 80's Collection Volume Two - Various artists (1990) Álbum FLAC 16 bits 44.1 kHz",
+    "imagen": "https://i.discogs.com/l5ds39wWwLG5CM-BxOPKlH3kOCWWML_kEA0fsI-Dedo/rs:fit/g:sm/q:90/h:450/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTEyNzg3/MDI5LTE1NDE5NDAw/ODYtODU5Ni5qcGVn.jpeg",
+    "masInfo": "Audio: FLAC, 2 canales (estéreo), 16 bits, 44.1 kHz\nCalidad: FLAC 16-bit\nResolución: N/A (Álbum Musical)\nFormato: FLAC\nTamaño: 825,2 MiB\nCodec: FLAC (sin pérdidas)\nSubtítulos: N/A",
+    "enlaces": [
+      {
+        "etiqueta": "MediaFire",
+        "url": "https://www.mediafire.com/file/lvj91xvnnm1ogor/80c.7z/file"
+      }
+    ],
+    "fecha": "25 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=the-80s-collection-volume-two-various-artists-1990-album-flac-16-bits-441-khz&cat=musica",
+    "descargado": false,
+    "originalTitle": "The 80's Collection Volume Two [Disc 1 / Disc 2]",
+    "year": "1990",
+    "country": "",
+    "duration": "N/A",
+    "genre": "Pop",
+    "description": "Gira en torno a... una compilación de dos discos con clásicos del pop de los años 80 a cargo de varios artistas, codificada en archivos FLAC sin pérdidas a 16 bits y 44,1 kHz (32 pistas presentes en el reporte).",
+    "type": "Música",
+    "audioFormat": "Lossless 16-bit",
+    "tasa": "16 bits",
+    "musicFormat": "FLAC",
+    "imax": "",
+    "emision": false,
+    "legacyCover": false,
+    "catalogSlug": "the-80s-collection-volume-two-various-artists-1990-album-flac-16-bits-441-khz"
   }
 ]
