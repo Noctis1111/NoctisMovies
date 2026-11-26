@@ -9921,5 +9921,38 @@
     "emision": false,
     "legacyCover": false,
     "catalogSlug": "la-emperatriz-divorciada-temporada-1-06-10-1080p-web-dl-coreano-ingles"
+  },
+  {
+    "id": "grand-theft-auto-vi-the-album-2026-album-flac-24-bits-mwwtrkdw-gyvten",
+    "titulo": "Grand Theft Auto VI: The Album (2026) Álbum FLAC 24 bits",
+    "imagen": "https://is1-ssl.mzstatic.com/image/thumb/Video211/v4/7d/64/7e/7d647e78-cfa5-dd77-91c2-db3ecdffc20d/OBJECT_PROXY8a4943b4-92ea-4370-b105-d8ec9894d647_KEY_FRAME_OUTPUT_0_OBJECT_PROXY8a4943b4-92ea-4370-b105-d8ec9894d647.png/316x316bb.webp",
+    "masInfo": "Audio: FLAC, 2 canales (estéreo), 24 bits, 44.1 kHz / 48 kHz / 88.2 kHz / 96 kHz (variable)\nCalidad: FLAC 24-bit\nResolución: N/A (Álbum Musical)\nFormato: FLAC\nTamaño: 1.26 GB\nCodec: FLAC (sin pérdidas)\nSubtítulos: N/A",
+    "enlaces": [
+      {
+        "etiqueta": "transfer",
+        "url": "https://transfer.it/t/SwPPwEpWlAQb"
+      },
+      {
+        "etiqueta": "transfer ZIP FILE",
+        "url": "https://transfer.it/t/1Umy1nABERqK"
+      }
+    ],
+    "fecha": "25 Noviembre 2026",
+    "detalleUrl": "https://noctis1111.github.io/NoctisMovies/detalle.html?id=grand-theft-auto-vi-the-album-2026-album-flac-24-bits&cat=musica",
+    "descargado": false,
+    "originalTitle": "Grand Theft Auto VI: The Album",
+    "year": "2026",
+    "country": "",
+    "duration": "1 h 37 min",
+    "genre": "N/A",
+    "description": "Gira en torno a... una selección de 34 pistas vinculadas a las estaciones de radio de Grand Theft Auto VI, combinando artistas de distintos géneros y generaciones con archivos FLAC sin pérdidas a 24 bits.",
+    "type": "Música",
+    "audioFormat": "Hi-Res 24-bit",
+    "tasa": "24 bits",
+    "musicFormat": "FLAC",
+    "imax": "",
+    "emision": false,
+    "legacyCover": false,
+    "catalogSlug": "grand-theft-auto-vi-the-album-2026-album-flac-24-bits"
   }
 ]
