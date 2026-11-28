@@ -1172,6 +1172,7 @@
                 <button type="button" class="chip chip-audiofmt chip-colored" data-value="16 bits" style="--chip-c:#1a4fa0;border-color:#1a4fa0;color:#1a4fa0;"><span class="chip-aft-title">16 bits</span></button>
                 <button type="button" class="chip chip-audiofmt chip-colored" data-value="24 bits" style="--chip-c:#c9a84c;border-color:#c9a84c;color:#c9a84c;"><span class="chip-aft-title">24 bits</span></button>
                 <button type="button" class="chip chip-audiofmt chip-colored chip-master32" data-value="32 bits" style="--chip-c:#e8dba0;border-color:#e8dba0;color:#e8dba0;"><span class="chip-aft-title">32 bits</span></button>
+                <button type="button" class="chip chip-audiofmt chip-colored" data-value="DSD" title="DSD / SACD: 1 bit, 2.8 MHz o más" style="--chip-c:#e0605a;border-color:#e0605a;color:#e0605a;"><span class="chip-aft-title">DSD</span></button>
               </div>
               <input type="hidden" id="f-tasa" value=""/>
               </div>
@@ -1183,6 +1184,7 @@
                 <button type="button" class="chip chip-audiofmt chip-colored" data-value="FLAC" style="--chip-c:#1a4fa0;border-color:#1a4fa0;color:#1a4fa0;"><span class="chip-aft-title">FLAC</span></button>
                 <button type="button" class="chip chip-audiofmt chip-colored" data-value="ALAC" style="--chip-c:#8a5cd6;border-color:#8a5cd6;color:#8a5cd6;"><span class="chip-aft-title">ALAC</span></button>
                 <button type="button" class="chip chip-audiofmt chip-colored" data-value="WAV" style="--chip-c:#2fb59a;border-color:#2fb59a;color:#2fb59a;"><span class="chip-aft-title">WAV</span></button>
+                <button type="button" class="chip chip-audiofmt chip-colored" data-value="DSD" title="DSD / SACD (archivos DSF, DFF o ISO)" style="--chip-c:#e0605a;border-color:#e0605a;color:#e0605a;"><span class="chip-aft-title">DSD</span></button>
               </div>
               <input type="hidden" id="f-musicformat" value=""/>
               </div>
@@ -1776,8 +1778,8 @@ const PELI_FILE_FOR = {
   // Música, sistema nuevo — dos capas independientes:
   //   tasa    (portada principal, como "fuente"): badges/tasa/320-kbps.png, 16-bits.png, 24-bits.png, 32-bits.png, 16-24-bits.png
   //   formato (encabezado, como "calidad"):       badges/formato/mp3.png, mp4.png, flac.png, alac.png, wav.png
-  tasa:    { '320-kbps':'320-kbps', '16-bits':'16-bits', '24-bits':'24-bits', '32-bits':'32-bits', '16-24-bits':'16-24-bits' },
-  formato: { 'mp3':'mp3', 'mp4':'mp4', 'flac':'flac', 'alac':'alac', 'wav':'wav' },
+  tasa:    { '320-kbps':'320-kbps', '16-bits':'16-bits', '24-bits':'24-bits', '32-bits':'32-bits', '16-24-bits':'16-24-bits', 'dsd':'dsd' },
+  formato: { 'mp3':'mp3', 'mp4':'mp4', 'flac':'flac', 'alac':'alac', 'wav':'wav', 'dsd':'dsd' },
 };
 
 // Formato(s) de audio activos (ej: "Lossless 16-bit, Hi-Res 24-bit") -> qué cinta de
@@ -1803,10 +1805,11 @@ function musicaBadgeKey() {
 //   (el detalle exacto queda en la descripción).
 // Formato (uno solo): MP3 | MP4 (archivos M4A/MP4/AAC con pérdida) | FLAC | ALAC | WAV.
 // Ojo: un .m4a puede ser AAC (con pérdida → MP4) o ALAC (sin pérdida → ALAC); si el texto dice ALAC, manda ALAC.
-const MUSICA_FORMATO_KEY = { 'MP3':'mp3', 'MP4':'mp4', 'FLAC':'flac', 'ALAC':'alac', 'WAV':'wav' };
+const MUSICA_FORMATO_KEY = { 'MP3':'mp3', 'MP4':'mp4', 'FLAC':'flac', 'ALAC':'alac', 'WAV':'wav', 'DSD':'dsd' };
 const _lista = v => String(v || '').split(',').map(x => x.trim()).filter(Boolean);
 function musicaTasaKeyFromList(list) {
   const has = v => list.includes(v);
+  if (has('DSD')) return 'dsd';          // DSD (SACD): 1 bit, 2.8 / 5.6 / 11.2 MHz — nivel propio
   if (has('32 bits')) return '32-bits';
   if (has('16 bits') && has('24 bits')) return '16-24-bits';
   if (has('24 bits')) return '24-bits';
@@ -1825,6 +1828,7 @@ function musicaLegacyTasa(m) {
 }
 function musicaFormatoDeTexto(t) {
   t = String(t || '').toUpperCase();
+  if (/\bDSD\d*\b|\bDSF\b|\bDFF\b/.test(t)) return 'DSD';   // SACD rip / archivos DSF-DFF (no basta la palabra SACD: puede ser un FLAC)
   if (/\bALAC\b|APPLE\s*LOSSLESS/.test(t)) return 'ALAC';
   if (/\bFLAC\b/.test(t)) return 'FLAC';
   if (/\bWAV\b/.test(t)) return 'WAV';
@@ -1861,6 +1865,7 @@ function musicaAudioFormatLegacy(tasaStr, formato) {
     else if (t === '16 bits') out.push('Lossless 16-bit');
     else if (t === '24 bits') out.push('Hi-Res 24-bit');
     else if (t === '32 bits') out.push('Master 32-bit');
+    else if (t === 'DSD') out.push('Hi-Res 24-bit');   // compatibilidad con el campo viejo audioFormat
   });
   if (!out.length && formato === 'MP3') out.push('MP3');
   if (!out.length && formato === 'MP4') out.push('AAC');
@@ -2705,7 +2710,7 @@ function autoRellenarTodo() {
     /\b(HEVC|H\.?26[45]|X26[45]|AVC|BLU-?RAY|BLURAY|REMUX|WEB-?DL|WEB-?RIP|WEB-?SCR|BDRIP|BRRIP|HDRIP|DVDRIP|UHD|2160P|1080P|720P|HDR10\+?|FPS)\b/.test(rawUp) ||
     /BITRATE\s+DE\s+VIDEO/.test(rawUp) ||
     /\b(MKV|MP4|AVI)\b/.test(formatoUp);
-  const isMusicFormat = !hayVideoSignals && /\.MP3\b|\.FLAC\b|\.WAV\b|\.M4A\b|\bMP3\b|\bFLAC\b|\bWAV\b|\bAAC\b|\bALAC\b/.test(musicaUp);
+  const isMusicFormat = !hayVideoSignals && /\.MP3\b|\.FLAC\b|\.WAV\b|\.M4A\b|\bMP3\b|\bFLAC\b|\bWAV\b|\bAAC\b|\bALAC\b|\bDSD\d*\b|\bDSF\b|\bSACD\b/.test(musicaUp);
 
   // CALIDAD — revisa resolución, calidad, y título
   const resUp = (p.resolucion2 || '').toUpperCase();
@@ -2739,7 +2744,9 @@ function autoRellenarTodo() {
     const dice32 = /32[\s\-]?BITS?/.test(tituloUp + ' ' + calUp);
     const conPerdida = formatoDet === 'MP3' || formatoDet === 'MP4' || (!formatoDet && /\b\d{2,3}\s*KBPS\b/.test(musicaUp));
     const tasasDet = [];
-    if (conPerdida) {
+    if (formatoDet === 'DSD') {
+      tasasDet.push('DSD');                 // DSD tiene su propio botón de Tasa de bits (no usa 16/24/32 bits)
+    } else if (conPerdida) {
       tasasDet.push('320 kbps');            // cualquier tasa con pérdida (320, 256, 192, 128…) usa este botón
     } else {
       if (dice16Texto || (dice16Pista && !dice24Texto && !dice24Pista && !dice32) || (formatoDet && !dice16Pista && !dice24Texto && !dice24Pista && !dice32)) tasasDet.push('16 bits');
