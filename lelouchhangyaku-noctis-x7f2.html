@@ -2746,6 +2746,7 @@ header::after {
           <a class="side-tag" href="?filter=16+bits">16 BITS</a>
           <a class="side-tag" href="?filter=24+bits">24 BITS</a>
           <a class="side-tag" href="?filter=32+bits">32 BITS</a>
+          <a class="side-tag" href="?filter=dsd" title="DSD / SACD">DSD</a>
         </div>
       </div>
     </div>
@@ -2758,6 +2759,7 @@ header::after {
           <a class="side-tag" href="?filter=flac">FLAC</a>
           <a class="side-tag" href="?filter=alac">ALAC</a>
           <a class="side-tag" href="?filter=wav">WAV</a>
+          <a class="side-tag" href="?filter=dsd" title="DSD / SACD">DSD</a>
         </div>
       </div>
     </div>
@@ -2985,8 +2987,8 @@ const PELI_FILE_FOR = {
   musica: { 'mp3':'mp3', '16-bits':'16-bits', '24-bits':'24-bits', '16-24-bits':'16-24-bits', 'wav-32-bits':'wav-32-bits' },   // sistema viejo
   imax: { 'imax':'imax' },
   emision: { 'emision':'emision' },   // capa entre la imagen y la portada principal
-  tasa:    { '320-kbps':'320-kbps', '16-bits':'16-bits', '24-bits':'24-bits', '32-bits':'32-bits', '16-24-bits':'16-24-bits' },
-  formato: { 'mp3':'mp3', 'mp4':'mp4', 'flac':'flac', 'alac':'alac', 'wav':'wav' },
+  tasa:    { '320-kbps':'320-kbps', '16-bits':'16-bits', '24-bits':'24-bits', '32-bits':'32-bits', '16-24-bits':'16-24-bits', 'dsd':'dsd' },
+  formato: { 'mp3':'mp3', 'mp4':'mp4', 'flac':'flac', 'alac':'alac', 'wav':'wav', 'dsd':'dsd' },
 };
 // index.html vive en la raíz del repo, igual que la carpeta badges/ -> sin subir nivel
 function peliBadgePath(cat, key) {
@@ -2998,10 +3000,11 @@ function peliBadgePath(cat, key) {
 // ───────── MÚSICA: Tasa de bits (portada principal) + Formato (encabezado) — idéntico a admin ─────────
 // Tasa de bits: 320 kbps (grupo "con pérdida": MP3/MP4 de cualquier tasa) | 16 bits | 24 bits | 32 bits.
 // Formato (uno): MP3 | MP4 (M4A/AAC) | FLAC | ALAC | WAV.  Cintas: badges/tasa/ y badges/formato/
-const MUSICA_FORMATO_KEY = { 'MP3':'mp3', 'MP4':'mp4', 'FLAC':'flac', 'ALAC':'alac', 'WAV':'wav' };
+const MUSICA_FORMATO_KEY = { 'MP3':'mp3', 'MP4':'mp4', 'FLAC':'flac', 'ALAC':'alac', 'WAV':'wav', 'DSD':'dsd' };
 const _lista = v => String(v || '').split(',').map(x => x.trim()).filter(Boolean);
 function musicaTasaKeyFromList(list) {
   const has = v => list.includes(v);
+  if (has('DSD')) return 'dsd';          // DSD (SACD): 1 bit, 2.8 / 5.6 / 11.2 MHz — nivel propio
   if (has('32 bits')) return '32-bits';
   if (has('16 bits') && has('24 bits')) return '16-24-bits';
   if (has('24 bits')) return '24-bits';
@@ -3020,6 +3023,7 @@ function musicaLegacyTasa(m) {
 }
 function musicaFormatoDeTexto(t) {
   t = String(t || '').toUpperCase();
+  if (/\bDSD\d*\b|\bDSF\b|\bDFF\b/.test(t)) return 'DSD';   // SACD rip / archivos DSF-DFF (no basta la palabra SACD: puede ser un FLAC)
   if (/\bALAC\b|APPLE\s*LOSSLESS/.test(t)) return 'ALAC';
   if (/\bFLAC\b/.test(t)) return 'FLAC';
   if (/\bWAV\b/.test(t)) return 'WAV';
